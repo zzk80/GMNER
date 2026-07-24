@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "kind": "null_release_full_chain_fold_pipeline",
+  "fold_id": 1,
+  "num_folds": 10,
+  "fold_manifest": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+  "fold_manifest_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+  "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+  "train_record_ids_sha256": "6575095714c27ae5ea89fd277125a6b6bbfab0e78cf27f7442eb7f07856e715b",
+  "heldout_record_ids_sha256": "6d2d51fdb412a122ae1c76bd91d0f1d2aedb6367d79e1250f5050b72557f1c8c",
+  "test_accessed": false,
+  "sealed": false,
+  "stages": {
+    "stage1": {
+      "status": "failed",
+      "command_sha256": "318316e96e600980383614c3d450f658047aa2409b453fd55d859b36b1eaf7ee",
+      "test_accessed": false
+    }
+  }
+}

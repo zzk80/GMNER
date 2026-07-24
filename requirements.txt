@@ -1,0 +1,33 @@
+# Core deep learning stack
+torch==2.2.0
+torchvision==0.17.0
+torchaudio==2.2.0
+
+# Transformers and data
+transformers==4.39.0
+datasets==2.18.0
+sentencepiece==0.2.0
+accelerate==0.28.0
+
+# Utilities
+numpy==1.26.4
+PyYAML==6.0.1
+Pillow==10.3.0
+tqdm==4.66.2
+
+# Graph and sequence labeling
+torch-geometric==2.5.0
+dgl==2.1.0
+pytorch-crf==0.7.2
+torchdata==0.7.1
+
+# Optional dependency parsing backend
+spacy==3.7.4
+stanza==1.8.2
+
+# Optional training framework (for future extension)
+pytorch-lightning==2.2.0
+
+# Optional detector / visual grounding toolchain
+yolov5==7.0.0
+opencv-python==4.9.0.80

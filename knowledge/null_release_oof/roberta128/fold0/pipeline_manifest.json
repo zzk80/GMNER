@@ -1,0 +1,340 @@
+{
+  "format_version": 1,
+  "kind": "null_release_full_chain_fold_pipeline",
+  "fold_id": 0,
+  "num_folds": 10,
+  "fold_manifest": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+  "fold_manifest_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+  "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+  "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+  "heldout_record_ids_sha256": "b4f02911a85ddb40cd1d228ed124404f39941a61a4baf9b28f3894eb8bad3115",
+  "test_accessed": false,
+  "sealed": true,
+  "stages": {
+    "stage1": {
+      "status": "complete",
+      "command_sha256": "ea3c92a63c13df0150c3dade2727c0f9302f9acbe5cd75bfcb5d8c0802e7d2ba",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/stage1/best_model.pt",
+          "sha256": "8385e925240c1e1cd6cc38da14ce77356806148d852d63851516d07e9ee894e0"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold0.jsonl",
+          "sha256": "c4e9f9842c87a4487764f9b2e2a142b4251f06623f562b7fbffa78b88ec421ea"
+        },
+        {
+          "path": "/home/zzk/gmner/GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt",
+          "sha256": "3ff31ebca3c858926ec6c98694820fda39c0f9718645174c00069ee5bcffab69"
+        }
+      ],
+      "heldout_excluded": true,
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "config": {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/configs/stage1.yaml",
+        "sha256": "0862362e4805ee2579964b4bb159f0a5f5ce8a5e2020ee0d5bfa719ee9480d7c"
+      },
+      "checkpoint": {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/stage1/best_model.pt",
+        "sha256": "8385e925240c1e1cd6cc38da14ce77356806148d852d63851516d07e9ee894e0"
+      }
+    },
+    "candidate_caches": {
+      "status": "complete",
+      "command_sha256": "5068a24b0c26722f5cfb06383aa7c26c96d8bf7273ff30357a46d1d36f858ff0",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r16.pt",
+          "sha256": "994a3e79a7b274a289a636698a8d1349acbfec653f85da63c36c80c9bd31461b"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r36.pt",
+          "sha256": "382cc27e0b24ce9f422c72457cfa187bbf8f2eba63114cef23e70c057df52059"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/dev_r16.pt",
+          "sha256": "1a897bfee1af4f6b82b4844f5d1a4aeae12be7f28ec68a420e605f7f5c6f4b37"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/dev_r36.pt",
+          "sha256": "003dd31b510d14204d01cdbdeae5fd42f488ec7f0cfa692e007db6cb5525ccee"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/heldout_r16.pt",
+          "sha256": "b3ee511598112d084a014ace55b4dcd408fb67688a3ffabb0bfea5705acb0d91"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/heldout_r36.pt",
+          "sha256": "6ac622170e98db635bb2a6c52b504293e78b810f2ff2cf773370db8ed348a59f"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/stage1/best_model.pt",
+          "sha256": "8385e925240c1e1cd6cc38da14ce77356806148d852d63851516d07e9ee894e0"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold0.jsonl",
+          "sha256": "c4e9f9842c87a4487764f9b2e2a142b4251f06623f562b7fbffa78b88ec421ea"
+        },
+        {
+          "path": "/home/zzk/gmner/GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt",
+          "sha256": "3ff31ebca3c858926ec6c98694820fda39c0f9718645174c00069ee5bcffab69"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold0.jsonl",
+          "sha256": "93851c535075ae440822715b84f661e89a0ed569b9d529a82175c686534fe6c5"
+        }
+      ]
+    },
+    "hierarchical": {
+      "status": "complete",
+      "command_sha256": "2efbe756e54d8a39b2c5d5690371647bce79a72533dde161206593b71eb7ef3d",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/hierarchical/best_model.pt",
+          "sha256": "a36de5ed912168a0e7e51ca1f822c0767c61b0b438d0a9cdd1b006557e155dec"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r16.pt",
+          "sha256": "994a3e79a7b274a289a636698a8d1349acbfec653f85da63c36c80c9bd31461b"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/dev_r16.pt",
+          "sha256": "1a897bfee1af4f6b82b4844f5d1a4aeae12be7f28ec68a420e605f7f5c6f4b37"
+        }
+      ],
+      "heldout_excluded": true,
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "config": {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/configs/hierarchical.yaml",
+        "sha256": "990064ab0e12baecae06f5fb80d6eaec9de1b4f582da9e1f3013ed360107822d"
+      },
+      "checkpoint": {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/hierarchical/best_model.pt",
+        "sha256": "a36de5ed912168a0e7e51ca1f822c0767c61b0b438d0a9cdd1b006557e155dec"
+      }
+    },
+    "coarse": {
+      "status": "complete",
+      "command_sha256": "3736eb227a198ebdbc3c2c6558ef849a9dbe094c342f9b238740326120aa4b95",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/coarse/best_model.pt",
+          "sha256": "4fd05ac3a2f1ad492d4fa3f6c7252a704a5836e5363bfc63a6af049b70e141bd"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r36.pt",
+          "sha256": "382cc27e0b24ce9f422c72457cfa187bbf8f2eba63114cef23e70c057df52059"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/dev_r36.pt",
+          "sha256": "003dd31b510d14204d01cdbdeae5fd42f488ec7f0cfa692e007db6cb5525ccee"
+        }
+      ],
+      "heldout_excluded": true,
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "config": {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/configs/coarse.yaml",
+        "sha256": "0c1f5df740da8114a31ceb11b5111239f25b33be362e13082ff6fc6b444805cb"
+      },
+      "checkpoint": {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/coarse/best_model.pt",
+        "sha256": "4fd05ac3a2f1ad492d4fa3f6c7252a704a5836e5363bfc63a6af049b70e141bd"
+      }
+    },
+    "fine": {
+      "status": "complete",
+      "command_sha256": "065ece266b48e9d6951e056502e5f4d3a20d6b6e6970d606a07f333072a86cdd",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/fine/best_model.pt",
+          "sha256": "5f6ec94883cbf0c46dda9c0b78e9f5e228e7dfcd39b31331a97932f7f14a7bc1"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/hierarchical/best_model.pt",
+          "sha256": "a36de5ed912168a0e7e51ca1f822c0767c61b0b438d0a9cdd1b006557e155dec"
+        },
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/coarse/best_model.pt",
+          "sha256": "4fd05ac3a2f1ad492d4fa3f6c7252a704a5836e5363bfc63a6af049b70e141bd"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r16.pt",
+          "sha256": "994a3e79a7b274a289a636698a8d1349acbfec653f85da63c36c80c9bd31461b"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r36.pt",
+          "sha256": "382cc27e0b24ce9f422c72457cfa187bbf8f2eba63114cef23e70c057df52059"
+        }
+      ],
+      "heldout_excluded": true,
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "config": {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/configs/fine.yaml",
+        "sha256": "7cb8edaa7a8a6a382bff6f28e19c700b4417e8ca8d41d34d21c33d59549a6bae"
+      },
+      "checkpoint": {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/fine/best_model.pt",
+        "sha256": "5f6ec94883cbf0c46dda9c0b78e9f5e228e7dfcd39b31331a97932f7f14a7bc1"
+      }
+    },
+    "evidence": {
+      "status": "complete",
+      "command_sha256": "a6f68f9511b24561a14c9e9413ce734213704882e22ef6233c64ddd14c075260",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/evidence/best_model.pt",
+          "sha256": "8bab4165347e2b851c051e5d7fa5c9f8b211cfce4fbb0d01de28dfeb9e5fc599"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/fine/best_model.pt",
+          "sha256": "5f6ec94883cbf0c46dda9c0b78e9f5e228e7dfcd39b31331a97932f7f14a7bc1"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r16.pt",
+          "sha256": "994a3e79a7b274a289a636698a8d1349acbfec653f85da63c36c80c9bd31461b"
+        }
+      ],
+      "heldout_excluded": true,
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "config": {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/configs/evidence.yaml",
+        "sha256": "fe503473363d94330c908096c647064dd76934c64e0237282ac5cf0271de5a7c"
+      },
+      "checkpoint": {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/evidence/best_model.pt",
+        "sha256": "8bab4165347e2b851c051e5d7fa5c9f8b211cfce4fbb0d01de28dfeb9e5fc599"
+      }
+    },
+    "siglip2_caches": {
+      "status": "complete",
+      "command_sha256": "c5464301cefe2c9857e4e989dfc976c5b069eccad9bf02b010141f991c6a3188",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/siglip2/train/manifest.json",
+          "sha256": "9b2dde208fe29753943a4207411d2417f9d66b7d260abe7bfcd5a5fc6e57d091"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/siglip2/dev/manifest.json",
+          "sha256": "cfe7b72bf188e35def68a2585e2348ae1fa33235efce110e5ad010647a25866e"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/siglip2/heldout/manifest.json",
+          "sha256": "a4576b68d995889b78b29891f2efb25e081873b833ad183f9bdd1d175ceb3a35"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r16.pt",
+          "sha256": "994a3e79a7b274a289a636698a8d1349acbfec653f85da63c36c80c9bd31461b"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/train_r36.pt",
+          "sha256": "382cc27e0b24ce9f422c72457cfa187bbf8f2eba63114cef23e70c057df52059"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/dev_r16.pt",
+          "sha256": "1a897bfee1af4f6b82b4844f5d1a4aeae12be7f28ec68a420e605f7f5c6f4b37"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/dev_r36.pt",
+          "sha256": "003dd31b510d14204d01cdbdeae5fd42f488ec7f0cfa692e007db6cb5525ccee"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/heldout_r16.pt",
+          "sha256": "b3ee511598112d084a014ace55b4dcd408fb67688a3ffabb0bfea5705acb0d91"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/candidates/heldout_r36.pt",
+          "sha256": "6ac622170e98db635bb2a6c52b504293e78b810f2ff2cf773370db8ed348a59f"
+        }
+      ]
+    },
+    "reliability": {
+      "status": "complete",
+      "command_sha256": "f3a9dff39315a326b4ff3ee701e2ca18c4d6ace91552067a1712299d396bfa66",
+      "test_accessed": false,
+      "outputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/reliability/best_ab_model.pt",
+          "sha256": "5ce6acb585142232d9b7412b60b8b2db4b6bf7da9825fb049c5d61747e690d10"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/fine/best_model.pt",
+          "sha256": "5f6ec94883cbf0c46dda9c0b78e9f5e228e7dfcd39b31331a97932f7f14a7bc1"
+        },
+        {
+          "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/evidence/best_model.pt",
+          "sha256": "8bab4165347e2b851c051e5d7fa5c9f8b211cfce4fbb0d01de28dfeb9e5fc599"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/siglip2/train/manifest.json",
+          "sha256": "9b2dde208fe29753943a4207411d2417f9d66b7d260abe7bfcd5a5fc6e57d091"
+        },
+        {
+          "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/siglip2/dev/manifest.json",
+          "sha256": "cfe7b72bf188e35def68a2585e2348ae1fa33235efce110e5ad010647a25866e"
+        }
+      ],
+      "heldout_excluded": true,
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "config": {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold0/configs/reliability.yaml",
+        "sha256": "a09c7612b70e4592fca4932e4b0ac688fa1fc3aa1d30b368773ead67c1f96982"
+      },
+      "checkpoint": {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/reliability/best_ab_model.pt",
+        "sha256": "5ce6acb585142232d9b7412b60b8b2db4b6bf7da9825fb049c5d61747e690d10"
+      }
+    }
+  },
+  "source_revision_history": [
+    {
+      "adopted_at_utc": "2026-07-23T05:04:14.381266+00:00",
+      "previous_source_tree_sha256": "23355894b173abf28dda7d077acdfb9c6450dec944279f049494991ed9b05752",
+      "source_tree_sha256": "09e3d2b06da07cdd8af1fe40662a55d639f2551781ffabaa893e9d0013cd134d",
+      "reason": "R36 candidate caches now anchor formal R16 Stage1 span/type predictions after pre-Fine alignment failure",
+      "preserved_stages": [
+        "stage1"
+      ],
+      "invalidated_from": "candidate_caches",
+      "test_accessed": false
+    },
+    {
+      "adopted_at_utc": "2026-07-23T05:22:09.371548+00:00",
+      "previous_source_tree_sha256": "09e3d2b06da07cdd8af1fe40662a55d639f2551781ffabaa893e9d0013cd134d",
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "reason": "Use explicit Gemma tokenizer plus SigLIP image processor under transformers 4.39 after AutoProcessor incompatibility",
+      "preserved_stages": [
+        "stage1",
+        "candidate_caches",
+        "hierarchical",
+        "coarse",
+        "fine",
+        "evidence"
+      ],
+      "invalidated_from": "siglip2_caches",
+      "test_accessed": false
+    }
+  ]
+}

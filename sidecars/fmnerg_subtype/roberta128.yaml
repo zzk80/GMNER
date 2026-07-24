@@ -1,0 +1,44 @@
+taxonomy: sidecars/fmnerg_subtype/taxonomy_twitter10000.json
+
+data:
+  train_source: GMNER-main/Twitter10000_v2.0/txt_fine/train.txt
+  dev_source: GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt
+  train_gold_features: knowledge/fmnerg_subtype_sidecar/roberta128/train_gold.pt
+  dev_gold_features: knowledge/fmnerg_subtype_sidecar/roberta128/dev_gold.pt
+  dev_formal_predictions: knowledge/fmnerg_subtype_sidecar/roberta128/dev_formal_predictions.json
+  dev_formal_features: knowledge/fmnerg_subtype_sidecar/roberta128/dev_formal.pt
+
+frozen:
+  stage1_config: configs/fmnerg_twitter10000_stage1.yaml
+  stage1_checkpoint: outputs/fmnerg_stage1_roberta128/best_model.pt
+  evidence_config: configs/fmnerg_twitter10000_evidence_visibility.yaml
+  evidence_checkpoint: outputs/fmnerg_roberta128_evidence_visibility/best_model.pt
+  formal_dev_cache: knowledge/record_candidates/roberta128/fmnerg_dev_hierarchical.pt
+  expanded_dev_cache: knowledge/record_candidates/roberta128/fmnerg_dev_hierarchical_r36.pt
+
+model:
+  input_size: 2304
+  hidden_size: 768
+  dropout: 0.1
+  head_architecture: shared_hard
+  parent_hidden_size: 192
+
+optim:
+  batch_size: 256
+  learning_rate: 0.001
+  weight_decay: 0.01
+  num_epochs: 30
+  early_stop_patience: 5
+  gradient_clip_norm: 1.0
+  loss_mode: ce
+  effective_number_beta: 0.999
+  parent_normalize_class_weights: true
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16_features: true
+  output_dir: outputs/fmnerg_roberta128_subtype_sidecar
+  save_best_metric: fmnerg_f1
+  expected_dev_gmner_f1: 0.621316
+  expected_dev_gmner_tolerance: 0.0000005
