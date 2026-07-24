@@ -379,33 +379,15 @@ def test_risk_curve_reports_best_prefix_without_executing_all_actions() -> None:
     assert len(risk["risk_coverage_curve"]) == 4
 
 
-def test_layered_config_has_no_test_cache_and_fixes_top4() -> None:
+def test_null_release_config_has_no_test_cache_and_fixes_top4() -> None:
     root = Path(__file__).resolve().parents[1]
     config = load_layered_action_verifier_config(
-        root / "configs" / "fmnerg_twitter10000_layered_action_verifier.yaml"
-    )
-    assert config.model.top_k == 4
-    assert config.evaluation.expected_baseline_gmner == 0.621316
-    assert not hasattr(config, "test")
-
-    real_only = load_layered_action_verifier_config(
-        root
-        / "configs"
-        / "fmnerg_twitter10000_layered_action_to_real_only.yaml"
-    )
-    null_only = load_layered_action_verifier_config(
-        root
-        / "configs"
-        / "fmnerg_twitter10000_layered_action_to_null_only.yaml"
-    )
-    null_release = load_layered_action_verifier_config(
         root / "configs" / "fmnerg_twitter10000_null_release_verifier.yaml"
     )
-    assert real_only.model.action_mode == ACTION_MODE_TO_REAL_ONLY
-    assert null_only.model.action_mode == ACTION_MODE_TO_NULL_ONLY
-    assert null_release.model.action_mode == ACTION_MODE_NULL_RELEASE_ONLY
-    assert null_release.loss.false_release_weight == 3.0
-    assert null_release.loss.missed_release_weight == 1.0
-    assert null_release.evaluation.minimum_keep_preservation_rate == 0.99
-    assert real_only.evaluation.minimum_net_correction == 5
-    assert null_only.evaluation.minimum_net_correction == 0
+    assert config.model.top_k == 4
+    assert config.model.action_mode == ACTION_MODE_NULL_RELEASE_ONLY
+    assert config.evaluation.expected_baseline_gmner == 0.621316
+    assert not hasattr(config, "test")
+    assert config.loss.false_release_weight == 3.0
+    assert config.loss.missed_release_weight == 1.0
+    assert config.evaluation.minimum_keep_preservation_rate == 0.99

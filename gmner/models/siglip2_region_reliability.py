@@ -173,7 +173,8 @@ def build_siglip2_matching_features(
     coarse_agreement = siglip_top1.eq(coarse_top1)
     base_agreement = siglip_top1.eq(base_top1)
     four_way = fine_agreement & coarse_agreement & base_agreement
-    repeated = lambda value: value.unsqueeze(-1).expand_as(semantic).float()
+    def repeated(value: torch.Tensor) -> torch.Tensor:
+        return value.unsqueeze(-1).expand_as(semantic).float()
     features = torch.cat(
         [
             matching,

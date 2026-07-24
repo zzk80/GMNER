@@ -1,7 +1,18 @@
 # GMNER / FMNERG 阶段性实验总结
 
 > 本文是历史实验归档，早期“当前最优”表述不再更新。当前 RoBERTa 完整链路、
-> 可运行配置和正式 test 结果以 [README.md](README.md) 为准。
+> 可运行配置和正式 test 结果以 [README.md](../README.md) 为准。
+
+## 2026-07-24 M3.6A-r2 最终归档
+
+- 10 个 full-chain OOF fold 已完成，7000 条 heldout 记录完整覆盖，
+  `test_accessed=false`。
+- M3.3A OOF Train micro F1：Span `0.870900`、MNER `0.811690`、
+  EEG `0.651135`、GMNER `0.610849`。
+- NULL Release 在严格 OOF 下没有超过 epoch-0 KEEP，M3.6A-r2 判定 no-go；
+  正式 Dev/Test 保持 `0.621316/0.61529`。
+- 完整阶段实现已封存在 Git tag `m3.6a-r2-oof-complete`；主分支只保留最小
+  复现实现与 OOF 审计基础设施。
 
 ## 2026-07-22 归档补充
 
@@ -91,8 +102,8 @@
 - 新增 Fold 0 优先的整链编排入口及 pipeline manifest。OOF 模式不再构建 Stage1 test
   Dataset，也不读取 Hierarchical test cache；六个监督模块必须共享同一 fold train ID
   摘要。Fine Top-4 在物化时显式冻结，加载后不重新排序。
-- 当前未生成 OOF 数据、未启动 r2 正式训练，也未读取 test；正式 test 最优保持
-  `GMNER=0.61529`。
+- 本节记录的是 r2 启动前状态；最终十折结果见文档顶部和
+  [OOF_NULL_RELEASE.md](OOF_NULL_RELEASE.md)。
 
 本文档总结当前 GMNER/FMNERG 任务上的主线链路、已完成尝试、实验现象、方法优劣和后续判断。重点不放在具体代码细节，而放在“为什么这样做、结果如何、下一步该往哪里走”。
 

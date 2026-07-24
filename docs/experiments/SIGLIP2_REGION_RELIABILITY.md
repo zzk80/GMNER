@@ -75,13 +75,14 @@ scripts/train_siglip2_region_reliability.py
 scripts/evaluate_siglip2_region_reliability.py
 ```
 
-新增配置：
+归档阶段使用过的配置：
 
 ```text
-configs/fmnerg_twitter10000_siglip2_reliability_vinvl.yaml
-configs/fmnerg_twitter10000_siglip2_reliability_siglip2.yaml
 configs/fmnerg_twitter10000_siglip2_reliability_fusion.yaml
 ```
+
+主分支只保留 OOF 仍依赖的 Fusion 配置。VinVL-only 与 SigLIP2-only 配置已随
+M3.4A 归档，可从 Git tag `m3.6a-r2-oof-complete` 恢复。
 
 特征缓存使用分片格式：
 

@@ -462,7 +462,7 @@ SigLIP 2 的 mention/context/type 与 local/context/global 三尺度旁路。其
 为 VinVL `0.5773`、SigLIP2 `0.5759`、Fusion `0.6003`；Fusion 风险净纠错为 `+9`，
 仍未达到 `0.70/+15` 门槛。M3.4A 因此 no-go，不进入 M3.4B，也不读取 test。旧版与
 M3.4A 的 A/B 集合不同，不能写成直接性能回退。完整口径、结果和 dev 切片入口见
-[README_SIGLIP2_REGION_RELIABILITY.md](README_SIGLIP2_REGION_RELIABILITY.md)。
+[M3.4A SigLIP2 归档](experiments/SIGLIP2_REGION_RELIABILITY.md)。
 
 ## 13. Milestone 3.5：实例对应与集合级诊断
 
@@ -488,7 +488,7 @@ Verifier。大量收益若来自单实体记录，则下一步仍应优化 pair 
 
 ```bash
 PYTHONPATH=. python scripts/analyze_record_set_assignment_oracle.py \
-  --config configs/fmnerg_twitter10000_siglip2_reliability_vinvl.yaml \
+  --config configs/fmnerg_twitter10000_siglip2_reliability_fusion.yaml \
   --top-k 1,2,4,8,16 \
   --device cuda \
   --output outputs/fmnerg_roberta128_evidence_visibility/dev_set_oracle.json
@@ -518,7 +518,7 @@ Top-16 的 `+411` 由 `130` 个 TO_NULL 和 `281` 个 TO_REAL gold-aware 上限�
 同类竞争施加软容量惩罚的 Set Verifier；不得使用全局硬 Hungarian。候选预算优先
 Top-4，Top-8 仅作覆盖对照，Top-16 的边际收益过小。
 
-## 14. 后续主线：分层 Top-4 动作验证
+## 14. 已归档：分层 Top-4 动作验证
 
 M3.5B 将后续固定为 `KEEP/TO_NULL/TO_VISIBLE`，并只在 TO_VISIBLE 下选择 Fine
 Top-4。这里需要修正旧实验归因：旧 Action Controller 已通过固定 `KEEP=0` 显式
@@ -544,18 +544,16 @@ correction、动作 margin、正确决策蒸馏和残差幅度约束。最后层
 非负初始优势，使 epoch 0 精确复现当前 `GMNER=0.621316`，而不是依靠推理阈值近似
 回退。
 
-M3.6A 已实现为独立模块，不修改或覆盖当前正式 checkpoint：
+M3.6A 曾实现为独立模块，不修改或覆盖当前正式 checkpoint。旧通用配置、训练命令
+和分布审计入口已从主分支删除，可从 Git tag `m3.6a-r2-oof-complete` 恢复；
+主分支只保留 NULL Release 所需的最小公共实现：
 
 ```text
 gmner/models/layered_action_verifier.py
 gmner/losses/layered_action_verifier_loss.py
 gmner/engine/layered_action_verifier_evaluator.py
-configs/fmnerg_twitter10000_layered_action_verifier.yaml
-configs/fmnerg_twitter10000_layered_action_to_real_only.yaml
-configs/fmnerg_twitter10000_layered_action_to_null_only.yaml
 scripts/train_layered_action_verifier.py
 scripts/evaluate_layered_action_verifier.py
-scripts/audit_layered_action_distribution.py
 ```
 
 Layer 1 直接学习三个状态相关 logits；Layer 2 在 Fine 单一排序的 Top-4 内使用多正框
@@ -566,14 +564,7 @@ NLL、KEEP margin、correction margin、不可操作样本 preservation 和 Laye
 条件不满足即中止训练。
 
 ```bash
-PYTHONPATH=. python scripts/train_layered_action_verifier.py \
-  --config configs/fmnerg_twitter10000_layered_action_verifier.yaml
-
-PYTHONPATH=. python scripts/evaluate_layered_action_verifier.py \
-  --config configs/fmnerg_twitter10000_layered_action_verifier.yaml \
-  --checkpoint outputs/fmnerg_roberta128_layered_action_verifier/best_model.pt \
-  --split dev \
-  --output outputs/fmnerg_roberta128_layered_action_verifier/dev_metrics.json
+git show m3.6a-r2-oof-complete:configs/fmnerg_twitter10000_layered_action_verifier.yaml
 ```
 
 评估器分别输出 TO_NULL 与 TO_REAL 的 corrected/damaged/net、KEEP 正确保护率、两层
@@ -618,14 +609,7 @@ TO_REAL-only 的风险曲线上限为 `+8`，达到 `+5` 工程门槛且不是�
 epoch 2/3 分别为 `-25/-14`，风险上限最多 `+2`，新 Null-Revert Head 暂停；正式
 Evidence Visibility 的 NULL 决策保持不变。
 
-分布审计入口：
-
-```bash
-PYTHONPATH=. python scripts/audit_layered_action_distribution.py \
-  --config configs/fmnerg_twitter10000_layered_action_verifier.yaml \
-  --output outputs/fmnerg_roberta128_layered_action_verifier/train_dev_distribution_audit.json \
-  --device cuda
-```
+旧分布审计入口和配置保存在 Git tag `m3.6a-r2-oof-complete`。
 
 当前非 OOF train 与 dev 的关键差异为：
 
@@ -823,7 +807,13 @@ overlap 切片。通过条件为多人 AUROC 至少 `0.60`、同 object 至少 `
 修正不低于 `+9`、NULL preservation 至少 `0.98`，并减少高重叠 DAMAGE。未通过则
 停止增加通用视觉编码器；无论是否通过，都不能把 DINOv2 描述为实体身份识别器。
 
-M3.6A/B 的 checkpoint、阈值和候选预算只能在 dev 上确定。必须报告 TO_NULL 与
-TO_REAL 的 corrected/damaged/net、KEEP 正确保护率、Top-4 动作准确率、碰撞/非碰撞
-切片和三元组净修正；未达到 KEEP 保护率 `0.97` 且 dev GMNER 稳定超过
-`0.621316` 前不得读取 test。
+### 14.5 最终结论
+
+10 个 full-chain heldout fold 已全部完成、封存并清理，7000 条训练记录完整覆盖，
+`test_accessed=false`。M3.3A OOF Train 的 micro GMNER 为 `0.610849`，fold
+mean/std 为 `0.610869/0.010907`。
+
+NULL Release 在严格 OOF 下没有稳定超过 epoch-0 KEEP，因此 M3.6A-r2 判定
+**no-go**。它不接入正式推理、不读取 test，也不再继续扫描阈值或扩展控制器。
+当前正式结果保持 Dev `0.621316`、Test `0.61529`。完整 OOF 契约和归档边界见
+[Strict OOF and NULL Release](OOF_NULL_RELEASE.md)。

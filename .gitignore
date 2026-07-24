@@ -12,10 +12,13 @@ nohup.out
 *.pth
 *.ckpt
 *.bin
+*.safetensors
 *.npz
 
 bert-base-multilingual-cased/
+bertweet-base/
 clip-vit-base-patch32/
+roberta-base/
 siglip2-base-patch16-224/
 GMNER-main/Twitter10000_v2.0/images/
 GMNER-main/Twitter10000_v2.0/VinVL/

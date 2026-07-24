@@ -7,7 +7,7 @@ import math
 import shutil
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 import torch
 from torch.optim import AdamW

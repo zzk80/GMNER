@@ -260,18 +260,11 @@ def test_sharded_feature_cache_and_configs(tmp_path: Path) -> None:
     assert cache[0]["value"].item() == 1.0
 
     root = Path(__file__).resolve().parents[1]
-    modes = {}
-    for name in ("vinvl", "siglip2", "fusion"):
-        config = load_siglip2_region_reliability_config(
-            root / "configs" / f"fmnerg_twitter10000_siglip2_reliability_{name}.yaml"
-        )
-        modes[name] = config.model.feature_mode
-        assert not hasattr(config.data, "test_cache")
-    assert modes == {
-        "vinvl": "vinvl_only",
-        "siglip2": "siglip2_only",
-        "fusion": "fusion",
-    }
+    config = load_siglip2_region_reliability_config(
+        root / "configs" / "fmnerg_twitter10000_siglip2_reliability_fusion.yaml"
+    )
+    assert config.model.feature_mode == "fusion"
+    assert not hasattr(config.data, "test_cache")
 
 
 def test_binary_calibration_helpers_cover_required_metrics() -> None:
