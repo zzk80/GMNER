@@ -5,8 +5,10 @@ __pycache__/
 
 outputs/
 *.log
+*.latest_log
 *.pid
 nohup.out
+.codex_backups/
 
 *.pt
 *.pth
@@ -26,3 +28,7 @@ GMNER-main/Twitter10000_v2.0/xml/
 knowledge/record_candidates/
 knowledge/evidence/
 knowledge/siglip2_region_cache/
+knowledge/grounding/
+knowledge/fmnerg_subtype_sidecar/
+knowledge/null_release_oof/roberta128/folds/
+configs/oof/
