@@ -1,0 +1,49 @@
+data:
+  formal_train_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold4/candidates/train_r16.pt
+  expanded_train_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold4/candidates/train_r36.pt
+  formal_dev_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold4/candidates/dev_r16.pt
+  expanded_dev_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold4/candidates/dev_r36.pt
+  num_workers: 0
+  require_oof_train_cache: false
+frozen:
+  fine_config: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold4/configs/fine.yaml
+  fine_checkpoint: /home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/fine/best_model.pt
+model:
+  input_size: 256
+  hidden_size: 256
+  num_candidate_sources: 4
+  source_embedding_size: 32
+  dropout: 0.2
+  residual_scale: 4.0
+loss:
+  lambda_bce: 1.0
+  lambda_visible_correction: 1.0
+  lambda_null_preservation: 1.0
+  lambda_keep: 0.5
+  lambda_residual: 0.05
+  visible_correction_group_weight: 0.35
+  visible_preservation_group_weight: 0.15
+  null_correction_group_weight: 0.2
+  null_preservation_group_weight: 0.3
+  visible_margin_gamma: 1.0
+  uncertainty_entropy_threshold: 0.65
+  uncertainty_margin_threshold: 0.08
+optim:
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 10
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: /home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/evidence
+  save_best_metric: gmner_score
+  save_best_tie_breakers:
+  - null_correct_preservation_rate
+  - visibility_net_correction
+  early_stop_patience: 3
+  log_every_steps: 50

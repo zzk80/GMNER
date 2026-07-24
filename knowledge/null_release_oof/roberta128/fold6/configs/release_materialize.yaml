@@ -1,0 +1,64 @@
+frozen:
+  reliability_config: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/reliability_heldout.yaml
+  reliability_checkpoint: /home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/best_ab_model.pt
+oof:
+  require_full_chain_oof: true
+  train_feature_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/full_chain_train_oof.pt
+  expected_num_folds: 10
+  expected_records: 7000
+model:
+  input_size: 256
+  hidden_size: 256
+  state_embedding_size: 32
+  source_embedding_size: 32
+  num_candidate_sources: 4
+  top_k: 4
+  dropout: 0.2
+  keep_initial_bias: 4.0
+  action_initial_bias: -4.0
+  layer2_residual_scale: 1.0
+  use_region_reliability: true
+  action_mode: null_release_only
+loss:
+  lambda_layer1: 1.0
+  lambda_layer2: 1.0
+  lambda_keep_margin: 0.5
+  lambda_correction_margin: 0.5
+  lambda_preservation: 0.2
+  lambda_residual: 0.02
+  keep_margin: 0.5
+  correction_margin: 0.5
+  keep_group_weight: 0.75
+  to_null_group_weight: 0.0
+  to_visible_group_weight: 0.25
+  false_release_weight: 3.0
+  missed_release_weight: 1.0
+  stage1_spans_only: true
+  require_correct_type: true
+evaluation:
+  execution_margin: 0.0
+  include_risk_curve: true
+  identity_tolerance: 1.0e-12
+  expected_baseline_gmner: 0.621316
+  expected_baseline_tolerance: 5.0e-06
+  minimum_keep_preservation_rate: 0.99
+  minimum_net_correction: 5
+optim:
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 10
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: /home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/release_materialize
+  save_best_metric: gmner_score
+  save_best_tie_breakers:
+  - null_release_net_correction
+  - keep_correct_preservation_rate
+  early_stop_patience: 3
+  log_every_steps: 50

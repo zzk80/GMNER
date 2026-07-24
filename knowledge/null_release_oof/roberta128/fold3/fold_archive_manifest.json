@@ -1,0 +1,481 @@
+{
+  "kind": "null_release_oof_fold_archive",
+  "format_version": 1,
+  "status": "cleaned",
+  "fold_id": 3,
+  "records": 700,
+  "batches": 88,
+  "pipeline_sealed": true,
+  "test_accessed": false,
+  "heldout_features": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/heldout_features.pt",
+    "bytes": 34310190,
+    "sha256": "45ce307c6f3f28291bb758688371c6ab3cbba7fa22a81a71e32ce8219e41de3a"
+  },
+  "fold_proof": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/fold_proof.json",
+    "bytes": 85197,
+    "sha256": "bf180b84c905628d5bbc64c59aabd413d01a8f2e42cb5917e40e6758df51a775"
+  },
+  "pipeline_manifest": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/pipeline_manifest.json",
+    "bytes": 14502,
+    "sha256": "16673b4399356725a4a905c8bfec1c7389a8749ea6e664988afa6c2520ae87b1"
+  },
+  "checkpoint_artifacts": [
+    {
+      "stage": "stage1",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/best_model.pt",
+      "bytes": 636426966,
+      "sha256": "843f6b2d90074a15fe88d6e4d590eadebdd66bdfbd29ba7e5a541a163ef7f168"
+    },
+    {
+      "stage": "hierarchical",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/best_model.pt",
+      "bytes": 6136218,
+      "sha256": "16eb266112ec265dafe84c61bb4e026386024d60dd9a50060b09f8a3acca3452"
+    },
+    {
+      "stage": "coarse",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/best_model.pt",
+      "bytes": 3463076,
+      "sha256": "fd459aa6b0546ef06769792127ba67062c8c2e8f8234820d3b425a0869b1e4ef"
+    },
+    {
+      "stage": "fine",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/best_model.pt",
+      "bytes": 7993726,
+      "sha256": "8148acbcbe2fb7585c1d9773089837ad0254e28563661bbd3f8a7db9ff231397"
+    },
+    {
+      "stage": "evidence",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/best_model.pt",
+      "bytes": 1658767,
+      "sha256": "0dea33c66a051aa8b9719cd534508a3b858d2518c5764866461e0713ff07a1ba"
+    },
+    {
+      "stage": "reliability",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/best_ab_model.pt",
+      "bytes": 1693052,
+      "sha256": "58e4459566634faacf58d9d75bcb23062bd4724eade5d2e4011a5d73e534dc5d"
+    }
+  ],
+  "proof_artifact_sha256": {
+    "action_config": "4116ee30ce414d378ae4bb8d76fe16c527f11f826d4fdbe6df2938359d5004ed",
+    "reliability_config": "e59f0d676ac96407a2113f68114135499d52dd710be3612580301478b897b69f",
+    "reliability_checkpoint": "58e4459566634faacf58d9d75bcb23062bd4724eade5d2e4011a5d73e534dc5d",
+    "fine_config": "82ca29f14f8be556cb315a3293fccc3545ad6c57e9af1b385dd29f8d44c76db1",
+    "fine_checkpoint": "8148acbcbe2fb7585c1d9773089837ad0254e28563661bbd3f8a7db9ff231397",
+    "evidence_config": "08d826c59c047ce10647fb6d2392437787a31d3c29bb2b7ebd874963e44440b0",
+    "evidence_checkpoint": "0dea33c66a051aa8b9719cd534508a3b858d2518c5764866461e0713ff07a1ba",
+    "hierarchical_config": "270335db5e1c01095a580231d6ccb6c510bee5768bd4a8444e52190f905659a4",
+    "hierarchical_checkpoint": "16eb266112ec265dafe84c61bb4e026386024d60dd9a50060b09f8a3acca3452",
+    "coarse_checkpoint": "fd459aa6b0546ef06769792127ba67062c8c2e8f8234820d3b425a0869b1e4ef",
+    "formal_cache": "dc9430308165a17a863a527a2e07f9a5c6d5cd159b700e9794afe9abdaee90a1",
+    "expanded_cache": "be6e5594c2e87897249ed73339b09a93c0b2f05b4b3d7a220ed67671379b9d03",
+    "siglip2_manifest": "6e823b3b6fcb99a5351ad6d1703af72216299d5dabebb85e9697b7f098034949",
+    "evidence_fine_checkpoint": "8148acbcbe2fb7585c1d9773089837ad0254e28563661bbd3f8a7db9ff231397"
+  },
+  "proof_artifact_matches": {
+    "action_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/release_materialize.yaml"
+    ],
+    "reliability_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/reliability_heldout.yaml"
+    ],
+    "reliability_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/best_ab_model.pt"
+    ],
+    "fine_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/fine.yaml"
+    ],
+    "fine_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/best_model.pt"
+    ],
+    "evidence_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/evidence.yaml"
+    ],
+    "evidence_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/best_model.pt"
+    ],
+    "hierarchical_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/hierarchical.yaml"
+    ],
+    "hierarchical_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/best_model.pt"
+    ],
+    "coarse_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/best_model.pt"
+    ],
+    "formal_cache": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/candidates/heldout_r16.pt"
+    ],
+    "expanded_cache": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/candidates/heldout_r36.pt"
+    ],
+    "siglip2_manifest": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/siglip2/heldout/manifest.json"
+    ],
+    "evidence_fine_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/best_model.pt"
+    ]
+  },
+  "reports_to_archive": [
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/metrics.json",
+      "archive_relative": "outputs/coarse/metrics.json",
+      "bytes": 24777
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/train.log",
+      "archive_relative": "outputs/coarse/train.log",
+      "bytes": 3850
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/metrics.json",
+      "archive_relative": "outputs/evidence/metrics.json",
+      "bytes": 14250
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/train.log",
+      "archive_relative": "outputs/evidence/train.log",
+      "bytes": 1761
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/metrics.json",
+      "archive_relative": "outputs/fine/metrics.json",
+      "bytes": 26654
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/train.log",
+      "archive_relative": "outputs/fine/train.log",
+      "bytes": 2655
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/metrics.json",
+      "archive_relative": "outputs/hierarchical/metrics.json",
+      "bytes": 42373
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/train.log",
+      "archive_relative": "outputs/hierarchical/train.log",
+      "bytes": 6298
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/metrics.json",
+      "archive_relative": "outputs/reliability/metrics.json",
+      "bytes": 49083
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/train.log",
+      "archive_relative": "outputs/reliability/train.log",
+      "bytes": 3612
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/resolved_config.yaml",
+      "archive_relative": "outputs/stage1/resolved_config.yaml",
+      "bytes": 7511
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/train.log",
+      "archive_relative": "outputs/stage1/train.log",
+      "bytes": 65211
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/train_summary.json",
+      "archive_relative": "outputs/stage1/train_summary.json",
+      "bytes": 185
+    },
+    {
+      "source": "/home/zzk/gmner/null_release_oof_fold3.log",
+      "archive_relative": "pipeline_logs/null_release_oof_fold3.log",
+      "bytes": 1675303
+    },
+    {
+      "source": "/home/zzk/gmner/null_release_oof_fold3_failed_runtime_20260723_2059.log",
+      "archive_relative": "pipeline_logs/null_release_oof_fold3_failed_runtime_20260723_2059.log",
+      "bytes": 8480
+    }
+  ],
+  "deletion_roots": [
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/candidates",
+      "exists": true,
+      "files": 12,
+      "bytes": 1321458046,
+      "tree_sha256": "a59d97268793e2db4c040d409ddcc8dccfdf6a7639c2cb314ec0bb0f22f315f3"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/siglip2",
+      "exists": true,
+      "files": 71,
+      "bytes": 1435773797,
+      "tree_sha256": "5a2230e5c4ebaf846eac81cea0e01ef9ec67f897202575607369fa7219f484f6"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3",
+      "exists": true,
+      "files": 1528,
+      "bytes": 670232414,
+      "tree_sha256": "38f140791cae2671ed953492b7733fbf1464073c2e482e5de58b079c50ffb672"
+    }
+  ],
+  "bytes_to_delete": 3427464257,
+  "estimated_retained_bytes": 37405521,
+  "max_retained_mb": 500.0,
+  "checkpoint_backup_note": "Hash-only checkpoint retention explicitly authorized for streaming OOF fold 3; heldout features, hashes, proof, configs, logs, and metrics retained.",
+  "prepared_at_utc": "2026-07-23T17:32:25.578945+00:00",
+  "pre_cleanup_validation": {
+    "all_required_stages_complete": true,
+    "pipeline_sealed": true,
+    "test_accessed": false,
+    "fold_records": 700,
+    "fixed_top4_valid": true,
+    "self_contained_payload": true,
+    "artifact_hashes_verified": true
+  },
+  "archived_reports": [
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/coarse/metrics.json",
+      "bytes": 24777,
+      "sha256": "e02ae76dc34f957c591460615a36b84b0c51e88d4bfeeb1429cfa51d2abd464e"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/coarse/train.log",
+      "bytes": 3850,
+      "sha256": "71bc433dc0409fe6c6bb3368aa642a7314879df70b591f50031b93fbc0ce2fb1"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/evidence/metrics.json",
+      "bytes": 14250,
+      "sha256": "2cab584f46ea07572210491ddca892b79851a9e1adf59a8316a6d3206cc4c737"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/evidence/train.log",
+      "bytes": 1761,
+      "sha256": "cf2d6315f22162c3ccc929dd5d4e29ecabd914f04d17a58602113b52c0c02a3b"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/fine/metrics.json",
+      "bytes": 26654,
+      "sha256": "31f3064615f6db8da1204955b49551fabbe8ff2f3fe31442c137fd2ac2a23c64"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/fine/train.log",
+      "bytes": 2655,
+      "sha256": "ee575a424bc2f7c1816fd08ef04b0ab99d4fcd6475b9db0298f7b11c7bec55a1"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/hierarchical/metrics.json",
+      "bytes": 42373,
+      "sha256": "5d8c79944104c2895cbf7b84efe28764a60747d63cde379da2c8480dd6fd7495"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/hierarchical/train.log",
+      "bytes": 6298,
+      "sha256": "40bcbce4be79475a9b9bc95fd44639423267f76d0a8202eeb7fac694723cec70"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/reliability/metrics.json",
+      "bytes": 49083,
+      "sha256": "1eb277cb02601be8f4f69c77c0ac3b20aa18fe3b0e8e88056966f2b840d884b2"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/reliability/train.log",
+      "bytes": 3612,
+      "sha256": "5791b008dac83def7b91fb49115bbdf6732f46a86aadb4ad34323d6150d1bf0a"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/resolved_config.yaml",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/stage1/resolved_config.yaml",
+      "bytes": 7511,
+      "sha256": "c4e49450f61a18ff294d1a631229cd4ac56737dfe4fb9179ee92990743e4ac3b"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/stage1/train.log",
+      "bytes": 65211,
+      "sha256": "633c998d30e9127de89f5e9d68c90cb608f95f39d5040324b492b20208a0b7fe"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/train_summary.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/stage1/train_summary.json",
+      "bytes": 185,
+      "sha256": "79e259af12cc8e1b61c5923a7f1cfe8ce645fd61902c7cc497143a436381ebb0"
+    },
+    {
+      "source": "/home/zzk/gmner/null_release_oof_fold3.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/pipeline_logs/null_release_oof_fold3.log",
+      "bytes": 1675303,
+      "sha256": "9fe1474c29cd54a532c13ac64104569a52472354c6ec4d774a51bcf5349533dd"
+    },
+    {
+      "source": "/home/zzk/gmner/null_release_oof_fold3_failed_runtime_20260723_2059.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/pipeline_logs/null_release_oof_fold3_failed_runtime_20260723_2059.log",
+      "bytes": 8480,
+      "sha256": "ab70085bcf5416b7d11c3916c8c8ea8402b4e48671fdeb08c72e9241494b07a1"
+    }
+  ],
+  "retained_files_before_cleanup": [
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/coarse/metrics.json",
+      "bytes": 24777,
+      "sha256": "e02ae76dc34f957c591460615a36b84b0c51e88d4bfeeb1429cfa51d2abd464e"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/coarse/train.log",
+      "bytes": 3850,
+      "sha256": "71bc433dc0409fe6c6bb3368aa642a7314879df70b591f50031b93fbc0ce2fb1"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/evidence/metrics.json",
+      "bytes": 14250,
+      "sha256": "2cab584f46ea07572210491ddca892b79851a9e1adf59a8316a6d3206cc4c737"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/evidence/train.log",
+      "bytes": 1761,
+      "sha256": "cf2d6315f22162c3ccc929dd5d4e29ecabd914f04d17a58602113b52c0c02a3b"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/fine/metrics.json",
+      "bytes": 26654,
+      "sha256": "31f3064615f6db8da1204955b49551fabbe8ff2f3fe31442c137fd2ac2a23c64"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/fine/train.log",
+      "bytes": 2655,
+      "sha256": "ee575a424bc2f7c1816fd08ef04b0ab99d4fcd6475b9db0298f7b11c7bec55a1"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/hierarchical/metrics.json",
+      "bytes": 42373,
+      "sha256": "5d8c79944104c2895cbf7b84efe28764a60747d63cde379da2c8480dd6fd7495"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/hierarchical/train.log",
+      "bytes": 6298,
+      "sha256": "40bcbce4be79475a9b9bc95fd44639423267f76d0a8202eeb7fac694723cec70"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/reliability/metrics.json",
+      "bytes": 49083,
+      "sha256": "1eb277cb02601be8f4f69c77c0ac3b20aa18fe3b0e8e88056966f2b840d884b2"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/reliability/train.log",
+      "bytes": 3612,
+      "sha256": "5791b008dac83def7b91fb49115bbdf6732f46a86aadb4ad34323d6150d1bf0a"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/stage1/resolved_config.yaml",
+      "bytes": 7511,
+      "sha256": "c4e49450f61a18ff294d1a631229cd4ac56737dfe4fb9179ee92990743e4ac3b"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/stage1/train.log",
+      "bytes": 65211,
+      "sha256": "633c998d30e9127de89f5e9d68c90cb608f95f39d5040324b492b20208a0b7fe"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/outputs/stage1/train_summary.json",
+      "bytes": 185,
+      "sha256": "79e259af12cc8e1b61c5923a7f1cfe8ce645fd61902c7cc497143a436381ebb0"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/pipeline_logs/null_release_oof_fold3.log",
+      "bytes": 1675303,
+      "sha256": "9fe1474c29cd54a532c13ac64104569a52472354c6ec4d774a51bcf5349533dd"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/archive/pipeline_logs/null_release_oof_fold3_failed_runtime_20260723_2059.log",
+      "bytes": 8480,
+      "sha256": "ab70085bcf5416b7d11c3916c8c8ea8402b4e48671fdeb08c72e9241494b07a1"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/coarse.yaml",
+      "bytes": 1091,
+      "sha256": "04c66f18ce12d7c3cc9207447296ad20cda832dc27b42b4cdd054a835a980238"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/evidence.yaml",
+      "bytes": 1663,
+      "sha256": "08d826c59c047ce10647fb6d2392437787a31d3c29bb2b7ebd874963e44440b0"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/fine.yaml",
+      "bytes": 1928,
+      "sha256": "82ca29f14f8be556cb315a3293fccc3545ad6c57e9af1b385dd29f8d44c76db1"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/hierarchical.yaml",
+      "bytes": 1601,
+      "sha256": "270335db5e1c01095a580231d6ccb6c510bee5768bd4a8444e52190f905659a4"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/release_materialize.yaml",
+      "bytes": 1831,
+      "sha256": "4116ee30ce414d378ae4bb8d76fe16c527f11f826d4fdbe6df2938359d5004ed"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/reliability.yaml",
+      "bytes": 2544,
+      "sha256": "32c916cd2e7e1ba83a9d40af52c0a18b8b9418ce5c4130a119645dbec8baa0cc"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/reliability_heldout.yaml",
+      "bytes": 2549,
+      "sha256": "e59f0d676ac96407a2113f68114135499d52dd710be3612580301478b897b69f"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/configs/stage1.yaml",
+      "bytes": 1846,
+      "sha256": "a8f4d11a65a96618eb6c2230aa60eafcb1bfc1a12c4cfdc23275729b71ec7ffd"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/fold_proof.json",
+      "bytes": 85197,
+      "sha256": "bf180b84c905628d5bbc64c59aabd413d01a8f2e42cb5917e40e6758df51a775"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/heldout_features.pt",
+      "bytes": 34310190,
+      "sha256": "45ce307c6f3f28291bb758688371c6ab3cbba7fa22a81a71e32ce8219e41de3a"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/heldout_features.pt.sha256",
+      "bytes": 86,
+      "sha256": "1dc65785c65018ce9b19904a0bb55f0a6fa1d7c92e1a2d4c98ff7507c9dcc14a"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/pipeline_manifest.json",
+      "bytes": 14502,
+      "sha256": "16673b4399356725a4a905c8bfec1c7389a8749ea6e664988afa6c2520ae87b1"
+    }
+  ],
+  "deleted_roots_completed": [
+    "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/candidates",
+    "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold3/siglip2",
+    "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3"
+  ],
+  "completed_at_utc": "2026-07-23T17:32:26.048468+00:00",
+  "post_cleanup_validation": {
+    "records": 700,
+    "batches": 88,
+    "retained_bytes": 36378292,
+    "self_contained_reload": true,
+    "test_accessed": false
+  },
+  "actual_retained_bytes": 36378292,
+  "actual_deleted_bytes": 3427464257
+}

@@ -710,9 +710,33 @@ PYTHONPATH=. python scripts/merge_null_release_oof_features.py \
   --output knowledge/null_release_oof/roberta128/full_chain_train_oof.pt \
   --expected-records 7000
 
+PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
+  --cache knowledge/null_release_oof/roberta128/full_chain_train_oof.pt \
+  --source-file GMNER-main/Twitter10000_v2.0/txt_fine/train.txt \
+  --output outputs/fmnerg_roberta128_m33a_oof_train/metrics.json
+
 PYTHONPATH=. python scripts/train_null_release_verifier.py \
   --config configs/fmnerg_twitter10000_null_release_verifier.yaml
 ```
+
+`aggregate_m33a_oof_metrics.py` 不加载 checkpoint、不训练模型，也不重新推理。它直接
+聚合十个 heldout cache 中冻结的 M3.3A 正式预测：`deployment_span_mask` 确定实体，
+`fixed_type_ids` 确定类型，`current_visible + Fine top-1/NULL` 确定区域。原始
+`train.txt` 只用于提供完整 gold 分母并验证 7000 个 record ID 精确覆盖；span、type
+和 region 是否正确均来自 heldout 时已冻结的匹配掩码。
+
+当前十折 OOF Train 微平均结果为：
+
+| Split | Records | Pred / Gold | Span F1 | MNER F1 | EEG F1 | GMNER F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| M3.3A OOF Train | 7000 | 12001 / 11779 | 0.870900 | 0.811690 | 0.651135 | 0.610849 |
+
+十折 GMNER F1 的 fold 均值为 `0.610869`、总体标准差为 `0.010907`；论文主表应使用
+上述按 7000 条样本一次性计数得到的微平均 `0.610849`。该结果是严格的 OOF Train
+诊断，不是 train in-sample 指标，也不是 fold ensemble。它不会改变冻结的正式
+Dev/Test 结果；若要用十个 fold 模型改善 Dev/Test，必须另行定义 ensemble 实验。
+聚合报告明确记录 `model_training=false`、`model_inference=false`、
+`fold_ensemble=false` 和 `test_accessed=false`。
 
 `--skip-test-evaluation` 现在连 test Dataset/DataLoader 都不会构建；层次化训练在关闭
 自动 test 时也不再读取 `test_cache`。每折 pipeline manifest 固定 train/heldout ID、

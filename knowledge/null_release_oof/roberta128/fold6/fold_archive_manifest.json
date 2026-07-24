@@ -1,0 +1,465 @@
+{
+  "kind": "null_release_oof_fold_archive",
+  "format_version": 1,
+  "status": "cleaned",
+  "fold_id": 6,
+  "records": 700,
+  "batches": 88,
+  "pipeline_sealed": true,
+  "test_accessed": false,
+  "heldout_features": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/heldout_features.pt",
+    "bytes": 34310254,
+    "sha256": "1889040e4f46d4b6ef46fad711b6cb1a37f516dd44f4db20f24ae53c4b44ef00"
+  },
+  "fold_proof": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/fold_proof.json",
+    "bytes": 85197,
+    "sha256": "936ab6b053c14c31e3b4f5d77b831e51e9118a8744f43060f4130b5f586a1e39"
+  },
+  "pipeline_manifest": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/pipeline_manifest.json",
+    "bytes": 14502,
+    "sha256": "b24ba3b416f243a74e906cafca9e503c9b5eed6b911e648bf88b6b3aed6488a6"
+  },
+  "checkpoint_artifacts": [
+    {
+      "stage": "stage1",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/best_model.pt",
+      "bytes": 636426966,
+      "sha256": "26d05aec71068414feaa6158b01d11a17f0d1b2b39b32ea92cd44f662f919cf9"
+    },
+    {
+      "stage": "hierarchical",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/best_model.pt",
+      "bytes": 6136218,
+      "sha256": "0774c328e5edbeda61c3484fcb3502dd5b005d26f5ae8caffdea8c5ee7b65443"
+    },
+    {
+      "stage": "coarse",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/best_model.pt",
+      "bytes": 3463076,
+      "sha256": "01265d6a6706cd639688976f0ba95d77bf040fd50a7064cc12b37652824294cf"
+    },
+    {
+      "stage": "fine",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/best_model.pt",
+      "bytes": 7993726,
+      "sha256": "8da310c54629d00a022dd666807ee8cd7c795c46928b6179f4187f52e8b5ce68"
+    },
+    {
+      "stage": "evidence",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/best_model.pt",
+      "bytes": 1658767,
+      "sha256": "cd3716af2f42233ccba0c91732c9ee0670ce25efb3c275bc3a8dac077ef658e0"
+    },
+    {
+      "stage": "reliability",
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/best_ab_model.pt",
+      "bytes": 1693052,
+      "sha256": "b4fc3d9e2e126c1e3232ced0e262106084c786650fc6cadcaae3c1033684ec3d"
+    }
+  ],
+  "proof_artifact_sha256": {
+    "action_config": "6a22a037e041e78c9eaa3f3eb7d07feab79ceea8da16e11f7936b82c54e22d79",
+    "reliability_config": "a8e7afa0cd1b9de5858f48d11644880902ac3ed66ca75368462a62c716cd5891",
+    "reliability_checkpoint": "b4fc3d9e2e126c1e3232ced0e262106084c786650fc6cadcaae3c1033684ec3d",
+    "fine_config": "31b7f04e5986ce95a257d2a8697e2648c565a3c67cc2235bd5418defe404be8e",
+    "fine_checkpoint": "8da310c54629d00a022dd666807ee8cd7c795c46928b6179f4187f52e8b5ce68",
+    "evidence_config": "6690e7c227b302b859d5ef5710ebfffec1d60aabfc1b26a0ed5b9ca9a0f73766",
+    "evidence_checkpoint": "cd3716af2f42233ccba0c91732c9ee0670ce25efb3c275bc3a8dac077ef658e0",
+    "hierarchical_config": "88159c1320bc004672d67fd84b1f8fcb9c053e7c722da17b95489bfb3ff3398d",
+    "hierarchical_checkpoint": "0774c328e5edbeda61c3484fcb3502dd5b005d26f5ae8caffdea8c5ee7b65443",
+    "coarse_checkpoint": "01265d6a6706cd639688976f0ba95d77bf040fd50a7064cc12b37652824294cf",
+    "formal_cache": "0282ce6e247273a64dc3602be2b7a148224fb5df2d401650de8c8e7da62279b6",
+    "expanded_cache": "994e2b818ab115ce62a729565da8f207804b7a9e5df268577c422522e8ac5612",
+    "siglip2_manifest": "665bc76935d6d404cef8fe319beff44861f610ea94981e12bb3d1950010e73b8",
+    "evidence_fine_checkpoint": "8da310c54629d00a022dd666807ee8cd7c795c46928b6179f4187f52e8b5ce68"
+  },
+  "proof_artifact_matches": {
+    "action_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/release_materialize.yaml"
+    ],
+    "reliability_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/reliability_heldout.yaml"
+    ],
+    "reliability_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/best_ab_model.pt"
+    ],
+    "fine_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/fine.yaml"
+    ],
+    "fine_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/best_model.pt"
+    ],
+    "evidence_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/evidence.yaml"
+    ],
+    "evidence_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/best_model.pt"
+    ],
+    "hierarchical_config": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/hierarchical.yaml"
+    ],
+    "hierarchical_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/best_model.pt"
+    ],
+    "coarse_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/best_model.pt"
+    ],
+    "formal_cache": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/candidates/heldout_r16.pt"
+    ],
+    "expanded_cache": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/candidates/heldout_r36.pt"
+    ],
+    "siglip2_manifest": [
+      "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/siglip2/heldout/manifest.json"
+    ],
+    "evidence_fine_checkpoint": [
+      "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/best_model.pt"
+    ]
+  },
+  "reports_to_archive": [
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/metrics.json",
+      "archive_relative": "outputs/coarse/metrics.json",
+      "bytes": 21185
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/train.log",
+      "archive_relative": "outputs/coarse/train.log",
+      "bytes": 3375
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/metrics.json",
+      "archive_relative": "outputs/evidence/metrics.json",
+      "bytes": 17714
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/train.log",
+      "archive_relative": "outputs/evidence/train.log",
+      "bytes": 2259
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/metrics.json",
+      "archive_relative": "outputs/fine/metrics.json",
+      "bytes": 31892
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/train.log",
+      "archive_relative": "outputs/fine/train.log",
+      "bytes": 3030
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/metrics.json",
+      "archive_relative": "outputs/hierarchical/metrics.json",
+      "bytes": 42343
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/train.log",
+      "archive_relative": "outputs/hierarchical/train.log",
+      "bytes": 6303
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/metrics.json",
+      "archive_relative": "outputs/reliability/metrics.json",
+      "bytes": 68116
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/train.log",
+      "archive_relative": "outputs/reliability/train.log",
+      "bytes": 5036
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/resolved_config.yaml",
+      "archive_relative": "outputs/stage1/resolved_config.yaml",
+      "bytes": 7511
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/train.log",
+      "archive_relative": "outputs/stage1/train.log",
+      "bytes": 40564
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/train_summary.json",
+      "archive_relative": "outputs/stage1/train_summary.json",
+      "bytes": 185
+    },
+    {
+      "source": "/home/zzk/gmner/null_release_oof_fold6.log",
+      "archive_relative": "pipeline_logs/null_release_oof_fold6.log",
+      "bytes": 1887107
+    }
+  ],
+  "deletion_roots": [
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/candidates",
+      "exists": true,
+      "files": 12,
+      "bytes": 1322489750,
+      "tree_sha256": "564a4c49377e56987d9312fd4f1a87681906f37c709bff4ba8adca51ce133062"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/siglip2",
+      "exists": true,
+      "files": 71,
+      "bytes": 1437572069,
+      "tree_sha256": "5ffba5ade62b7e614a9e0c3ed904c207b92bf086fd3a53200d32091d0de6f6f4"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6",
+      "exists": true,
+      "files": 1528,
+      "bytes": 670233707,
+      "tree_sha256": "4ddd62961f113b530cf7aa23f4a25a6bf6b9eed6dc3eb9db0c79c9454d62af8f"
+    }
+  ],
+  "bytes_to_delete": 3430295526,
+  "estimated_retained_bytes": 37610202,
+  "max_retained_mb": 500.0,
+  "checkpoint_backup_note": "Hash-only checkpoint retention explicitly authorized for streaming OOF fold 6; heldout features, hashes, proof, configs, logs, and metrics retained.",
+  "prepared_at_utc": "2026-07-24T02:33:07.616783+00:00",
+  "pre_cleanup_validation": {
+    "all_required_stages_complete": true,
+    "pipeline_sealed": true,
+    "test_accessed": false,
+    "fold_records": 700,
+    "fixed_top4_valid": true,
+    "self_contained_payload": true,
+    "artifact_hashes_verified": true
+  },
+  "archived_reports": [
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/coarse/metrics.json",
+      "bytes": 21185,
+      "sha256": "2b72b0908e1fc05a12b6cf5f04a819e139e8ae5c5e5bc68a1ccf9d1334d76d8f"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/coarse/train.log",
+      "bytes": 3375,
+      "sha256": "12cf957a37e9abd329228413e914caa91df78cce69c603a6b973b46f48f0d52d"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/evidence/metrics.json",
+      "bytes": 17714,
+      "sha256": "0e6eef17df691a3485820ca73e6d64175dbc4726f4325d646fb22675cc3c410c"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/evidence/train.log",
+      "bytes": 2259,
+      "sha256": "7eca1e1a6552efef12930f1185b04c06f2bcfddda304786a93af1e9bd7fafd91"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/fine/metrics.json",
+      "bytes": 31892,
+      "sha256": "a6d8d622a753a7d652b77701717ba73e23003a93fff07c02b132827a59437f14"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/fine/train.log",
+      "bytes": 3030,
+      "sha256": "6a7a03bac2175184c7c1b94227a70b8dd0be9ed449905321440cfa91b5d7df29"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/hierarchical/metrics.json",
+      "bytes": 42343,
+      "sha256": "b8041a954328ffc028c6726d583f1b73c4c025ba660316f61d6d66d7b6dd6b5b"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/hierarchical/train.log",
+      "bytes": 6303,
+      "sha256": "86791e1fba9b49f9cc342e75f9b2981faad5c2e1a1983a370e6ce55773373e41"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/metrics.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/reliability/metrics.json",
+      "bytes": 68116,
+      "sha256": "15f0c09e44f7a34d0ef39dd7390ebd8085aafbb1b2feb50dec87b44aa706d582"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/reliability/train.log",
+      "bytes": 5036,
+      "sha256": "41c2a475d9993679769cb63a192c38ecb985f4559b48d940421832b547227ace"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/resolved_config.yaml",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/stage1/resolved_config.yaml",
+      "bytes": 7511,
+      "sha256": "8dcbc6e624e345746119da7c08b8a09e3b5fe2b23d435a1e3276427403bdfe5d"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/train.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/stage1/train.log",
+      "bytes": 40564,
+      "sha256": "bec4f82c6e338e32fdbc4f22d0508fe1d9df99317ab957b239966f2cbeb2d874"
+    },
+    {
+      "source": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/train_summary.json",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/stage1/train_summary.json",
+      "bytes": 185,
+      "sha256": "424bfa111b37e56cc54d8e7a47e46576c6029040d2e4a8a5517c5b0fd472bfce"
+    },
+    {
+      "source": "/home/zzk/gmner/null_release_oof_fold6.log",
+      "archive": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/pipeline_logs/null_release_oof_fold6.log",
+      "bytes": 1887107,
+      "sha256": "8c4a8820df72e8d13ab5d5f9a78d3ccdde65bcd8a23b71c36c9644eb00968671"
+    }
+  ],
+  "retained_files_before_cleanup": [
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/coarse/metrics.json",
+      "bytes": 21185,
+      "sha256": "2b72b0908e1fc05a12b6cf5f04a819e139e8ae5c5e5bc68a1ccf9d1334d76d8f"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/coarse/train.log",
+      "bytes": 3375,
+      "sha256": "12cf957a37e9abd329228413e914caa91df78cce69c603a6b973b46f48f0d52d"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/evidence/metrics.json",
+      "bytes": 17714,
+      "sha256": "0e6eef17df691a3485820ca73e6d64175dbc4726f4325d646fb22675cc3c410c"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/evidence/train.log",
+      "bytes": 2259,
+      "sha256": "7eca1e1a6552efef12930f1185b04c06f2bcfddda304786a93af1e9bd7fafd91"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/fine/metrics.json",
+      "bytes": 31892,
+      "sha256": "a6d8d622a753a7d652b77701717ba73e23003a93fff07c02b132827a59437f14"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/fine/train.log",
+      "bytes": 3030,
+      "sha256": "6a7a03bac2175184c7c1b94227a70b8dd0be9ed449905321440cfa91b5d7df29"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/hierarchical/metrics.json",
+      "bytes": 42343,
+      "sha256": "b8041a954328ffc028c6726d583f1b73c4c025ba660316f61d6d66d7b6dd6b5b"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/hierarchical/train.log",
+      "bytes": 6303,
+      "sha256": "86791e1fba9b49f9cc342e75f9b2981faad5c2e1a1983a370e6ce55773373e41"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/reliability/metrics.json",
+      "bytes": 68116,
+      "sha256": "15f0c09e44f7a34d0ef39dd7390ebd8085aafbb1b2feb50dec87b44aa706d582"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/reliability/train.log",
+      "bytes": 5036,
+      "sha256": "41c2a475d9993679769cb63a192c38ecb985f4559b48d940421832b547227ace"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/stage1/resolved_config.yaml",
+      "bytes": 7511,
+      "sha256": "8dcbc6e624e345746119da7c08b8a09e3b5fe2b23d435a1e3276427403bdfe5d"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/stage1/train.log",
+      "bytes": 40564,
+      "sha256": "bec4f82c6e338e32fdbc4f22d0508fe1d9df99317ab957b239966f2cbeb2d874"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/outputs/stage1/train_summary.json",
+      "bytes": 185,
+      "sha256": "424bfa111b37e56cc54d8e7a47e46576c6029040d2e4a8a5517c5b0fd472bfce"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/archive/pipeline_logs/null_release_oof_fold6.log",
+      "bytes": 1887107,
+      "sha256": "8c4a8820df72e8d13ab5d5f9a78d3ccdde65bcd8a23b71c36c9644eb00968671"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/coarse.yaml",
+      "bytes": 1091,
+      "sha256": "d14bb9dce6e8f237fc2bebc2df1ae13aaf194c77364a52ff8c5b44ae3462a086"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/evidence.yaml",
+      "bytes": 1663,
+      "sha256": "6690e7c227b302b859d5ef5710ebfffec1d60aabfc1b26a0ed5b9ca9a0f73766"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/fine.yaml",
+      "bytes": 1928,
+      "sha256": "31b7f04e5986ce95a257d2a8697e2648c565a3c67cc2235bd5418defe404be8e"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/hierarchical.yaml",
+      "bytes": 1601,
+      "sha256": "88159c1320bc004672d67fd84b1f8fcb9c053e7c722da17b95489bfb3ff3398d"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/release_materialize.yaml",
+      "bytes": 1831,
+      "sha256": "6a22a037e041e78c9eaa3f3eb7d07feab79ceea8da16e11f7936b82c54e22d79"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/reliability.yaml",
+      "bytes": 2544,
+      "sha256": "b63177f03b461969e7cb5f86a12693ff4c7076908b42669e882d6874480ed950"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/reliability_heldout.yaml",
+      "bytes": 2549,
+      "sha256": "a8e7afa0cd1b9de5858f48d11644880902ac3ed66ca75368462a62c716cd5891"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/configs/stage1.yaml",
+      "bytes": 1846,
+      "sha256": "0e82312c093858283fb9cd0accc07e740f68ed9fa5265170608bbe1fd2168234"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/fold_proof.json",
+      "bytes": 85197,
+      "sha256": "936ab6b053c14c31e3b4f5d77b831e51e9118a8744f43060f4130b5f586a1e39"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/heldout_features.pt",
+      "bytes": 34310254,
+      "sha256": "1889040e4f46d4b6ef46fad711b6cb1a37f516dd44f4db20f24ae53c4b44ef00"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/heldout_features.pt.sha256",
+      "bytes": 86,
+      "sha256": "acc9ddb31566e932958e70e343b0689780ae4ac0886ed73c0cbd9ecf4bf89492"
+    },
+    {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/pipeline_manifest.json",
+      "bytes": 14502,
+      "sha256": "b24ba3b416f243a74e906cafca9e503c9b5eed6b911e648bf88b6b3aed6488a6"
+    }
+  ],
+  "deleted_roots_completed": [
+    "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/candidates",
+    "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/siglip2",
+    "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6"
+  ],
+  "completed_at_utc": "2026-07-24T02:33:08.077546+00:00",
+  "post_cleanup_validation": {
+    "records": 700,
+    "batches": 88,
+    "retained_bytes": 36582112,
+    "self_contained_reload": true,
+    "test_accessed": false
+  },
+  "actual_retained_bytes": 36582112,
+  "actual_deleted_bytes": 3430295526
+}

@@ -1,0 +1,61 @@
+data:
+  train_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/candidates/train_r16.pt
+  dev_cache: /home/zzk/gmner/knowledge/null_release_oof/roberta128/fold6/candidates/dev_r16.pt
+  num_workers: 0
+  require_oof_train_cache: false
+model:
+  input_size: 768
+  hidden_size: 256
+  num_types: 4
+  num_sources: 4
+  dropout: 0.2
+  base_region_temperature: 1.0
+  region_residual_scale: 0.25
+optim:
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 12
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+loss:
+  lambda_entity: 1.0
+  lambda_visibility: 1.0
+  lambda_region_multi_positive: 1.0
+  lambda_region_iou: 0.2
+  lambda_region_hard: 0.5
+  lambda_region_preserve: 0.5
+  entity_positive_weight: 2.0
+  visibility_positive_weight: 2.0
+  visibility_error_weight: 3.0
+  visibility_preserve_weight: 1.0
+  region_hard_margin: 0.2
+  region_preserve_margin: 0.2
+  iou_temperature: 0.1
+  source_weights:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.25
+  grounding_stage1_only: true
+decode:
+  entity_threshold: 0.0
+  strategy: interval
+  stage1_spans_only: true
+  enable_visibility_correction: true
+  enable_region_override: true
+  visible_from_null_threshold: 0.8
+  null_from_visible_threshold: 0.2
+  region_override_mode: margin
+  region_override_logit_margin: 0.2
+  region_override_probability_margin: 0.05
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: /home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical
+  save_best_metric: gmner_score
+  early_stop_patience: 3
+  log_every_steps: 50
+  evaluate_test_after_training: false

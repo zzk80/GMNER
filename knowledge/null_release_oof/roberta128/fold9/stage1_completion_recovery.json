@@ -1,0 +1,77 @@
+{
+  "format_version": 1,
+  "kind": "null_release_oof_completed_stage_recovery",
+  "status": "recovered",
+  "fold_id": 9,
+  "stage": "stage1",
+  "reason": "Training completed and SIGSEGV occurred during process shutdown.",
+  "failure_signal": "SIGSEGV:11",
+  "test_accessed": false,
+  "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+  "pipeline_manifest": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold9/pipeline_manifest.json",
+  "pipeline_manifest_sha256_before": "017034ee877ef85417cfad510f541e4db8e1e97798e6704a9f4824badf8bf12f",
+  "failure_log": {
+    "path": "/home/zzk/gmner/null_release_oof_fold9.log",
+    "sha256": "0c6297df7005fd76fc9ca58fc7159fc3224342d4dd3a96cefb0e7e393f8c6f0d"
+  },
+  "summary": {
+    "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold9/stage1/train_summary.json",
+    "sha256": "a23bfb0fe923d1a1f9a4c30b9b9271bf9ca4d7d9fdb82bb40ba9fe73f2bba93c"
+  },
+  "resolved_config": {
+    "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold9/stage1/resolved_config.yaml",
+    "sha256": "5d6833333728b03b632f269ee6fa9032878be4b130f755be0dce807d3de44319"
+  },
+  "checkpoint": {
+    "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold9/stage1/best_model.pt",
+    "sha256": "f3ae9b2c9197e364e56d91af7da2d0932f8c8582f7997a3dae24fb7f34571e7e"
+  },
+  "checkpoint_validation": {
+    "best_metric_name": "gmner_score",
+    "best_metric_value": 0.5937562940584089,
+    "best_epoch": 12,
+    "model_state_tensors": 563
+  },
+  "tokenizer_files": [
+    "merges.txt",
+    "tokenizer.json",
+    "vocab.json"
+  ],
+  "completion_markers": [
+    "Best checkpoint: /home/zzk/gmner/outputs/null_release_oof/roberta128/fold9/stage1/best_model.pt",
+    "Skipping final test evaluation by request."
+  ],
+  "recovered_stage": {
+    "status": "complete",
+    "command_sha256": "15070ba496dd0dd270bc319829508bcda0640dcac8908b091f2c19736ff8aad6",
+    "test_accessed": false,
+    "outputs": [
+      {
+        "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold9/stage1/best_model.pt",
+        "sha256": "f3ae9b2c9197e364e56d91af7da2d0932f8c8582f7997a3dae24fb7f34571e7e"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold9.jsonl",
+        "sha256": "3e24cd3c19e4427b9f84ad3a93ee022a54dbc49ca2791b302bae8f81bb4bbd51"
+      },
+      {
+        "path": "/home/zzk/gmner/GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt",
+        "sha256": "3ff31ebca3c858926ec6c98694820fda39c0f9718645174c00069ee5bcffab69"
+      }
+    ],
+    "heldout_excluded": true,
+    "train_record_ids_sha256": "0132900c93941a3d3e77d0739fa9bd23ce9edb2893221ecea84b3f1283745ba1",
+    "config": {
+      "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold9/configs/stage1.yaml",
+      "sha256": "b766dce51cc4769eff728223f8ef0510b5cea036acf2bf73b606120815c77d4a"
+    },
+    "checkpoint": {
+      "path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold9/stage1/best_model.pt",
+      "sha256": "f3ae9b2c9197e364e56d91af7da2d0932f8c8582f7997a3dae24fb7f34571e7e"
+    }
+  },
+  "recovered_at_utc": "2026-07-24T08:22:50.452329+00:00",
+  "pipeline_manifest_sha256_after": "48526848d2b8482d7bc1cd3a0a72b3e945635a0ec814be68c7764ea9f8c8c8e9"
+}

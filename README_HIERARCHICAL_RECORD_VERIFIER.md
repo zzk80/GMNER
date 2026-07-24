@@ -770,6 +770,49 @@ sealed、八阶段完整、test-free、proof/hash、700 条 heldout、固定 Top
 Stage1 完成后 `SIGSEGV: 11` 可自动恢复。Fold 9 后不会自动合并或训练 Release Head，
 必须先完成人工十折覆盖与分布审计。
 
+### 14.4 M3.3A 十折 OOF Train 聚合
+
+十折 heldout 特征完成后，必须先聚合已有 M3.3A 正式预测，而不是再次运行
+cross-fitting。合并缓存的只读评估入口为：
+
+```bash
+PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
+  --cache knowledge/null_release_oof/roberta128/full_chain_train_oof.pt \
+  --source-file GMNER-main/Twitter10000_v2.0/txt_fine/train.txt \
+  --output outputs/fmnerg_roberta128_m33a_oof_train/metrics.json
+```
+
+也可以直接读取十个折级归档：
+
+```bash
+PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
+  --feature-root knowledge/null_release_oof/roberta128 \
+  --source-file GMNER-main/Twitter10000_v2.0/txt_fine/train.txt \
+  --output outputs/fmnerg_roberta128_m33a_oof_train/metrics.json
+```
+
+该入口只使用 heldout cache 中的 `deployment_span_mask`、正式 fixed type、
+Evidence Visibility 状态和 Fine top-1/NULL，原始 train 标签仅提供完整 gold 数量及
+record-ID 全集审计。它不加载模型、不执行训练或推理，也没有 dev/test 数据入口。
+
+正式聚合结果为：
+
+```text
+records / folds       7000 / 10
+predicted / gold      12001 / 11779
+Span F1               0.870900
+MNER F1               0.811690
+EEG F1                0.651135
+GMNER F1              0.610849
+GMNER fold mean/std   0.610869 / 0.010907
+test_accessed         false
+```
+
+主结果口径采用 7000 条 OOF 预测合并后的微平均 `0.610849`，fold mean/std 仅用于
+稳定性诊断。这是严谨的 M3.3A OOF Train 结果，但不是 fold ensemble；因此不会自动
+改变正式 Dev `0.621316` 或 Test `0.61529`。使用十个 fold checkpoint 对 Dev/Test
+投票或平均属于独立的模型集成实验，不能与 OOF 指标混写。
+
 M3.6B 仅在多实体、同类 object、Top-1/2 冲突、高 context overlap 且 pair margin
 较低时启用 Set Verifier。NULL 可无限复用，真实区域默认允许共享；只有不同 PER 等
 明确竞争关系才施加软容量损失。普通记录必须绕过集合模块，以单独报告碰撞净修正、
