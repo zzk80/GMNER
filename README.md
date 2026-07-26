@@ -81,7 +81,8 @@ configs/fmnerg_twitter10000_evidence_visibility.yaml
   F0 以及“RoBERTa 最后 4 层 / 全量解冻”的隔离副本消融，详见
   [Subtype Sidecar](sidecars/fmnerg_subtype/README.md)。
 - `sidecars/fmnerg_joint/`：读取冻结 M3.3A region 的 subtype-region
-  联合实验；使用 matched F2-continuation control，不修改正式
+  联合实验；matched C1/J0 已判定 no-go 并关闭。目录当前只保留复现代码以及
+  新结构实施前的 Dev-only R36 subtype 可分性 Oracle，不修改正式
   span/type/region，详见
   [Joint Experiments](sidecars/fmnerg_joint/README.md)。
 - `docs/HIERARCHICAL_RECORD_VERIFIER.md`：M2 到 M3.3A 的方法细节。
@@ -139,7 +140,12 @@ PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
 
 - **FMNERG J0 matched control**：C1 continued-F2 与 fixed-region visual
   fusion 的三 seed Dev 最优均为 epoch 0，J0 相对 C1 的 FMNERG 增量为
-  `0.000000`；按预注册规则 no-go，未读取 Test。
+  `0.000000`；按预注册规则 no-go，未读取 Test。F2 继续作为当前 FMNERG
+  最优方案，J0/J1/J2 不再推进。
+- **Subtype-region successor gate**：在实现
+  `Top-K regions + subtype-conditioned attention` 前，先使用 Train 视觉
+  subtype centroid 对 Dev 的“GMNER 正确但 subtype 错误”切片执行只读 R36
+  Oracle；该结果只决定是否值得开发新结构，不改变正式 Dev/Test。
 - **M3.6A-r1**：非 OOF Dev 达到 `0.623738`，不能作为正式提升。
 - **M3.6A-r2**：严格 10-fold full-chain OOF 下，最优 checkpoint 为
   epoch-0 KEEP，无可部署收益，状态为 **archived no-go**。

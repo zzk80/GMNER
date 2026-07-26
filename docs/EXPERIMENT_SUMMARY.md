@@ -15,6 +15,12 @@
   `0.816714/0.660880/0.621316`，formal prediction changed 为 0。
 - 整体方案和视觉模块均未达到预注册门槛，判定 no-go；不启动 J1/J2，
   不构建 J0 OOF formal-region 特征，不读取 Test。正式 F2 Test 结果保持不变。
+- F2 全量解冻 RoBERTa 固定为当前 FMNERG 最优方案；C1/J0/J1/J2 分支关闭。
+- 后继方向不再使用固定 M3.3A Top-1 region，而是候选通过只读 Dev Oracle 后才
+  考虑 `Top-K region set + subtype-conditioned attention`。Oracle 使用 Train
+  视觉 subtype centroid，专门分析“GMNER 正确但 subtype 错误”切片，并区分
+  formal region、Fine Top-K 与完整 R36 的视觉可分性上限；全程不训练、不访问
+  Test。
 
 ## 2026-07-24 M3.6A-r2 最终归档
 

@@ -285,3 +285,64 @@ docs/experiments/fmnerg_joint_j0_matched_dev_summary.json
 
 C1/J0 的工具没有 Test 参数。F2 Test 已经冻结，不能用于 J0/J1/J2 的
 结构、学习率、epoch 或阈值选择。
+
+## Branch Closure And Successor Gate
+
+截至 2026-07-26，联合分支的正式边界为：
+
+```text
+F2 全量解冻 RoBERTa：当前 FMNERG 最优方案，冻结
+C1 continued-F2：      无继续训练收益，关闭
+J0 fixed-region visual：无独立视觉贡献，关闭
+J1/J2：                不启动，关闭
+```
+
+因此不再沿“固定 M3.3A Top-1 region + 小型 visual residual”继续扩展。若
+视觉 subtype 方法仍有价值，结构必须改为：
+
+```text
+entity text state
+  + Fine Top-K / R36 region set
+  + one query per subtype
+  -> subtype-conditioned region attention
+  -> subtype-specific visual evidence
+  -> hierarchy-masked 51-way subtype prediction
+```
+
+关键变化是视觉模块参与证据选择；不同 subtype 可以关注不同区域，而不是接受
+M3.3A 已选 Top-1 作为唯一视觉输入。
+
+### Read-only R36 Oracle
+
+新模型实现前必须先运行 Dev-only Oracle：
+
+```bash
+cd ~/gmner
+
+PYTHONPATH=. python tools/analyze_fmnerg_subtype_region_oracle.py \
+  --joint-config sidecars/fmnerg_joint/configs/j0_visual_fusion.yaml \
+  --evidence-config configs/fmnerg_twitter10000_evidence_visibility.yaml \
+  --seeds 41,42,43 \
+  --top-k 1,2,4,8,16 \
+  --device cuda \
+  --output outputs/fmnerg_joint_subtype_region_oracle/dev_oracle.json
+```
+
+该工具没有 split/Test 参数，不训练模型，也不执行反向传播。它只分析：
+
+```text
+formal GMNER 已正确
+且 F2 subtype 错误
+```
+
+具体口径：
+
+1. 使用 Train gold-visible R36 特征形成 51 个冻结视觉 subtype centroid。
+2. 在 Dev 上比较正确 subtype 与 F2 错误 subtype，以及同 parent 全部 sibling。
+3. 分别报告固定 formal region、Fine Top-1/2/4/8/16 和完整 R36 的上限。
+4. 只有官方 IoU 合格的真实区域计为 clean visual evidence。
+5. gold NULL subtype 错误单独报告，不伪装成可由 region attention 恢复。
+
+这是 gold-aware 的可分性诊断，不是部署准确率。只有当 Fine Top-4 相对固定
+formal region 在三个 seed 上都产生稳定的新增 pairwise/sibling recovery，才实现
+subtype-conditioned region attention；否则终止通用视觉 subtype 融合路线。
