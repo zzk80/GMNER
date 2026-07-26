@@ -32,41 +32,43 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class SceneDataset(Dataset):
-    """Scene classification dataset"""
+# Dataset class - only needed for PyTorch version
+if TORCH_AVAILABLE:
+    class SceneDataset(Dataset):
+        """Scene classification dataset"""
 
-    def __init__(self, records: List[Dict], label_fn=None):
-        """
-        Args:
-            records: 记录列表，每条包含 text, entities 等
-            label_fn: 标签生成函数，默认使用 entity count
-        """
-        self.records = records
-        self.label_fn = label_fn or self._default_label_fn
+        def __init__(self, records: List[Dict], label_fn=None):
+            """
+            Args:
+                records: 记录列表，每条包含 text, entities 等
+                label_fn: 标签生成函数，默认使用 entity count
+            """
+            self.records = records
+            self.label_fn = label_fn or self._default_label_fn
 
-    def _default_label_fn(self, record: Dict) -> int:
-        """默认标签: 0=single (<=1 entity), 1=multi (>1 entity)"""
-        num_entities = len(record.get('entities', []))
-        return 0 if num_entities <= 1 else 1
+        def _default_label_fn(self, record: Dict) -> int:
+            """默认标签: 0=single (<=1 entity), 1=multi (>1 entity)"""
+            num_entities = len(record.get('entities', []))
+            return 0 if num_entities <= 1 else 1
 
-    def __len__(self):
-        return len(self.records)
+        def __len__(self):
+            return len(self.records)
 
-    def __getitem__(self, idx):
-        record = self.records[idx]
-        label = self.label_fn(record)
+        def __getitem__(self, idx):
+            record = self.records[idx]
+            label = self.label_fn(record)
 
-        # 提取特征
-        text_length = len(record['tokens'])
-        num_spans = len(record['entities'])
+            # 提取特征
+            text_length = len(record['tokens'])
+            num_spans = len(record['entities'])
 
-        # 简化版本：使用统计特征
-        return {
-            'text_length': text_length,
-            'num_spans': num_spans,
-            'label': label,
-            'record_idx': idx,
-        }
+            # 简化版本：使用统计特征
+            return {
+                'text_length': text_length,
+                'num_spans': num_spans,
+                'label': label,
+                'record_idx': idx,
+            }
 
 
 def parse_conll_file(file_path: Path) -> List[Dict]:
