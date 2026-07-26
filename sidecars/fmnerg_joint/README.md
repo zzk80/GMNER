@@ -131,6 +131,20 @@ MNER / EEG / GMNER exact identity
 Test accessed = false
 ```
 
+首次同步到训练环境后先执行只读预检：
+
+```bash
+PYTHONPATH=. /home/zzk/miniconda3/envs/gmner/bin/python \
+  tools/train_fmnerg_joint_j0.py \
+  --config sidecars/fmnerg_joint/configs/j0_visual_fusion.yaml \
+  --seed 41 \
+  --device cuda \
+  --preflight
+```
+
+预检只验证缓存、checkpoint、epoch-0 F2 恒等性和冻结 GMNER，不执行反向
+传播，也不访问 Test。
+
 运行：
 
 ```bash

@@ -47,6 +47,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default=None)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--num-epochs", type=int, default=None)
+    parser.add_argument(
+        "--preflight",
+        action="store_true",
+        help="Validate artifacts and epoch-0 identity without training.",
+    )
     return parser.parse_args()
 
 
@@ -239,6 +244,34 @@ def main() -> None:
         raise AssertionError(
             "J0 epoch 0 does not reproduce its paired F2 checkpoint."
         )
+    if args.preflight:
+        print(
+            json.dumps(
+                {
+                    "status": "preflight_passed",
+                    "seed": seed,
+                    "train_records": len(train_dataset),
+                    "train_examples": len(train_dataset.examples),
+                    "dev_formal_examples": len(dev_formal_dataset.examples),
+                    "data_coverage": data_artifacts["coverage"],
+                    "initial_fine_mner_f1": initial_metrics[
+                        "fine_mner_f1"
+                    ],
+                    "initial_fmnerg_f1": initial_metrics["fmnerg_f1"],
+                    "initial_gmner_f1": initial_metrics["gmner_f1"],
+                    "formal_prediction_changed_count": initial_metrics[
+                        "j0_formal_prediction_changed_count"
+                    ],
+                    "formal_stage1_mutated": False,
+                    "formal_region_mutated": False,
+                    "test_accessed": False,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            flush=True,
+        )
+        return
 
     checkpoint_path = output_dir / "best_model.pt"
     history: list[dict[str, Any]] = [
