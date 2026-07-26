@@ -20,6 +20,11 @@ from sidecars.fmnerg_subtype.encoder_model import (
     pool_online_span_features,
     trainable_checkpoint_state,
 )
+from sidecars.fmnerg_subtype.final_test import (
+    FINAL_TEST_SEEDS,
+    aggregate_seed_metrics,
+    load_final_test_protocol,
+)
 from sidecars.fmnerg_subtype.online_data import (
     OnlineSubtypeCollator,
     OnlineSubtypeRecordDataset,
@@ -300,6 +305,34 @@ class SubtypeEncoderTest(unittest.TestCase):
                 for run in runs
             )
         )
+
+    def test_final_test_protocol_is_frozen_before_access(self):
+        protocol = load_final_test_protocol(
+            ROOT
+            / "sidecars"
+            / "fmnerg_subtype"
+            / "roberta128_encoder_final_test.yaml",
+            ROOT,
+        )
+        self.assertEqual(
+            tuple(protocol["method"]["seeds"]),
+            FINAL_TEST_SEEDS,
+        )
+        self.assertEqual(protocol["method"]["encoder_scope"], "all")
+        self.assertEqual(protocol["method"]["selection_source"], "dev")
+        self.assertEqual(protocol["method"]["report"], "mean_std")
+        self.assertFalse(protocol["method"]["select_best_seed_on_test"])
+        self.assertEqual(
+            [item["seed"] for item in protocol["checkpoints"]],
+            list(FINAL_TEST_SEEDS),
+        )
+
+    def test_final_test_aggregation_has_no_seed_selection(self):
+        rows = [{"fmnerg_f1": value} for value in (0.5, 0.52, 0.51)]
+        result = aggregate_seed_metrics(rows, ("fmnerg_f1",))
+        self.assertAlmostEqual(result["fmnerg_f1"]["mean"], 0.51)
+        self.assertIn("std", result["fmnerg_f1"])
+        self.assertNotIn("best", result["fmnerg_f1"])
 
 
 if __name__ == "__main__":

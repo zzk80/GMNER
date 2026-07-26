@@ -64,7 +64,10 @@ def load_formal_predictions(
     path: str | Path,
     *,
     taxonomy: SubtypeTaxonomy,
+    expected_split: str = "dev",
 ) -> dict[str, Any]:
+    if expected_split not in {"dev", "test"}:
+        raise ValueError("Formal prediction split must be dev or test.")
     source = Path(path)
     payload = json.loads(source.read_text(encoding="utf-8"))
     metadata = dict(payload.get("metadata") or {})
@@ -72,10 +75,16 @@ def load_formal_predictions(
         raise ValueError("Not a frozen FMNERG formal-prediction artifact.")
     if int(metadata.get("format_version", -1)) != 1:
         raise ValueError("Unsupported frozen formal-prediction format.")
-    if metadata.get("split") != "dev":
-        raise ValueError("Only dev formal predictions are allowed before test release.")
-    if metadata.get("test_accessed") is not False:
-        raise ValueError("Frozen formal predictions accessed test data.")
+    if metadata.get("split") != expected_split:
+        raise ValueError(
+            f"Expected {expected_split} formal predictions, "
+            f"found {metadata.get('split')!r}."
+        )
+    expected_test_access = expected_split == "test"
+    if metadata.get("test_accessed") is not expected_test_access:
+        raise ValueError(
+            "Frozen formal-prediction Test access marker is inconsistent."
+        )
     if metadata.get("taxonomy_sha256") != taxonomy.source_sha256:
         raise ValueError("Frozen formal-prediction taxonomy fingerprint changed.")
     records = list(payload.get("records") or [])
@@ -397,8 +406,8 @@ def evaluate_formal_subtype_ids(
         "metadata": {
             "kind": "fmnerg_subtype_sidecar_evaluation",
             "format_version": 1,
-            "split": "dev",
-            "test_accessed": False,
+            "split": metadata["split"],
+            "test_accessed": bool(metadata["test_accessed"]),
             **identity,
         },
         "metrics": metrics,

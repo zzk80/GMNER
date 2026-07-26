@@ -50,7 +50,10 @@ def export_evidence_visibility_predictions(
     expanded_cache_path: str | Path,
     device: torch.device,
     batch_size: int | None = None,
+    split: str = "dev",
 ) -> dict[str, Any]:
+    if split not in {"dev", "test"}:
+        raise ValueError("Formal subtype export split must be dev or test.")
     config_path = resolve(evidence_config_path, root)
     checkpoint_path = resolve(evidence_checkpoint_path, root)
     formal_path = resolve(formal_cache_path, root)
@@ -269,7 +272,7 @@ def export_evidence_visibility_predictions(
         "metadata": {
             "kind": "fmnerg_frozen_formal_predictions",
             "format_version": 1,
-            "split": "dev",
+            "split": split,
             "records": len(records),
             "predictions": int(coarse_metrics["predicted"]),
             "gold": int(coarse_metrics["gold"]),
@@ -286,7 +289,7 @@ def export_evidence_visibility_predictions(
             "expanded_cache": str(expanded_path),
             "expanded_cache_sha256": sha256_file(expanded_path),
             "coarse_metrics": coarse_metrics,
-            "test_accessed": False,
+            "test_accessed": split == "test",
         },
         "records": records,
     }

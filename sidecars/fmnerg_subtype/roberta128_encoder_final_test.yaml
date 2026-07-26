@@ -1,0 +1,62 @@
+kind: fmnerg_subtype_encoder_final_test_protocol
+format_version: 1
+
+method:
+  name: isolated_fmnerg_roberta_full_finetuning
+  encoder_scope: all
+  selection_source: dev
+  selection_metric: fmnerg_f1
+  seeds: [41, 42, 43]
+  report: mean_std
+  select_best_seed_on_test: false
+  architecture_and_hyperparameters_frozen: true
+
+artifacts:
+  encoder_config:
+    path: sidecars/fmnerg_subtype/roberta128_encoder_all.yaml
+    sha256: c396ea6f6d2ff85632e3ebb01c510875c86300b441d7f70f0c945c1b68b81ff5
+  dev_summary:
+    path: outputs/fmnerg_roberta128_subtype_encoder_ablation/summary.json
+    sha256: 14efe32f595dc8f6f4c00b58c8293281305fe2bc367277c25fb40c5a40aaaffe
+  taxonomy:
+    path: sidecars/fmnerg_subtype/taxonomy_twitter10000.json
+    sha256: 84d6bae4298d383aea989b7a559c4d5d68d465733fcdfe1b3da288380e622f40
+  stage1_checkpoint:
+    path: outputs/fmnerg_stage1_roberta128/best_model.pt
+    sha256: efc617f09e5a7cda818560a4640d606623a2f386cf4035f3b90c3fc620a4d29d
+  evidence_config:
+    path: configs/fmnerg_twitter10000_evidence_visibility.yaml
+    sha256: bc90e550547bca42fac9c02f00e3e9b0af915b787bb318718ae307829cd22eea
+  evidence_checkpoint:
+    path: outputs/fmnerg_roberta128_evidence_visibility/best_model.pt
+    sha256: 666fe9731b46580983a0b5a93fb5f3169f59d7bff0931fbfad915b511d1f8989
+
+checkpoints:
+  - seed: 41
+    path: outputs/fmnerg_roberta128_subtype_encoder_ablation/all_seed41/best_model.pt
+    sha256: 327276c327d83f503f2f6a98e897d0766c6a3513d34d0ba715f7ae3a26a60b5c
+  - seed: 42
+    path: outputs/fmnerg_roberta128_subtype_encoder_ablation/all_seed42/best_model.pt
+    sha256: e0f4abeb730e09d11883f73f79a02ca8aa9bb6494ec9db286ce85b87aa4eb9c7
+  - seed: 43
+    path: outputs/fmnerg_roberta128_subtype_encoder_ablation/all_seed43/best_model.pt
+    sha256: 05e48ee9853280109f64acf00f967edc3ee4faef1b88c8e85734717a0e8d49c7
+
+test_data:
+  source:
+    path: GMNER-main/Twitter10000_v2.0/txt_fine/test.txt
+    sha256: 70e726cc49fa8f9003c29857294f9bb68fe017af4a63a95ad22f2d58c526277e
+  formal_cache:
+    path: knowledge/record_candidates/roberta128/fmnerg_test_hierarchical.pt
+    sha256: ba8ba18f86fa7143a7c05e61a4cbc2041827cbbc8900a828b6edd0540a0cdf90
+  expanded_cache:
+    path: knowledge/record_candidates/roberta128/fmnerg_test_hierarchical_r36.pt
+    sha256: 105d068601c66c6f4577580d93eac59ba16fc6b672f5946aac7158acc5e25da5
+
+expected_test_main_chain:
+  coarse_mner_f1: 0.81843
+  eeg_f1: 0.65216
+  gmner_f1: 0.61529
+  tolerance: 0.00005
+
+output_dir: outputs/fmnerg_roberta128_subtype_encoder_final_test

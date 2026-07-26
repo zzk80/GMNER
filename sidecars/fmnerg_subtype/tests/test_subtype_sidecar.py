@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -15,6 +17,7 @@ from sidecars.fmnerg_subtype.data import (
 )
 from sidecars.fmnerg_subtype.evaluator import (
     evaluate_formal_predictions,
+    load_formal_predictions,
     validate_expected_frozen_gmner,
 )
 from sidecars.fmnerg_subtype.losses import build_subtype_class_weights
@@ -280,6 +283,36 @@ class SubtypeSidecarTest(unittest.TestCase):
         self.assertEqual(result["metrics"]["fine_mner_f1"], 1.0)
         self.assertEqual(result["metrics"]["fmnerg_f1"], 1.0)
         self.assertEqual(result["metrics"]["hierarchy_consistency_rate"], 1.0)
+        self.assertEqual(result["metadata"]["split"], "dev")
+        self.assertFalse(result["metadata"]["test_accessed"])
+
+    def test_test_formal_predictions_require_explicit_release(self):
+        records = []
+        payload = {
+            "metadata": {
+                "kind": "fmnerg_frozen_formal_predictions",
+                "format_version": 1,
+                "split": "test",
+                "taxonomy_sha256": self.taxonomy.source_sha256,
+                "coarse_prediction_sha256": (
+                    canonical_coarse_prediction_sha256(records)
+                ),
+                "coarse_metrics": coarse_end_to_end_metrics(records),
+                "test_accessed": True,
+            },
+            "records": records,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "formal.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                load_formal_predictions(path, taxonomy=self.taxonomy)
+            loaded = load_formal_predictions(
+                path,
+                taxonomy=self.taxonomy,
+                expected_split="test",
+            )
+        self.assertTrue(loaded["metadata"]["test_accessed"])
 
 
 if __name__ == "__main__":
