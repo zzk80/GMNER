@@ -516,6 +516,64 @@ test_accessed = false
 F1/F2 只在 Dev 上比较。选定唯一 scope 和学习率后，才允许对最终模型执行一次
 Test；当前工具没有 Test 参数，防止把 Test 用作调参集。
 
+### F1/F2 Dev 结果（3 seeds）
+
+| Scope | Fine MNER F1 | FMNERG F1 | Gold Macro-F1 |
+| --- | ---: | ---: | ---: |
+| Frozen F0（本轮重建） | 0.61324 +/- 0.00151 | 0.47167 +/- 0.00133 | 0.52185 +/- 0.01288 |
+| Last-4 | 0.65240 +/- 0.00389 | 0.49926 +/- 0.00238 | 0.62676 +/- 0.01197 |
+| **All** | **0.67488 +/- 0.00243** | **0.51729 +/- 0.00083** | **0.68284 +/- 0.00561** |
+
+全量解冻在三个 seed 上均取得正 FMNERG 增益，并保持
+`GMNER=0.621316108` 完全恒等，因此在 Dev 上锁定为唯一最终方案。历史 F0
+曾记录 `FMNERG=0.47719`；即使采用该更强基线，全量解冻仍提升约 `+0.04010`。
+
+### Final Test（冻结结果）
+
+最终 Test 在架构、学习率和三个 seed checkpoint 全部冻结后一次性执行，不按
+Test 选择最佳 seed：
+
+| Seed | Epoch | Fine MNER F1 | FMNERG F1 |
+| ---: | ---: | ---: | ---: |
+| 41 | 10 | 0.66118 | 0.50196 |
+| 42 | 11 | 0.66118 | 0.49961 |
+| 43 | 14 | 0.66196 | 0.50275 |
+| **Mean +/- Std** | - | **0.66144 +/- 0.00037** | **0.50144 +/- 0.00133** |
+
+辅助 subtype 指标：
+
+```text
+Gold-span subtype Accuracy = 0.76825 +/- 0.00074
+Gold-span subtype Macro-F1 = 0.67966 +/- 0.00954
+Parent-conditioned Accuracy = 0.80818 +/- 0.00045
+```
+
+冻结主链在三个 seed 上严格一致：
+
+```text
+MNER  = 0.8184313725
+EEG   = 0.6521568627
+GMNER = 0.6152941176
+formal_stage1_mutated = false
+gmner_identity_exact = true
+```
+
+一次性访问契约：
+
+```text
+Dev-selected scope: all
+Predetermined seeds: 41 / 42 / 43
+Test access count: 1
+Select best seed on Test: false
+Preregistered code commit: c4eb925
+Protocol SHA-256: 5645efe00e1fecf14a727a353d777efee75c36e4e313954614449a4e0274cc37
+Result SHA-256: e25661a161a6945574bd885ec5955304c78276340a30677231ef5b7a4d47166d
+```
+
+可审计结果快照位于
+`sidecars/fmnerg_subtype/roberta128_encoder_final_test_result.json`。该 Test
+结果现已冻结，不再用于结构、学习率、seed 或阈值选择。
+
 ## 与 NULL Release OOF 的关系
 
 该实现全部位于：

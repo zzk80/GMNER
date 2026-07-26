@@ -1,0 +1,86 @@
+{
+  "kind": "fmnerg_subtype_encoder_final_test_frozen_result",
+  "format_version": 1,
+  "method": "isolated_fmnerg_roberta_full_finetuning",
+  "encoder_scope": "all",
+  "selection_source": "dev",
+  "selection_metric": "fmnerg_f1",
+  "seeds": [
+    41,
+    42,
+    43
+  ],
+  "report": "mean_std",
+  "select_best_seed_on_test": false,
+  "architecture_and_hyperparameters_frozen": true,
+  "formal_stage1_mutated": false,
+  "gmner_identity_exact": true,
+  "test_accessed": true,
+  "test_access_count": 1,
+  "test_access_started_at": "2026-07-26T05:44:35.722220+00:00",
+  "test_access_completed_at": "2026-07-26T05:44:50.431003+00:00",
+  "preregistered_code_commit": "c4eb9250a147649ffc5f4274bf54e9c9db9ae4f1",
+  "protocol_sha256": "5645efe00e1fecf14a727a353d777efee75c36e4e313954614449a4e0274cc37",
+  "formal_predictions_sha256": "50b97389b741a65df1673748a0d51a8209781f3a1ebb4961763b7d911b356cea",
+  "source_summary_sha256": "e25661a161a6945574bd885ec5955304c78276340a30677231ef5b7a4d47166d",
+  "source_seal_sha256": "b62e61a8421479734a554763bc5fd8deb0839959285bb64b935fa8c48983e01f",
+  "fixed_main_chain_metrics": {
+    "mner_f1": 0.8184313725490198,
+    "eeg_f1": 0.6521568627450981,
+    "gmner_f1": 0.6152941176470589
+  },
+  "per_seed": [
+    {
+      "seed": 41,
+      "checkpoint_epoch": 10,
+      "checkpoint_sha256": "327276c327d83f503f2f6a98e897d0766c6a3513d34d0ba715f7ae3a26a60b5c",
+      "fine_mner_f1": 0.6611764705882353,
+      "fmnerg_f1": 0.5019607843137254,
+      "subtype_accuracy_on_gold_spans": 0.7687770349980338,
+      "subtype_macro_f1_on_gold_spans": 0.6917315591377258,
+      "parent_conditioned_subtype_accuracy": 0.8078581696214662
+    },
+    {
+      "seed": 42,
+      "checkpoint_epoch": 11,
+      "checkpoint_sha256": "e0f4abeb730e09d11883f73f79a02ca8aa9bb6494ec9db286ce85b87aa4eb9c7",
+      "fine_mner_f1": 0.6611764705882353,
+      "fmnerg_f1": 0.4996078431372549,
+      "subtype_accuracy_on_gold_spans": 0.7672040896578843,
+      "subtype_macro_f1_on_gold_spans": 0.6684092993819271,
+      "parent_conditioned_subtype_accuracy": 0.8078581696214662
+    },
+    {
+      "seed": 43,
+      "checkpoint_epoch": 14,
+      "checkpoint_sha256": "05e48ee9853280109f64acf00f967edc3ee4faef1b88c8e85734717a0e8d49c7",
+      "fine_mner_f1": 0.6619607843137255,
+      "fmnerg_f1": 0.5027450980392156,
+      "subtype_accuracy_on_gold_spans": 0.7687770349980338,
+      "subtype_macro_f1_on_gold_spans": 0.6788282651478322,
+      "parent_conditioned_subtype_accuracy": 0.8088164829899377
+    }
+  ],
+  "aggregate": {
+    "fine_mner_f1": {
+      "mean": 0.661437908496732,
+      "std": 0.00036972903591456474
+    },
+    "fmnerg_f1": {
+      "mean": 0.501437908496732,
+      "std": 0.0013330769970176775
+    },
+    "subtype_accuracy_on_gold_spans": {
+      "mean": 0.7682527198846507,
+      "std": 0.000741493544303667
+    },
+    "subtype_macro_f1_on_gold_spans": {
+      "mean": 0.6796563745558284,
+      "std": 0.00953926181361171
+    },
+    "parent_conditioned_subtype_accuracy": {
+      "mean": 0.8081776074109567,
+      "std": 0.000451753254231956
+    }
+  }
+}

@@ -9,13 +9,17 @@
 Current formal method: M3.3A
 Formal Dev GMNER:      0.621316
 Formal Test MNER:      0.81843
+Formal Test Fine MNER: 0.66144 +/- 0.00037
 Formal Test EEG:       0.65216
 Formal Test GMNER:     0.61529
+Formal Test FMNERG:    0.50144 +/- 0.00133
 ```
 
 - Dev/Test 结果已经冻结。
 - M3.6 NULL Release 没有访问 Test，也没有进入正式链路。
 - GMNER 与 FMNERG 都是主任务；51 类 subtype 由独立 sidecar 评估。
+- FMNERG 使用 Dev 选定的全量解冻 RoBERTa 副本，Test 固定报告三个预定
+  seed 的 mean/std，不按 Test 选择 seed。
 
 ## Formal Architecture
 
@@ -39,11 +43,11 @@ RoBERTa Stage1
 
 ## Formal Results
 
-| Split | Span F1 | MNER F1 | EEG F1 | GMNER F1 |
-| --- | ---: | ---: | ---: | ---: |
-| OOF Train | 0.870900 | 0.811690 | 0.651135 | 0.610849 |
-| Dev | - | 0.816714 | 0.660880 | 0.621316 |
-| Test | - | 0.81843 | 0.65216 | 0.61529 |
+| Split | Span F1 | MNER F1 | Fine MNER F1 | EEG F1 | GMNER F1 | FMNERG F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| OOF Train | 0.870900 | 0.811690 | - | 0.651135 | 0.610849 | - |
+| Dev | - | 0.816714 | 0.67488 +/- 0.00243 | 0.660880 | 0.621316 | 0.51729 +/- 0.00083 |
+| Test | - | 0.81843 | 0.66144 +/- 0.00037 | 0.65216 | 0.61529 | 0.50144 +/- 0.00133 |
 
 OOF Train 是 10 个 heldout fold、7000 条记录的严格 micro-average，不是
 fold ensemble，也不会改变正式 Dev/Test 结果。其 fold GMNER 为

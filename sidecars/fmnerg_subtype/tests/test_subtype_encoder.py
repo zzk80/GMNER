@@ -334,6 +334,26 @@ class SubtypeEncoderTest(unittest.TestCase):
         self.assertIn("std", result["fmnerg_f1"])
         self.assertNotIn("best", result["fmnerg_f1"])
 
+    def test_frozen_final_test_result_preserves_main_chain(self):
+        path = (
+            ROOT
+            / "sidecars"
+            / "fmnerg_subtype"
+            / "roberta128_encoder_final_test_result.json"
+        )
+        result = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(result["test_access_count"], 1)
+        self.assertFalse(result["select_best_seed_on_test"])
+        self.assertEqual(
+            [row["seed"] for row in result["per_seed"]],
+            list(FINAL_TEST_SEEDS),
+        )
+        self.assertAlmostEqual(
+            result["fixed_main_chain_metrics"]["gmner_f1"],
+            0.6152941176470589,
+        )
+        self.assertNotIn("best_seed", result)
+
 
 if __name__ == "__main__":
     unittest.main()
