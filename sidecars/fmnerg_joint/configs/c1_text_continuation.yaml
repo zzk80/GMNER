@@ -13,7 +13,7 @@ initialization:
 
 model:
   stage: j0
-  experiment_mode: visual_fusion
+  experiment_mode: text_continuation
   text_feature_size: 2304
   region_feature_size: 768
   geometry_size: 4
@@ -41,7 +41,7 @@ runtime:
   seed: 42
   device: cuda
   mixed_precision: true
-  output_dir: outputs/fmnerg_joint_j0_seed42
+  output_dir: outputs/fmnerg_joint_c1_seed42
   expected_dev_gmner_f1: 0.621316108
   expected_dev_gmner_tolerance: 0.0000005
   expected_initial_fmnerg_f1: null

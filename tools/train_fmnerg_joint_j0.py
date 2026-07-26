@@ -78,6 +78,22 @@ def metric_tuple(metrics: dict[str, Any]) -> tuple[float, float, float]:
     )
 
 
+def attach_initial_f2_baseline(
+    metrics: dict[str, Any],
+    *,
+    initial_fine_mner_f1: float,
+    initial_fmnerg_f1: float,
+) -> None:
+    metrics["initial_f2_fine_mner_f1"] = float(initial_fine_mner_f1)
+    metrics["initial_f2_fmnerg_f1"] = float(initial_fmnerg_f1)
+    metrics["fine_mner_delta_vs_initial_f2"] = (
+        float(metrics["fine_mner_f1"]) - float(initial_fine_mner_f1)
+    )
+    metrics["fmnerg_delta_vs_initial_f2"] = (
+        float(metrics["fmnerg_f1"]) - float(initial_fmnerg_f1)
+    )
+
+
 def evaluate_dev(
     *,
     model,
@@ -220,6 +236,13 @@ def main() -> None:
         device=device,
     )
     initial_metrics = initial["metrics"]
+    initial_fine_mner_f1 = float(initial_metrics["fine_mner_f1"])
+    initial_fmnerg_f1 = float(initial_metrics["fmnerg_f1"])
+    attach_initial_f2_baseline(
+        initial_metrics,
+        initial_fine_mner_f1=initial_fine_mner_f1,
+        initial_fmnerg_f1=initial_fmnerg_f1,
+    )
     expected_gmner = float(config.runtime.expected_dev_gmner_f1)
     if (
         abs(float(initial_metrics["gmner_f1"]) - expected_gmner)
@@ -250,6 +273,7 @@ def main() -> None:
                 {
                     "status": "preflight_passed",
                     "seed": seed,
+                    "experiment_mode": config.model.experiment_mode,
                     "train_records": len(train_dataset),
                     "train_examples": len(train_dataset.examples),
                     "dev_formal_examples": len(dev_formal_dataset.examples),
@@ -258,6 +282,10 @@ def main() -> None:
                         "fine_mner_f1"
                     ],
                     "initial_fmnerg_f1": initial_metrics["fmnerg_f1"],
+                    "initial_coarse_mner_f1": initial_metrics[
+                        "coarse_mner_f1"
+                    ],
+                    "initial_eeg_f1": initial_metrics["eeg_f1"],
                     "initial_gmner_f1": initial_metrics["gmner_f1"],
                     "formal_prediction_changed_count": initial_metrics[
                         "j0_formal_prediction_changed_count"
@@ -288,6 +316,7 @@ def main() -> None:
         return {
             "kind": "fmnerg_joint_j0_visual_fusion",
             "format_version": 1,
+            "experiment_mode": config.model.experiment_mode,
             "epoch": int(epoch),
             "model": j0_checkpoint_state(model),
             "config": config.to_dict(),
@@ -315,6 +344,7 @@ def main() -> None:
         start = {
             "event": "fmnerg_joint_j0_start",
             "seed": seed,
+            "experiment_mode": config.model.experiment_mode,
             "device": str(device),
             "train_records": len(train_dataset),
             "train_examples": len(train_dataset.examples),
@@ -390,6 +420,11 @@ def main() -> None:
                 device=device,
             )
             metrics = result["metrics"]
+            attach_initial_f2_baseline(
+                metrics,
+                initial_fine_mner_f1=initial_fine_mner_f1,
+                initial_fmnerg_f1=initial_fmnerg_f1,
+            )
             if (
                 abs(float(metrics["gmner_f1"]) - expected_gmner)
                 > config.runtime.expected_dev_gmner_tolerance
@@ -455,6 +490,11 @@ def main() -> None:
         device=device,
         include_detailed=True,
     )
+    attach_initial_f2_baseline(
+        final["metrics"],
+        initial_fine_mner_f1=initial_fine_mner_f1,
+        initial_fmnerg_f1=initial_fmnerg_f1,
+    )
     summary = {
         "metadata": {
             "kind": "fmnerg_joint_j0_training_summary",
@@ -462,6 +502,7 @@ def main() -> None:
             "best_epoch": best_epoch,
             "best_checkpoint": str(checkpoint_path),
             "selection_metric": "fmnerg_f1",
+            "experiment_mode": config.model.experiment_mode,
             "initialization": initialization,
             "optimizer_groups": optimizer_report,
             "formal_stage1_mutated": False,

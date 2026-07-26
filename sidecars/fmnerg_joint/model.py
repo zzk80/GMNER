@@ -39,11 +39,20 @@ class J0VisualSubtypeFusion(nn.Module):
         hidden_size: int,
         dropout: float,
         residual_scale: float,
+        experiment_mode: str,
     ) -> None:
         super().__init__()
         self.text_encoder = text_encoder
         self.taxonomy = taxonomy
         self.residual_scale = float(residual_scale)
+        self.experiment_mode = str(experiment_mode)
+        if self.experiment_mode not in {
+            "visual_fusion",
+            "text_continuation",
+        }:
+            raise ValueError(
+                f"Unknown J0 experiment mode: {self.experiment_mode!r}."
+            )
         self.text_projection = nn.Sequential(
             nn.LayerNorm(text_feature_size),
             nn.Linear(text_feature_size, hidden_size),
@@ -98,9 +107,7 @@ class J0VisualSubtypeFusion(nn.Module):
         )
         text_state = self.text_projection(text_outputs["features"].float())
         available = joint_visual_available.bool().unsqueeze(-1)
-        region_state = self.region_projection(
-            joint_region_features.float()
-        )
+        region_state = self.region_projection(joint_region_features.float())
         region_state = region_state * available.to(region_state.dtype)
         scalars = torch.cat(
             [
@@ -122,7 +129,13 @@ class J0VisualSubtypeFusion(nn.Module):
             ],
             dim=-1,
         )
-        raw_residual = self.fusion_head(interaction)
+        computed_residual = self.fusion_head(interaction)
+        if self.experiment_mode == "visual_fusion":
+            raw_residual = computed_residual
+        else:
+            # C1 executes the same operations (including dropout/RNG use) but
+            # blocks both the visual value and its gradient.
+            raw_residual = computed_residual.detach() * 0.0
         bounded_residual = self.residual_scale * torch.tanh(raw_residual)
         raw_logits = text_outputs["raw_logits"].float() + bounded_residual
         logits = self.taxonomy.mask_logits(raw_logits, coarse_type_ids)
@@ -202,9 +215,11 @@ def build_j0_visual_subtype_model(
         hidden_size=config.model.hidden_size,
         dropout=config.model.dropout,
         residual_scale=config.model.residual_scale,
+        experiment_mode=config.model.experiment_mode,
     ).to(device)
     report = {
         "stage": "j0",
+        "experiment_mode": config.model.experiment_mode,
         "subtype_encoder_config": str(encoder_config_path),
         "subtype_encoder_config_sha256": sha256_file(encoder_config_path),
         "subtype_checkpoint": str(checkpoint_path),

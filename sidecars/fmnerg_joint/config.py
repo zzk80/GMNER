@@ -9,6 +9,9 @@ from typing import Any
 import yaml
 
 
+EXPERIMENT_MODES = ("visual_fusion", "text_continuation")
+
+
 @dataclass
 class JointSubtypeDataConfig:
     train_source: str
@@ -27,6 +30,7 @@ class JointSubtypeInitializationConfig:
 @dataclass
 class JointSubtypeModelConfig:
     stage: str = "j0"
+    experiment_mode: str = "visual_fusion"
     text_feature_size: int = 2304
     region_feature_size: int = 768
     geometry_size: int = 4
@@ -121,6 +125,10 @@ def load_joint_subtype_config(path: str | Path) -> JointSubtypeConfig:
         raise ValueError(
             "Only the frozen-region J0 stage is implemented. J1/J2 must use "
             "separate, explicitly preregistered configs."
+        )
+    if config.model.experiment_mode not in EXPERIMENT_MODES:
+        raise ValueError(
+            f"model.experiment_mode must be one of {EXPERIMENT_MODES}."
         )
     for name, value in (
         ("text_feature_size", config.model.text_feature_size),

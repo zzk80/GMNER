@@ -75,6 +75,8 @@ def main() -> None:
     checkpoint = torch.load(checkpoint_path, map_location="cpu")
     if checkpoint.get("kind") != "fmnerg_joint_j0_visual_fusion":
         raise ValueError("Not a J0 visual-subtype checkpoint.")
+    if checkpoint.get("experiment_mode") != config.model.experiment_mode:
+        raise ValueError("J0 checkpoint experiment mode changed.")
     if checkpoint.get("test_accessed") is not False:
         raise ValueError("J0 checkpoint accessed Test data.")
     if checkpoint.get("taxonomy_sha256") != taxonomy.source_sha256:
@@ -118,17 +120,40 @@ def main() -> None:
         batch_size=config.optim.eval_batch_size,
         device=device,
     )
+    initial_metrics = dict(
+        initialization["subtype_checkpoint_metrics"]
+    )
+    combined_metrics = {**gold, **formal["metrics"]}
+    combined_metrics.update(
+        {
+            "initial_f2_fine_mner_f1": float(
+                initial_metrics["fine_mner_f1"]
+            ),
+            "initial_f2_fmnerg_f1": float(
+                initial_metrics["fmnerg_f1"]
+            ),
+            "fine_mner_delta_vs_initial_f2": float(
+                formal["metrics"]["fine_mner_f1"]
+                - initial_metrics["fine_mner_f1"]
+            ),
+            "fmnerg_delta_vs_initial_f2": float(
+                formal["metrics"]["fmnerg_f1"]
+                - initial_metrics["fmnerg_f1"]
+            ),
+        }
+    )
     result = {
         "metadata": {
             **formal["metadata"],
             "checkpoint": str(checkpoint_path),
             "checkpoint_epoch": int(checkpoint["epoch"]),
             "paired_f2_seed": seed,
+            "experiment_mode": config.model.experiment_mode,
             "formal_stage1_mutated": False,
             "formal_region_mutated": False,
             "test_accessed": False,
         },
-        "metrics": {**gold, **formal["metrics"]},
+        "metrics": combined_metrics,
     }
     output = resolve_path(
         args.output

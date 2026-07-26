@@ -96,6 +96,29 @@ text / region / scalar projections
 visual fusion residual
 ```
 
+由于 F2 encoder 和 subtype head 也会继续更新，J0 相对冻结 F2 的总增益
+不能直接归因为视觉。为此使用完全匹配的 C1：
+
+```text
+C1: F2 Continued
+  - 与 J0 相同 seed、样本、batch、epoch、warmup、early stopping 和学习率
+  - F2 encoder 与 subtype head 继续训练
+  - visual residual 在 forward 中永久固定为 0
+
+J0: Visual Fusion
+  - 唯一额外变量是固定区域视觉 residual
+```
+
+配置：
+
+```text
+sidecars/fmnerg_joint/configs/c1_text_continuation.yaml
+sidecars/fmnerg_joint/configs/j0_visual_fusion.yaml
+```
+
+测试会逐字段比较两份配置；除 `experiment_mode` 和 `output_dir` 外不允许
+存在差异。
+
 J0 永久冻结：
 
 ```text
@@ -119,33 +142,62 @@ J1（Fine Adapter 副本）和 J2（Evidence Visibility 副本）尚未实现，
 41 / 42 / 43
 ```
 
-每个 J0 seed 使用相同 seed 的 F2 checkpoint 初始化。只报告 mean/std，不
-选择最佳 seed。
+每个 C1/J0 seed 使用相同 seed 的 F2 checkpoint 初始化。只报告成对
+mean/std，不选择最佳 seed。
 
-预注册最低通过条件：
+整体方案通过：
 
 ```text
+J0 相对初始 F2：
 mean FMNERG delta >= +0.005
-至少 2/3 seeds 的 FMNERG delta > 0
+至少 2/3 seeds > 0
 MNER / EEG / GMNER exact identity
 Test accessed = false
 ```
 
-首次同步到训练环境后先执行只读预检：
+视觉模块通过：
+
+```text
+J0 相对 C1：
+mean FMNERG delta >= +0.003
+至少 2/3 seeds > 0
+Fine MNER mean 不下降
+MNER / EEG / GMNER exact identity
+```
+
+`j0_visual_residual_fmnerg_delta` 表示 J0 最终视觉输出相对同一时刻文本分支
+的差值；`fmnerg_delta_vs_initial_f2` 才表示整个训练方案相对原始 F2 的
+差值。两者不能混用。
+
+首次同步到训练环境后，三个 seed 分别执行只读预检：
 
 ```bash
-PYTHONPATH=. /home/zzk/miniconda3/envs/gmner/bin/python \
-  tools/train_fmnerg_joint_j0.py \
-  --config sidecars/fmnerg_joint/configs/j0_visual_fusion.yaml \
-  --seed 41 \
-  --device cuda \
-  --preflight
+for seed in 41 42 43; do
+  PYTHONPATH=. /home/zzk/miniconda3/envs/gmner/bin/python \
+    tools/train_fmnerg_joint_j0.py \
+    --config sidecars/fmnerg_joint/configs/j0_visual_fusion.yaml \
+    --seed "$seed" \
+    --device cuda \
+    --preflight
+done
 ```
 
 预检只验证缓存、checkpoint、epoch-0 F2 恒等性和冻结 GMNER，不执行反向
-传播，也不访问 Test。
+传播，也不访问 Test。正式 matched runner 会在训练前再次预检 C1/J0 的全部
+seed。
 
-运行：
+正式运行顺序固定为 C1 三 seed、J0 三 seed、成对汇总：
+
+训练前需将当前提交冻结为 tag：
+
+```bash
+git tag -a fmnerg-j0-matched-dev-preregistered -m \
+  "Preregister matched C1/J0 Dev experiment"
+```
+
+runner 会拒绝 tag 未指向当前 `HEAD` 或存在 tracked file 修改的环境，并将
+commit、tag 和两份配置的 SHA-256 写入
+`outputs/fmnerg_joint_matched/protocol_manifest.json`。
 
 ```bash
 cd ~/gmner
@@ -154,21 +206,24 @@ nohup env \
   PYTHONPATH=. \
   PYTHON_BIN=/home/zzk/miniconda3/envs/gmner/bin/python \
   DEVICE=cuda \
-  bash tools/run_fmnerg_joint_j0.sh \
-  > fmnerg_joint_j0.log 2>&1 &
+  bash tools/run_fmnerg_joint_matched.sh \
+  > fmnerg_joint_matched.log 2>&1 &
 
 echo $!
-tail -f fmnerg_joint_j0.log
+tail -f fmnerg_joint_matched.log
 ```
 
 结果：
 
 ```text
+outputs/fmnerg_joint_c1/seed41..43/
 outputs/fmnerg_joint_j0/seed41/
 outputs/fmnerg_joint_j0/seed42/
 outputs/fmnerg_joint_j0/seed43/
-outputs/fmnerg_joint_j0/dev_summary.json
+outputs/fmnerg_joint_matched/c1_dev_summary.json
+outputs/fmnerg_joint_matched/j0_dev_summary.json
+outputs/fmnerg_joint_matched/matched_dev_summary.json
 ```
 
-J0 的工具没有 Test 参数。F2 Test 已经冻结，不能用于 J0/J1/J2 的结构、
-学习率、epoch 或阈值选择。
+C1/J0 的工具没有 Test 参数。F2 Test 已经冻结，不能用于 J0/J1/J2 的
+结构、学习率、epoch 或阈值选择。

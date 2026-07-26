@@ -254,11 +254,13 @@ def evaluate_joint_formal_predictions(
     final_metrics = dict(final["metrics"])
     final_metrics.update(
         {
-            "j0_base_fine_mner_f1": float(
+            "j0_current_text_fine_mner_f1": float(
                 base["metrics"]["fine_mner_f1"]
             ),
-            "j0_base_fmnerg_f1": float(base["metrics"]["fmnerg_f1"]),
-            "j0_fmnerg_delta": float(
+            "j0_current_text_fmnerg_f1": float(
+                base["metrics"]["fmnerg_f1"]
+            ),
+            "j0_visual_residual_fmnerg_delta": float(
                 final["metrics"]["fmnerg_f1"]
                 - base["metrics"]["fmnerg_f1"]
             ),
@@ -281,6 +283,7 @@ def evaluate_joint_formal_predictions(
             **final["metadata"],
             "kind": "fmnerg_joint_j0_dev_evaluation",
             "format_version": 1,
+            "experiment_mode": model.experiment_mode,
             "formal_stage1_mutated": False,
             "formal_region_mutated": False,
             "test_accessed": False,

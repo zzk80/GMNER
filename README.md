@@ -81,7 +81,8 @@ configs/fmnerg_twitter10000_evidence_visibility.yaml
   F0 以及“RoBERTa 最后 4 层 / 全量解冻”的隔离副本消融，详见
   [Subtype Sidecar](sidecars/fmnerg_subtype/README.md)。
 - `sidecars/fmnerg_joint/`：读取冻结 M3.3A region 的 subtype-region
-  联合实验；不修改正式 span/type/region，详见
+  联合实验；使用 matched F2-continuation control，不修改正式
+  span/type/region，详见
   [Joint Experiments](sidecars/fmnerg_joint/README.md)。
 - `docs/HIERARCHICAL_RECORD_VERIFIER.md`：M2 到 M3.3A 的方法细节。
 - `docs/EXPERIMENT_SUMMARY.md`：历史实验和负结果。

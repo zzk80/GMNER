@@ -17,12 +17,18 @@ from sidecars.fmnerg_subtype.evaluator import save_json_atomic
 METRICS = (
     "fine_mner_f1",
     "fmnerg_f1",
-    "j0_base_fine_mner_f1",
-    "j0_base_fmnerg_f1",
-    "j0_fmnerg_delta",
+    "initial_f2_fine_mner_f1",
+    "initial_f2_fmnerg_f1",
+    "fine_mner_delta_vs_initial_f2",
+    "fmnerg_delta_vs_initial_f2",
+    "j0_current_text_fine_mner_f1",
+    "j0_current_text_fmnerg_f1",
+    "j0_visual_residual_fmnerg_delta",
     "subtype_macro_f1_on_gold_spans",
     "j0_formal_prediction_changed_rate",
     "j0_subtype_net_corrections",
+    "coarse_mner_f1",
+    "eeg_f1",
     "gmner_f1",
 )
 
@@ -32,6 +38,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--root", required=True)
     parser.add_argument("--seeds", default="41,42,43")
     parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--expected-mode",
+        choices=("visual_fusion", "text_continuation"),
+        default="visual_fusion",
+    )
     return parser.parse_args()
 
 
@@ -56,6 +67,12 @@ def main() -> None:
         metrics = dict(payload["metrics"])
         if metadata.get("test_accessed") is not False:
             raise ValueError(f"J0 seed {seed} accessed Test data.")
+        if metadata.get("experiment_mode") != args.expected_mode:
+            raise ValueError(
+                f"J0 seed {seed} has mode "
+                f"{metadata.get('experiment_mode')!r}, expected "
+                f"{args.expected_mode!r}."
+            )
         if (
             metadata.get("formal_stage1_mutated") is not False
             or metadata.get("formal_region_mutated") is not False
@@ -74,25 +91,27 @@ def main() -> None:
         for name in METRICS
     }
     positive = sum(
-        int(row["metrics"]["j0_fmnerg_delta"] > 0) for row in rows
+        int(row["metrics"]["fmnerg_delta_vs_initial_f2"] > 0)
+        for row in rows
     )
-    accepted = (
-        result["j0_fmnerg_delta"]["mean"] >= 0.005
-        and positive >= 2
-        and all(
-            abs(
-                row["metrics"]["gmner_f1"]
-                - rows[0]["metrics"]["gmner_f1"]
-            )
-            <= 1e-12
+    coarse_identity = all(
+        all(
+            abs(row["metrics"][name] - rows[0]["metrics"][name]) <= 1e-12
             for row in rows
         )
+        for name in ("coarse_mner_f1", "eeg_f1", "gmner_f1")
+    )
+    accepted = (
+        result["fmnerg_delta_vs_initial_f2"]["mean"] >= 0.005
+        and positive >= 2
+        and coarse_identity
     )
     payload = {
         "metadata": {
             "kind": "fmnerg_joint_j0_dev_summary",
             "format_version": 1,
             "selection_source": "dev",
+            "experiment_mode": args.expected_mode,
             "seeds": seeds,
             "report": "mean_std",
             "select_best_seed": False,
@@ -104,10 +123,10 @@ def main() -> None:
         "aggregate": result,
         "acceptance": {
             "mean_fmnerg_delta_at_least_0.005": (
-                result["j0_fmnerg_delta"]["mean"] >= 0.005
+                result["fmnerg_delta_vs_initial_f2"]["mean"] >= 0.005
             ),
             "positive_seed_count_at_least_2": positive >= 2,
-            "gmner_identity_exact": True,
+            "mner_eeg_gmner_identity_exact": coarse_identity,
             "accepted": accepted,
         },
     }
