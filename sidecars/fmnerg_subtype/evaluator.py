@@ -219,40 +219,30 @@ def _assert_exact_coarse_identity(
     }
 
 
-@torch.inference_mode()
-def evaluate_formal_predictions(
-    model: HierarchicalSubtypeSidecar,
-    dataset: SubtypeFeatureDataset,
-    formal_payload: dict[str, Any],
+def evaluate_formal_subtype_ids(
     *,
+    subtype_predictions: list[int],
+    gold_parent_predictions: list[int],
+    target_subtype_ids: torch.Tensor,
+    predicted_parent_ids: torch.Tensor,
+    examples: list[dict[str, Any]],
+    formal_payload: dict[str, Any],
     taxonomy: SubtypeTaxonomy,
-    batch_size: int,
-    device: torch.device,
     include_records: bool = False,
 ) -> dict[str, Any]:
-    metadata = dict(formal_payload["metadata"])
-    if dataset.metadata.get("coarse_prediction_sha256") != metadata.get(
-        "coarse_prediction_sha256"
+    if not (
+        len(subtype_predictions)
+        == len(gold_parent_predictions)
+        == target_subtype_ids.numel()
+        == predicted_parent_ids.numel()
+        == len(examples)
     ):
-        raise ValueError(
-            "Formal feature cache and formal prediction digest are inconsistent."
-        )
-    formal_path = dataset.metadata.get("formal_predictions")
-    if formal_path and Path(formal_path).exists():
-        if sha256_file(formal_path) != dataset.metadata.get(
-            "formal_predictions_sha256"
-        ):
-            raise ValueError("Formal prediction file changed after feature extraction.")
-
-    subtype_predictions = predict_subtypes(
-        model,
-        dataset,
-        batch_size=batch_size,
-        device=device,
-    )
-    target_subtype_ids = dataset.subtype_ids.long()
+        raise ValueError("Formal subtype predictions and examples are misaligned.")
+    metadata = dict(formal_payload["metadata"])
+    target_subtype_ids = target_subtype_ids.long()
+    predicted_parent_ids = predicted_parent_ids.long()
     target_available = target_subtype_ids.ge(0)
-    oracle_parent_ids = dataset.coarse_type_ids.clone().long()
+    oracle_parent_ids = predicted_parent_ids.clone()
     if target_available.any():
         oracle_parent_ids[target_available] = torch.tensor(
             [
@@ -261,19 +251,13 @@ def evaluate_formal_predictions(
             ],
             dtype=torch.long,
         )
-    gold_parent_predictions = predict_subtypes(
-        model,
-        dataset,
-        batch_size=batch_size,
-        device=device,
-        coarse_type_ids=oracle_parent_ids,
-    )
+
     original_records = list(formal_payload["records"])
     augmented_records = copy.deepcopy(original_records)
     assigned: set[tuple[int, int]] = set()
     hierarchy_consistent = 0
 
-    for subtype_id, example in zip(subtype_predictions, dataset.examples):
+    for subtype_id, example in zip(subtype_predictions, examples):
         record_index = int(example["record_index"])
         prediction_index = int(example["prediction_index"])
         key = (record_index, prediction_index)
@@ -295,7 +279,10 @@ def evaluate_formal_predictions(
             example["record_id"]
         ):
             raise ValueError(f"Formal record id mismatch at {key}.")
-        if list(map(int, original["span"])) != list(map(int, example["span"])):
+        example_span = example.get("span")
+        if example_span is None:
+            example_span = [example["start"], example["end"]]
+        if list(map(int, original["span"])) != list(map(int, example_span)):
             raise ValueError(f"Formal span mismatch at {key}.")
         if int(original["type_id"]) != int(example["coarse_type_id"]):
             raise ValueError(f"Formal coarse type mismatch at {key}.")
@@ -370,7 +357,6 @@ def evaluate_formal_predictions(
         gold_parent_predictions,
         dtype=torch.long,
     )
-    predicted_parent_ids = dataset.coarse_type_ids.long()
     coarse_wrong = target_available & predicted_parent_ids.ne(oracle_parent_ids)
     gold_parent_correct = (
         target_available
@@ -420,6 +406,67 @@ def evaluate_formal_predictions(
     if include_records:
         result["records"] = augmented_records
     return result
+
+
+@torch.inference_mode()
+def evaluate_formal_predictions(
+    model: HierarchicalSubtypeSidecar,
+    dataset: SubtypeFeatureDataset,
+    formal_payload: dict[str, Any],
+    *,
+    taxonomy: SubtypeTaxonomy,
+    batch_size: int,
+    device: torch.device,
+    include_records: bool = False,
+) -> dict[str, Any]:
+    metadata = dict(formal_payload["metadata"])
+    if dataset.metadata.get("coarse_prediction_sha256") != metadata.get(
+        "coarse_prediction_sha256"
+    ):
+        raise ValueError(
+            "Formal feature cache and formal prediction digest are inconsistent."
+        )
+    formal_path = dataset.metadata.get("formal_predictions")
+    if formal_path and Path(formal_path).exists():
+        if sha256_file(formal_path) != dataset.metadata.get(
+            "formal_predictions_sha256"
+        ):
+            raise ValueError("Formal prediction file changed after feature extraction.")
+
+    subtype_predictions = predict_subtypes(
+        model,
+        dataset,
+        batch_size=batch_size,
+        device=device,
+    )
+    target_subtype_ids = dataset.subtype_ids.long()
+    target_available = target_subtype_ids.ge(0)
+    oracle_parent_ids = dataset.coarse_type_ids.clone().long()
+    if target_available.any():
+        oracle_parent_ids[target_available] = torch.tensor(
+            [
+                taxonomy.parent_id(int(subtype_id))
+                for subtype_id in target_subtype_ids[target_available].tolist()
+            ],
+            dtype=torch.long,
+        )
+    gold_parent_predictions = predict_subtypes(
+        model,
+        dataset,
+        batch_size=batch_size,
+        device=device,
+        coarse_type_ids=oracle_parent_ids,
+    )
+    return evaluate_formal_subtype_ids(
+        subtype_predictions=subtype_predictions,
+        gold_parent_predictions=gold_parent_predictions,
+        target_subtype_ids=target_subtype_ids,
+        predicted_parent_ids=dataset.coarse_type_ids,
+        examples=dataset.examples,
+        formal_payload=formal_payload,
+        taxonomy=taxonomy,
+        include_records=include_records,
+    )
 
 
 def save_json_atomic(payload: dict[str, Any], path: str | Path) -> None:

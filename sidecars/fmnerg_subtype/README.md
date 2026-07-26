@@ -5,7 +5,7 @@
 该分支在冻结现有 GMNER 主链的前提下，为每个正式预测实体增加 51 类
 细粒度 subtype。GMNER 与 FMNERG 均作为主指标报告。
 
-第一版只建立纯文本细粒度类型基线，不使用图像、原型、SigLIP2 或外部知识。
+F0 只建立冻结纯文本细粒度类型基线，不使用图像、原型、SigLIP2 或外部知识。
 
 ```text
 冻结 RoBERTa Stage1
@@ -404,6 +404,114 @@ Coarse propagation 诊断显示，每个 seed 固定有 139 个 exact predicted 
 Parent-specific 平均约 43.7 个。该 Oracle 说明 coarse error 确实造成一部分
 上限损失，但仅更换 subtype head 无法解决它。任何允许跨父类修正的后续方法
 必须作为会改变 coarse GMNER 的独立联合实验，不能继续声称 GMNER 恒等。
+
+## Trainable RoBERTa Copy 消融
+
+当前 FMNERG 的主要缺口来自 subtype，而不是正式 grounding。新的 encoder
+消融采用“任务隔离、表示继承”：
+
+```text
+M3.3A formal chain（冻结、只读）
+  -> fixed span / coarse type / region / NULL
+
+Stage1 RoBERTa 参数副本（独立）
+  -> 在线编码原始文本
+  -> fixed span 的 start/end/mean 表示
+  -> Shared-51 subtype head
+  -> predicted coarse type hard mask
+```
+
+它不加载可训练的 Hierarchy、Coarse、Fine 或 Evidence 模块，也不会将梯度写回
+`outputs/fmnerg_stage1_roberta128/`。正式 Dev 评估仍逐记录检查原始
+span/type/region/order 和 GMNER SHA-256 完全一致。
+
+三个受控版本为：
+
+| ID | 可训练参数 | 配置 |
+| --- | --- | --- |
+| F0 | subtype MLP | `roberta128.yaml` |
+| F1 | RoBERTa 最后 4 层 + subtype head | `roberta128_encoder_last4.yaml` |
+| F2 | RoBERTa 全部层 + subtype head | `roberta128_encoder_all.yaml` |
+
+F1/F2 第一轮继续使用 train gold span 和 gold parent；Dev 使用固定 M3.3A
+predicted span 和 predicted parent。唯一新增变量是 encoder 的可训练范围，不同时
+加入类别重加权、图像、外部知识、prototype 或新的 coarse head。
+
+一键脚本优先复用 `frozen_seed*/dev_metrics.json`；若云端清理时已删除旧的
+逐 seed 文件，则基于现有冻结 `train_gold/dev_gold/dev_formal` 特征在 CPU
+快速重建 F0 CE seed 41/42/43。该步骤不重新编码 RoBERTa。汇总器随后将 F1/F2
+与对应的 F0 seed 做配对比较。
+
+优化设置：
+
+```text
+RoBERTa lower layers: 1e-6（仅 F2）
+RoBERTa upper 4:      5e-6
+Subtype head:         1e-4
+Weight decay:         0.01
+Warmup:               0.1
+Epochs:               15
+Early stopping:       Dev FMNERG
+Gradient clipping:    1.0
+```
+
+先确保冻结正式预测文件已经由 F0 流水线生成，再运行三个 seed：
+
+```bash
+cd ~/gmner
+
+nohup env \
+  PYTHON_BIN=/home/zzk/miniconda3/envs/gmner/bin/python \
+  DEVICE=cuda \
+  SEEDS="41 42 43" \
+  bash tools/run_fmnerg_subtype_encoder_ablation.sh \
+  > fmnerg_subtype_encoder_ablation.log 2>&1 &
+
+echo $!
+tail -f fmnerg_subtype_encoder_ablation.log
+```
+
+输出：
+
+```text
+outputs/fmnerg_roberta128_subtype_encoder_ablation/
+  frozen_seed41/
+  frozen_seed42/
+  frozen_seed43/
+  last4_seed41/
+  last4_seed42/
+  last4_seed43/
+  all_seed41/
+  all_seed42/
+  all_seed43/
+  summary.json
+```
+
+checkpoint 只保存相对正式 Stage1 初始化发生训练的 backbone 参数和 subtype
+head；正式 Stage1 checkpoint 继续作为只读初始化来源。单次 Dev 复评：
+
+```bash
+PYTHONPATH=. python tools/evaluate_fmnerg_subtype_encoder.py \
+  --config sidecars/fmnerg_subtype/roberta128_encoder_last4.yaml \
+  --checkpoint outputs/fmnerg_roberta128_subtype_encoder_ablation/last4_seed42/best_model.pt \
+  --output outputs/fmnerg_roberta128_subtype_encoder_ablation/last4_seed42/dev_metrics_recomputed.json \
+  --device cuda
+```
+
+第一阶段验收固定为：
+
+```text
+主选择指标 = Dev FMNERG
+三 seed mean FMNERG 相对 F0 至少 +0.005
+Fine MNER 不下降
+三个 seed 的 FMNERG 均高于对应 F0 seed
+GMNER identity exact = true
+formal_stage1_mutated = false
+test_accessed = false
+```
+
+F1/F2 只在 Dev 上比较。选定唯一 scope 和学习率后，才允许对最终模型执行一次
+Test；当前工具没有 Test 参数，防止把 Test 用作调参集。
 
 ## 与 NULL Release OOF 的关系
 
