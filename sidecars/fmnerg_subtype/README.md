@@ -442,6 +442,9 @@ predicted span 和 predicted parent。唯一新增变量是 encoder 的可训练
 快速重建 F0 CE seed 41/42/43。该步骤不重新编码 RoBERTa。汇总器随后将 F1/F2
 与对应的 F0 seed 做配对比较。
 
+脚本使用独占运行锁；中断后再次执行会跳过已有 `dev_metrics.json` 或
+`train_summary.json` 的完整 seed。只有显式设置 `FORCE=1` 才会重跑。
+
 优化设置：
 
 ```text
