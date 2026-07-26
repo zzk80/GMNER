@@ -3,6 +3,19 @@
 > 本文是历史实验归档，早期“当前最优”表述不再更新。当前 RoBERTa 完整链路、
 > 可运行配置和正式 test 结果以 [README.md](../README.md) 为准。
 
+## 2026-07-26 FMNERG J0 匹配控制归档
+
+- 在 tag `fmnerg-j0-matched-dev-preregistered` 上完成 C1
+  F2-continuation 与 J0 fixed-region visual fusion 的三 seed 配对 Dev 实验。
+- 三个 seed 的 C1 和 J0 最优 checkpoint 均为 epoch 0；FMNERG F1 mean/std
+  均为 `0.517292/0.000830`。
+- C1 相对初始 F2、J0 相对初始 F2、J0 相对 C1 的平均增量均为 `0.000000`。
+  因此继续微调收益和固定区域视觉 residual 的独立收益均未成立。
+- Coarse MNER、EEG、GMNER 分别严格保持
+  `0.816714/0.660880/0.621316`，formal prediction changed 为 0。
+- 整体方案和视觉模块均未达到预注册门槛，判定 no-go；不启动 J1/J2，
+  不构建 J0 OOF formal-region 特征，不读取 Test。正式 F2 Test 结果保持不变。
+
 ## 2026-07-24 M3.6A-r2 最终归档
 
 - 10 个 full-chain OOF fold 已完成，7000 条 heldout 记录完整覆盖，

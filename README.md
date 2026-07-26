@@ -137,6 +137,9 @@ PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
 
 ## Archived Experiments
 
+- **FMNERG J0 matched control**：C1 continued-F2 与 fixed-region visual
+  fusion 的三 seed Dev 最优均为 epoch 0，J0 相对 C1 的 FMNERG 增量为
+  `0.000000`；按预注册规则 no-go，未读取 Test。
 - **M3.6A-r1**：非 OOF Dev 达到 `0.623738`，不能作为正式提升。
 - **M3.6A-r2**：严格 10-fold full-chain OOF 下，最优 checkpoint 为
   epoch-0 KEEP，无可部署收益，状态为 **archived no-go**。

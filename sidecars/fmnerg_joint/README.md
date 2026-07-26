@@ -225,5 +225,63 @@ outputs/fmnerg_joint_matched/j0_dev_summary.json
 outputs/fmnerg_joint_matched/matched_dev_summary.json
 ```
 
+## Formal Dev Result
+
+预注册版本：
+
+```text
+date:   2026-07-26
+commit: ae8553a
+tag:    fmnerg-j0-matched-dev-preregistered
+seeds:  41 / 42 / 43
+```
+
+三组匹配结果：
+
+| Dev 指标 | 初始 F2 | C1 Continued | J0 Visual Fusion |
+|---|---:|---:|---:|
+| FMNERG F1 mean | 0.517292 | 0.517292 | 0.517292 |
+| FMNERG F1 std | 0.000830 | 0.000830 | 0.000830 |
+| Fine MNER F1 mean | 0.674876 | 0.674876 | 0.674876 |
+| best epoch (41/42/43) | 0/0/0 | 0/0/0 | 0/0/0 |
+
+配对增量：
+
+```text
+C1 - initial F2 = 0.000000
+J0 - initial F2 = 0.000000
+J0 - C1         = 0.000000
+```
+
+冻结主链恒等：
+
+```text
+Coarse MNER F1 = 0.816714
+EEG F1         = 0.660880
+GMNER F1       = 0.621316
+formal prediction changed = 0
+test_accessed = false
+```
+
+正式判断：
+
+```text
+整体 J0 方案：no-go
+视觉模块独立贡献：no-go
+C1 继续训练收益：无
+```
+
+所有已训练 epoch 的 Dev FMNERG 均未超过对应 seed 的 epoch 0，因此早停
+一致保留初始 F2。该结果说明在当前“Train gold-positive region / Dev formal
+region”的 J0 口径下，没有证据支持固定区域视觉 residual。按照预注册规则，
+不启动 J1/J2，不为 J0 构建 OOF formal-region 特征，也不读取 Test。
+
+机器可读归档：
+
+```text
+docs/experiments/fmnerg_joint_j0_matched_protocol_manifest.json
+docs/experiments/fmnerg_joint_j0_matched_dev_summary.json
+```
+
 C1/J0 的工具没有 Test 参数。F2 Test 已经冻结，不能用于 J0/J1/J2 的
 结构、学习率、epoch 或阈值选择。
