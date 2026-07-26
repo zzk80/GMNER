@@ -11,13 +11,18 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-from tqdm import tqdm
-
-from gmner.models.scene_analyzer import SceneAnalyzer
+# PyTorch imports are optional - only needed for neural network version
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torch.utils.data import Dataset, DataLoader
+    from gmner.models.scene_analyzer import SceneAnalyzer
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info("PyTorch not available - only baseline mode supported")
 
 
 logging.basicConfig(
