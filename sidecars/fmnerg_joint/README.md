@@ -346,3 +346,46 @@ formal GMNER 已正确
 这是 gold-aware 的可分性诊断，不是部署准确率。只有当 Fine Top-4 相对固定
 formal region 在三个 seed 上都产生稳定的新增 pairwise/sibling recovery，才实现
 subtype-conditioned region attention；否则终止通用视觉 subtype 融合路线。
+
+### Oracle Result
+
+2026-07-26 的正式 Dev-only 结果：
+
+```text
+Formal Dev GMNER-correct triples:       1539
+F2 subtype errors, mean/std:            257.67 / 2.05
+Gold-visible subtype errors, mean/std:  103.00 / 0.82
+Gold-NULL subtype errors, mean/std:      154.67 / 1.70
+
+Formal-region pairwise support:          59.21%
+Formal-region sibling top-1:             17.79%
+Fine Top-4 pairwise support:             64.39%
+Fine Top-4 sibling top-1:                22.33%
+
+Top-4 incremental pairwise recovery:      5.33 / seed
+Top-4 incremental sibling recovery:       4.67 / seed
+Top-4 = Top-8 = Top-16 = full R36 ceiling
+```
+
+Train R36 覆盖 `11778/11779` 个 gold span，并为 49/51 个 subtype 形成可见
+原型；`continent` 和 `ordinance` 没有 Train gold-visible region。
+
+结果说明：
+
+1. 约 60% 的 F2 subtype 错误对应 gold NULL，候选区域注意力无法提供正确真实
+   区域证据。
+2. 可见错误中存在 pairwise 视觉信号，但绝大部分已经包含在 formal Top-1。
+3. 从 Top-1 扩展到 Top-4 每个 seed 只新增恢复 4--6 个错误；继续扩展到完整
+   R36 不再增加上限。
+4. 在同 parent 全部 subtype 中，完整 R36 的 gold sibling top-1 仍只有
+   `22.33%`，不足以支持稳定的 51 类视觉决策。
+
+因此 `Top-K region set + subtype-conditioned attention` 也判定 **no-go**，
+不进入模型训练。F2 保持当前 FMNERG 正式方案，C1/J0/J1/J2 和通用视觉 subtype
+融合路线统一关闭；Test 未访问。
+
+机器可读归档：
+
+```text
+docs/experiments/fmnerg_subtype_region_oracle_dev_summary.json
+```

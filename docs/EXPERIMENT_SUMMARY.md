@@ -21,6 +21,11 @@
   视觉 subtype centroid，专门分析“GMNER 正确但 subtype 错误”切片，并区分
   formal region、Fine Top-K 与完整 R36 的视觉可分性上限；全程不训练、不访问
   Test。
+- Oracle 三 seed 中平均有 `257.67` 个 subtype 错误，其中 `154.67` 个为 gold
+  NULL，只有 `103.00` 个具有真实区域证据。Fine Top-4 相对 formal region 平均
+  只新增 `5.33` 个 pairwise 和 `4.67` 个 sibling recovery；Top-4、Top-8、
+  Top-16 与完整 R36 上限相同。完整 R36 的严格 sibling top-1 仅 `22.33%`。
+  因此 Top-K subtype-conditioned attention 同样判定 no-go，F2 保持正式方案。
 
 ## 2026-07-24 M3.6A-r2 最终归档
 

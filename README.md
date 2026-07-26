@@ -145,7 +145,9 @@ PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
 - **Subtype-region successor gate**：在实现
   `Top-K regions + subtype-conditioned attention` 前，先使用 Train 视觉
   subtype centroid 对 Dev 的“GMNER 正确但 subtype 错误”切片执行只读 R36
-  Oracle；该结果只决定是否值得开发新结构，不改变正式 Dev/Test。
+  Oracle。Top-4 相对 formal region 每个 seed 仅新增约 `5.33` 个 pairwise
+  recovery，且 Top-4 已等于完整 R36 上限；严格 sibling top-1 只有
+  `22.33%`，因此该后继结构也判定 no-go，不改变正式 Dev/Test。
 - **M3.6A-r1**：非 OOF Dev 达到 `0.623738`，不能作为正式提升。
 - **M3.6A-r2**：严格 10-fold full-chain OOF 下，最优 checkpoint 为
   epoch-0 KEEP，无可部署收益，状态为 **archived no-go**。
