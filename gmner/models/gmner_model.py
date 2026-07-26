@@ -11,6 +11,14 @@ import torch.nn.functional as F
 from gmner.config import GMNERConfig
 from gmner.constants import DEFAULT_LABEL2ID, ENTITY_TYPE2ID, IGNORE_INDEX
 from gmner.data.graph_builders import build_image_adjacency
+from gmner.fmnerg.subtype_head import (
+    FineSubtypeHead,
+    pool_span_boundary_mean,
+)
+from gmner.fmnerg.taxonomy import (
+    SubtypeTaxonomy,
+    bind_config_taxonomy_fingerprint,
+)
 from gmner.losses import (
     alignment_objective,
     base_top1_hard_negative_margin_loss,
@@ -57,6 +65,79 @@ class GMNERModel(nn.Module):
         self.text_encoder = TextEncoder(config.model.text_model_name, dropout=dropout)
         text_hidden = self.text_encoder.hidden_size
         self.text_projector = nn.Identity() if text_hidden == hidden_size else nn.Linear(text_hidden, hidden_size)
+
+        self.fine_subtype_taxonomy = None
+        self.fine_subtype_head = None
+        if bool(getattr(config.model, "use_fine_subtype_head", False)):
+            if bool(getattr(config.model, "use_subtype_auxiliary", False)):
+                raise ValueError(
+                    "The formal fine subtype head and legacy subtype auxiliary "
+                    "head cannot be enabled together."
+                )
+            taxonomy_path = str(
+                getattr(config.data, "subtype_taxonomy", "")
+            ).strip()
+            if not taxonomy_path:
+                raise ValueError(
+                    "Stage1-F requires data.subtype_taxonomy."
+                )
+            input_source = str(
+                getattr(
+                    config.model,
+                    "fine_subtype_input_source",
+                    "text_only",
+                )
+            )
+            if input_source != "text_only":
+                raise ValueError(
+                    "M3.3F F1 only supports text_only subtype inputs."
+                )
+            self.fine_subtype_taxonomy = SubtypeTaxonomy.from_file(
+                taxonomy_path
+            )
+            bind_config_taxonomy_fingerprint(
+                config.data,
+                self.fine_subtype_taxonomy,
+            )
+            configured_subtypes = int(
+                getattr(config.model, "num_subtypes", 0)
+            )
+            if configured_subtypes not in {
+                0,
+                self.fine_subtype_taxonomy.num_subtypes,
+            }:
+                raise ValueError(
+                    "model.num_subtypes does not match the fixed taxonomy."
+                )
+            config.model.num_subtypes = (
+                self.fine_subtype_taxonomy.num_subtypes
+            )
+            self.fine_subtype_head = FineSubtypeHead(
+                input_size=hidden_size * 3,
+                hidden_size=int(
+                    getattr(
+                        config.model,
+                        "fine_subtype_hidden_size",
+                        text_hidden,
+                    )
+                ),
+                dropout=dropout,
+                taxonomy=self.fine_subtype_taxonomy,
+                architecture=str(
+                    getattr(
+                        config.model,
+                        "fine_subtype_head_architecture",
+                        "shared_hard",
+                    )
+                ),
+                parent_hidden_size=int(
+                    getattr(
+                        config.model,
+                        "fine_subtype_parent_hidden_size",
+                        192,
+                    )
+                ),
+            )
 
         self.prototype_bank = None
         if config.model.use_semantic_prototypes:
@@ -325,6 +406,9 @@ class GMNERModel(nn.Module):
         self.lambda_subtype_prototype = config.loss.lambda_subtype_prototype
         self.lambda_subtype_auxiliary = config.loss.lambda_subtype_auxiliary
         self.lambda_subtype_contrastive = config.loss.lambda_subtype_contrastive
+        self.lambda_fine_subtype = float(
+            getattr(config.loss, "lambda_fine_subtype", 0.0)
+        )
         self.lambda_external_knowledge_type = float(
             getattr(config.loss, "lambda_external_knowledge_type", 0.0)
         )
@@ -428,6 +512,81 @@ class GMNERModel(nn.Module):
         if prototypes.size(0) != num_subtypes or prototypes.size(1) != hidden_size:
             return torch.empty((0, hidden_size), dtype=torch.float32)
         return F.normalize(prototypes.float(), dim=-1)
+
+    def checkpoint_metadata(self) -> dict[str, object]:
+        metadata: dict[str, object] = {
+            "label_schema": str(
+                getattr(self.config.data, "label_schema", "coarse")
+            ),
+            "use_fine_subtype_head": self.fine_subtype_head is not None,
+        }
+        if self.fine_subtype_taxonomy is not None:
+            metadata.update(
+                self.fine_subtype_taxonomy.fingerprint_metadata()
+            )
+        return metadata
+
+    def score_fine_subtypes(
+        self,
+        *,
+        token_states: torch.Tensor,
+        target_mask: torch.Tensor,
+        parent_ids: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        """Score fixed-taxonomy subtypes from text-only span states."""
+
+        if self.fine_subtype_head is None:
+            raise RuntimeError("The formal fine subtype head is disabled.")
+        features = pool_span_boundary_mean(token_states, target_mask)
+        raw_logits = self.fine_subtype_head.raw_logits(features)
+        parents = parent_ids.to(
+            device=raw_logits.device,
+            dtype=torch.long,
+        )
+        valid = (parents >= 0) & (
+            parents < self.fine_subtype_head.num_parents
+        )
+        logits = raw_logits.new_full(
+            raw_logits.shape,
+            torch.finfo(raw_logits.dtype).min,
+        )
+        predicted = torch.full(
+            (raw_logits.size(0),),
+            IGNORE_INDEX,
+            dtype=torch.long,
+            device=raw_logits.device,
+        )
+        confidence = raw_logits.new_zeros(raw_logits.size(0))
+        margin = raw_logits.new_zeros(raw_logits.size(0))
+        entropy = raw_logits.new_zeros(raw_logits.size(0))
+        if torch.any(valid):
+            valid_logits = self.fine_subtype_head.mask_logits(
+                raw_logits[valid],
+                parents[valid],
+            )
+            logits[valid] = valid_logits
+            probabilities = F.softmax(valid_logits.float(), dim=-1)
+            top_values, top_indices = probabilities.topk(2, dim=-1)
+            predicted[valid] = top_indices[:, 0]
+            confidence[valid] = top_values[:, 0].to(confidence.dtype)
+            margin[valid] = (
+                top_values[:, 0] - top_values[:, 1]
+            ).to(margin.dtype)
+            entropy[valid] = (
+                -(probabilities * probabilities.clamp_min(1e-8).log())
+                .sum(dim=-1)
+                .to(entropy.dtype)
+            )
+        return {
+            "features": features,
+            "raw_logits": raw_logits,
+            "logits": logits,
+            "predicted_subtype_ids": predicted,
+            "confidence": confidence,
+            "margin": margin,
+            "entropy": entropy,
+            "valid_parent_mask": valid,
+        }
 
     def _predicted_entity_masks(
         self,
@@ -1211,6 +1370,11 @@ class GMNERModel(nn.Module):
             )
             total_loss = self.lambda_ner * ner_loss
             outputs["loss_ner"] = ner_loss.detach()
+            outputs["raw_loss_ner"] = ner_loss.detach()
+            outputs["task_loss_ner"] = ner_loss
+            outputs["weighted_loss_ner"] = (
+                self.lambda_ner * ner_loss.detach()
+            )
 
         target_type_ids = batch.get("target_type_ids")
         if (
@@ -1280,6 +1444,64 @@ class GMNERModel(nn.Module):
             target_repr = masked_mean(pre_prototype_fused_tokens, target_mask)
             reranker_target_repr = self._entity_boundary_repr(pre_prototype_fused_tokens, target_mask)
         text_target_repr = masked_mean(base_text_nodes, target_mask)
+        if (
+            self.fine_subtype_head is not None
+            and "target_type_ids" in batch
+        ):
+            fine_outputs = self.score_fine_subtypes(
+                token_states=base_text_nodes,
+                target_mask=knowledge_target_mask,
+                parent_ids=batch["target_type_ids"],
+            )
+            outputs["fine_subtype_raw_logits"] = fine_outputs[
+                "raw_logits"
+            ]
+            outputs["fine_subtype_logits"] = fine_outputs["logits"]
+            outputs["fine_subtype_predicted_ids"] = fine_outputs[
+                "predicted_subtype_ids"
+            ]
+            outputs["fine_subtype_confidence"] = fine_outputs[
+                "confidence"
+            ]
+            outputs["fine_subtype_margin"] = fine_outputs["margin"]
+            outputs["fine_subtype_entropy"] = fine_outputs["entropy"]
+            target_subtype_ids = batch.get("target_subtype_ids")
+            if target_subtype_ids is not None:
+                valid_subtypes = (
+                    fine_outputs["valid_parent_mask"]
+                    & (target_subtype_ids >= 0)
+                    & (
+                        target_subtype_ids
+                        < self.fine_subtype_head.num_subtypes
+                    )
+                )
+                if torch.any(valid_subtypes):
+                    subtype_loss = F.cross_entropy(
+                        fine_outputs["logits"][valid_subtypes],
+                        target_subtype_ids[valid_subtypes],
+                    )
+                    outputs["loss_fine_subtype"] = (
+                        subtype_loss.detach()
+                    )
+                    outputs["raw_loss_fine_subtype"] = (
+                        subtype_loss.detach()
+                    )
+                    outputs["raw_loss_subtype"] = subtype_loss.detach()
+                    outputs["task_loss_fine_subtype"] = subtype_loss
+                    outputs["weighted_loss_fine_subtype"] = (
+                        self.lambda_fine_subtype
+                        * subtype_loss.detach()
+                    )
+                    outputs["weighted_loss_subtype"] = (
+                        self.lambda_fine_subtype
+                        * subtype_loss.detach()
+                    )
+                    total_loss = (
+                        self.lambda_fine_subtype * subtype_loss
+                        if total_loss is None
+                        else total_loss
+                        + self.lambda_fine_subtype * subtype_loss
+                    )
         context_repr = masked_mean(
             pre_prototype_fused_tokens,
             attention_mask.to(device=pre_prototype_fused_tokens.device, dtype=pre_prototype_fused_tokens.dtype),
@@ -1962,6 +2184,11 @@ class GMNERModel(nn.Module):
                     label_smoothing=self.label_smoothing,
                 )
             outputs["loss_grounding"] = grounding_loss.detach()
+            outputs["raw_loss_grounding"] = grounding_loss.detach()
+            outputs["task_loss_grounding"] = grounding_loss
+            outputs["weighted_loss_grounding"] = (
+                self.lambda_grounding * grounding_loss.detach()
+            )
             if "grounding_base_logits" in outputs:
                 base_ce_loss = masked_cross_entropy(
                     logits=outputs["grounding_base_logits"],
@@ -2109,6 +2336,11 @@ class GMNERModel(nn.Module):
             )
         align_loss = alignment_objective(alignment_score, positive_mask=positive_mask)
         outputs["loss_align"] = align_loss.detach()
+        outputs["raw_loss_alignment"] = align_loss.detach()
+        outputs["task_loss_alignment"] = align_loss
+        outputs["weighted_loss_alignment"] = (
+            self.lambda_alignment * align_loss.detach()
+        )
         total_loss = align_loss * self.lambda_alignment if total_loss is None else total_loss + self.lambda_alignment * align_loss
 
         if (

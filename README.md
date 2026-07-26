@@ -3,6 +3,12 @@
 本仓库当前只以 **M3.3A** 作为正式主线。历史实验、失败分支和严格 OOF
 基础设施仍可复现，但不属于正式推理链。
 
+独立 FMNERG `Model-F / M3.3F` 的完全共享 Stage1-F 已完成 Dev-only F1：
+`lambda_f=1.0` 和唯一预注册诊断 `0.5` 均未通过 Gate，因此该分支正式
+no-go，未运行其他 seed、R36、后半链或 Test。固定 taxonomy、Fine 指标和
+subtype-aware R16 工程保留用于复现。协议与结果见
+[`docs/FMNERG_FULL_CHAIN.md`](docs/FMNERG_FULL_CHAIN.md)。
+
 ## Current Status
 
 ```text
@@ -86,6 +92,8 @@ configs/fmnerg_twitter10000_evidence_visibility.yaml
   span/type/region，详见
   [Joint Experiments](sidecars/fmnerg_joint/README.md)。
 - `docs/HIERARCHICAL_RECORD_VERIFIER.md`：M2 到 M3.3A 的方法细节。
+- `docs/FMNERG_FULL_CHAIN.md`：独立 M3.3F 的 F0/F1 契约、Gate 和 Dev-only
+  运行流程。
 - `docs/EXPERIMENT_SUMMARY.md`：历史实验和负结果。
 - `docs/OOF_NULL_RELEASE.md`：严格 OOF 契约及 M3.6A-r2 no-go 结论。
 - `docs/experiments/`：不属于正式推理链的诊断实验。

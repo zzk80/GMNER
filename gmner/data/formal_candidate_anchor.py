@@ -40,6 +40,8 @@ def load_formal_anchor_cache(
     stage1_checkpoint_sha256: str,
     data_source_sha256: str,
     expanded_candidate_spec: dict,
+    expected_label_schema: str | None = None,
+    expected_taxonomy_sha256: str | None = None,
 ) -> tuple[list[dict], dict]:
     """Load and validate the authoritative formal Stage1 decode."""
 
@@ -51,6 +53,16 @@ def load_formal_anchor_cache(
         raise ValueError("Formal anchor cache uses another Stage1 checkpoint.")
     if metadata.get("data_source_sha256") != data_source_sha256:
         raise ValueError("Formal anchor cache uses another source file.")
+    if (
+        expected_label_schema is not None
+        and metadata.get("label_schema") != expected_label_schema
+    ):
+        raise ValueError("Formal anchor cache uses another label schema.")
+    if (
+        expected_taxonomy_sha256 is not None
+        and metadata.get("taxonomy_sha256") != expected_taxonomy_sha256
+    ):
+        raise ValueError("Formal anchor cache uses another subtype taxonomy.")
     formal_spec = dict(metadata.get("candidate_config") or {})
     mismatches = candidate_config_mismatches(
         formal_spec,
@@ -80,6 +92,10 @@ def load_formal_anchor_cache(
             metadata.get("candidate_config_sha256") or ""
         ),
     }
+    if expected_label_schema is not None:
+        provenance["label_schema"] = expected_label_schema
+    if expected_taxonomy_sha256 is not None:
+        provenance["taxonomy_sha256"] = expected_taxonomy_sha256
     return records, provenance
 
 
@@ -116,6 +132,11 @@ def stage1_entities_from_anchor(
                 "end": end,
                 "type": ID2ENTITY_TYPE[type_id],
                 "text": " ".join(tokens[start:end]),
+                **(
+                    {"subtype_id": int(prediction["subtype_id"])}
+                    if prediction.get("subtype_id") is not None
+                    else {}
+                ),
             }
         )
     return entities

@@ -1,0 +1,86 @@
+data:
+  task_type: multimodal_ner
+  dataset_name: twitter10000_fmnerg
+  train_file: GMNER-main/Twitter10000_v2.0/txt_fine/train.txt
+  dev_file: GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt
+  test_file: GMNER-main/Twitter10000_v2.0/txt_fine/test.txt
+  image_dir: GMNER-main/Twitter10000_v2.0/images
+  image_feature_dir: GMNER-main/Twitter10000_v2.0/VinVL
+  image_annotation_dir: GMNER-main/Twitter10000_v2.0/xml
+  max_length: 128
+  num_workers: 0
+  use_dependency_graph: true
+  dependency_backend: spacy
+  dependency_model: en_core_web_sm
+  graph_window_size: 2
+  max_regions: 16
+  grounding_iou_threshold: 0.5
+  add_null_region: true
+  grounding_enabled: true
+  expand_entities_for_grounding: true
+  groundability_type_priors: knowledge/grounding/groundability_by_type.jsonl
+  groundability_mention_priors: knowledge/grounding/groundability_by_mention_type.jsonl
+  region_min_score: 0.0
+  label_schema: fine_hierarchical
+  subtype_taxonomy: sidecars/fmnerg_subtype/taxonomy_twitter10000.json
+  subtype_taxonomy_sha256: 84d6bae4298d383aea989b7a559c4d5d68d465733fcdfe1b3da288380e622f40
+
+model:
+  text_model_name: /home/zzk/gmner/roberta-base
+  image_backbone: resnet50
+  hidden_size: 768
+  projection_dim: 768
+  dropout: 0.1
+  graph_layers: 3
+  graph_dropout: 0.1
+  cross_attention_heads: 8
+  use_crf: true
+  use_pretrained_vision: true
+  region_feature_dim: 2048
+  grounding_null_prior_weight: 1.0
+  grounding_null_logit_bias: 0.0
+  region_score_prior_weight: 0.1
+  region_object_compatibility_weight: 0.2
+  use_fine_subtype_head: true
+  num_subtypes: 51
+  fine_subtype_hidden_size: 768
+  fine_subtype_head_architecture: shared_hard
+  fine_subtype_parent_hidden_size: 192
+  fine_subtype_input_source: text_only
+
+optim:
+  batch_size: 8
+  learning_rate: 1.0e-5
+  weight_decay: 0.01
+  num_epochs: 15
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+  new_module_learning_rate: 1.0e-5
+  high_level_learning_rate: 1.0e-5
+  backbone_learning_rate: 5.0e-6
+  subtype_learning_rate: 1.0e-4
+  backbone_lower_learning_rate: 1.0e-6
+  backbone_upper_learning_rate: 5.0e-6
+  backbone_upper_layer_count: 4
+
+loss:
+  label_smoothing: 0.0
+  lambda_ner: 1.0
+  lambda_fine_subtype: 1.0
+  lambda_grounding: 1.0
+  lambda_alignment: 0.1
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: outputs/fmnerg_fine/stage1_seed42
+  init_checkpoint: outputs/fmnerg_stage1_roberta128/best_model.pt
+  trainable_modules: all
+  save_best_metric: fmnerg_score
+  save_latest_checkpoint: false
+  early_stopping_patience: 3
+  log_every_steps: 20
+  log_grad_norms: true
+  task_gradient_cosine_interval: 400

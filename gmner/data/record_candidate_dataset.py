@@ -22,6 +22,7 @@ class RecordCandidateDataset(Dataset):
         *,
         expected_stage1_sha256: str | None = None,
         expected_candidate_sha256: str | None = None,
+        expected_taxonomy_sha256: str | None = None,
     ) -> None:
         self.path = Path(path)
         if not self.path.exists():
@@ -39,6 +40,10 @@ class RecordCandidateDataset(Dataset):
         self.records = list(payload["records"])
         self._validate_fingerprint("stage1_checkpoint_sha256", expected_stage1_sha256)
         self._validate_fingerprint("candidate_config_sha256", expected_candidate_sha256)
+        self._validate_fingerprint(
+            "taxonomy_sha256",
+            expected_taxonomy_sha256,
+        )
 
     def _validate_fingerprint(self, key: str, expected: str | None) -> None:
         if not expected:

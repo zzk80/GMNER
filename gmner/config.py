@@ -37,6 +37,9 @@ class DataConfig:
     groundability_type_priors: str = "knowledge/grounding/groundability_by_type.jsonl"
     groundability_mention_priors: str = "knowledge/grounding/groundability_by_mention_type.jsonl"
     region_min_score: float = 0.0
+    label_schema: str = "coarse"
+    subtype_taxonomy: str = ""
+    subtype_taxonomy_sha256: str = ""
 
 
 @dataclass
@@ -101,6 +104,11 @@ class ModelConfig:
     use_subtype_auxiliary: bool = False
     num_subtypes: int = 0
     subtype_contrastive_temperature: float = 0.1
+    use_fine_subtype_head: bool = False
+    fine_subtype_hidden_size: int = 768
+    fine_subtype_head_architecture: str = "shared_hard"
+    fine_subtype_parent_hidden_size: int = 192
+    fine_subtype_input_source: str = "text_only"
     use_semantic_prototypes: bool = False
     prototype_type_score_weight: float = 1.0
     prototype_subtype_score_weight: float = 1.0
@@ -170,6 +178,10 @@ class OptimConfig:
     gradual_unfreeze_high_epoch: int = 3
     gradual_unfreeze_bert_epoch: int = 6
     bert_unfreeze_last_n_layers: int = 4
+    subtype_learning_rate: float = 1e-4
+    backbone_lower_learning_rate: float = 1e-6
+    backbone_upper_learning_rate: float = 5e-6
+    backbone_upper_layer_count: int = 4
 
 
 @dataclass
@@ -182,6 +194,7 @@ class LossConfig:
     lambda_subtype_prototype: float = 0.05
     lambda_subtype_auxiliary: float = 0.0
     lambda_subtype_contrastive: float = 0.0
+    lambda_fine_subtype: float = 0.0
     lambda_external_knowledge_type: float = 0.0
     lambda_external_knowledge_subtype: float = 0.0
     lambda_external_knowledge_arbiter: float = 0.0
@@ -234,6 +247,7 @@ class RuntimeConfig:
     eval_frozen_modules: bool = False
     log_every_steps: int = 20
     log_grad_norms: bool = False
+    task_gradient_cosine_interval: int = 0
 
 
 @dataclass

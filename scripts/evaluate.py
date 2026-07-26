@@ -23,6 +23,11 @@ from gmner.data import (
 )
 from gmner.data.graph_builders import GraphBuilderConfig
 from gmner.engine import evaluate_model
+from gmner.fmnerg.taxonomy import (
+    SubtypeTaxonomy,
+    bind_config_taxonomy_fingerprint,
+    validate_taxonomy_fingerprint,
+)
 from gmner.models import GMNERModel
 from gmner.utils.logging import create_logger
 from gmner.utils.io import maybe_convert_conll
@@ -78,6 +83,21 @@ if __name__ == "__main__":
     if args.reranker_alpha is not None:
         config.model.grounding_reranker_fusion_mode = "fixed"
         config.model.grounding_reranker_weight = args.reranker_alpha
+    if bool(getattr(config.model, "use_fine_subtype_head", False)):
+        if str(getattr(config.data, "label_schema", "")) != "fine_hierarchical":
+            raise ValueError(
+                "Stage1-F requires data.label_schema=fine_hierarchical."
+            )
+        config.data.subtype_taxonomy = str(
+            resolve_path(config.data.subtype_taxonomy, project_root)
+        )
+        taxonomy = SubtypeTaxonomy.from_file(
+            config.data.subtype_taxonomy
+        )
+        bind_config_taxonomy_fingerprint(config.data, taxonomy)
+        config.model.num_subtypes = taxonomy.num_subtypes
+    else:
+        taxonomy = None
     if config.data.semantic_prototype_path:
         config.data.semantic_prototype_path = str(
             resolve_path(config.data.semantic_prototype_path, project_root)
@@ -155,6 +175,7 @@ if __name__ == "__main__":
         groundability_type_priors=str(groundability_type_priors) if groundability_type_priors else None,
         groundability_mention_priors=str(groundability_mention_priors) if groundability_mention_priors else None,
         region_min_score=config.data.region_min_score,
+        subtype_taxonomy=taxonomy,
     )
     num_labels = args.num_labels if args.num_labels is not None else 9
     if config.model.use_subtype_auxiliary and config.model.num_subtypes <= 0:
@@ -171,6 +192,12 @@ if __name__ == "__main__":
     model = GMNERModel(config=config, num_labels=num_labels)
 
     checkpoint = torch.load(args.checkpoint, map_location="cpu")
+    if taxonomy is not None:
+        validate_taxonomy_fingerprint(
+            dict(checkpoint.get("model_metadata") or {}),
+            taxonomy,
+            artifact_name="Stage1-F checkpoint",
+        )
     model.load_state_dict(checkpoint["model_state_dict"])
 
     device = torch.device("cuda" if torch.cuda.is_available() and config.runtime.device.startswith("cuda") else "cpu")

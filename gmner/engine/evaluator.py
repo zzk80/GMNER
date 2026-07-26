@@ -8,10 +8,18 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from gmner.engine.utils import move_batch_to_device
+from gmner.engine.utils import f1_counts, move_batch_to_device
 from gmner.knowledge.region_compatibility import compatibility_score
 from gmner.models.gmner_model import GMNERModel
-from gmner.constants import DEFAULT_LABEL2ID, IGNORE_INDEX
+from gmner.constants import (
+    DEFAULT_LABEL2ID,
+    ENTITY_TYPE2ID,
+    IGNORE_INDEX,
+)
+from gmner.fmnerg.metrics import (
+    fine_entities_from_bio_tags,
+    subtype_classification_metrics,
+)
 from gmner.models.common import masked_mean
 from gmner.utils.metrics import (
     extract_entities_from_word_labels,
@@ -188,6 +196,17 @@ def evaluate_model(
     joint_enabled = model.joint_type_region_verifier is not None
     seen_records = set()
     seen_ner_records = set()
+    fine_enabled = model.fine_subtype_head is not None
+    fine_mner_correct = 0
+    fmnerg_correct = 0
+    fine_prediction_count = 0
+    fine_gold_count = 0
+    gold_span_subtype_predictions: list[int] = []
+    gold_span_subtype_targets: list[int] = []
+    parent_conditioned_subtype_correct = 0
+    parent_conditioned_subtype_count = 0
+    hierarchy_consistent_count = 0
+    hierarchy_prediction_count = 0
 
     for batch in dataloader:
         batch = move_batch_to_device(batch, device)
@@ -677,6 +696,23 @@ def evaluate_model(
 
                 pred_entities = extract_entities_from_word_labels(word_pred, tokens, id2label)
                 gold_entities = extract_entities_from_word_labels(word_gold, tokens, id2label)
+                gold_fine_entities: list[dict] = []
+                if fine_enabled:
+                    fine_tags = meta.get("fine_ner_tags")
+                    if not isinstance(fine_tags, list):
+                        raise ValueError(
+                            "Stage1-F evaluation requires fine_ner_tags in "
+                            f"record {record_id}."
+                        )
+                    gold_fine_entities = fine_entities_from_bio_tags(
+                        tokens=tokens,
+                        coarse_tags=word_gold,
+                        fine_tags=fine_tags,
+                        taxonomy=model.fine_subtype_taxonomy,
+                        coarse_id2label=id2label,
+                    )
+                    fine_prediction_count += len(pred_entities)
+                    fine_gold_count += len(gold_fine_entities)
 
                 no_region_index = int(region_boxes.size(1) - 1)
                 record_region_boxes = region_boxes[idx]
@@ -690,6 +726,8 @@ def evaluate_model(
                 reranker_only_matched = set()
                 reranker_only_eeg_matched = set()
                 joint_mner_matched = set()
+                fine_mner_matched: set[int] = set()
+                fmnerg_matched: set[int] = set()
                 triple_predict += len(pred_entities)
                 triple_gold += len(gold_entities)
                 eeg_predict += len(pred_entities)
@@ -697,6 +735,49 @@ def evaluate_model(
                 if joint_enabled:
                     joint_mner_predict += len(pred_entities)
                     joint_mner_gold += len(gold_entities)
+
+                if fine_enabled:
+                    subtype_text_states = outputs["base_text_nodes"][
+                        idx : idx + 1
+                    ]
+                    for gold_fine in gold_fine_entities:
+                        gold_target_mask = torch.zeros_like(
+                            batch["attention_mask"][idx],
+                            dtype=torch.float32,
+                        )
+                        for token_pos, word_id in enumerate(word_ids):
+                            if word_id is None:
+                                continue
+                            if (
+                                int(gold_fine["start"])
+                                <= word_id
+                                < int(gold_fine["end"])
+                            ):
+                                gold_target_mask[token_pos] = 1.0
+                        if gold_target_mask.sum() == 0:
+                            raise ValueError(
+                                "Gold fine span has no aligned subwords in "
+                                f"record {record_id}."
+                            )
+                        gold_subtype_outputs = model.score_fine_subtypes(
+                            token_states=subtype_text_states,
+                            target_mask=gold_target_mask.unsqueeze(0),
+                            parent_ids=torch.tensor(
+                                [int(gold_fine["type_id"])],
+                                dtype=torch.long,
+                                device=subtype_text_states.device,
+                            ),
+                        )
+                        gold_span_subtype_predictions.append(
+                            int(
+                                gold_subtype_outputs[
+                                    "predicted_subtype_ids"
+                                ][0].item()
+                            )
+                        )
+                        gold_span_subtype_targets.append(
+                            int(gold_fine["subtype_id"])
+                        )
 
                 for pred_ent in pred_entities:
                     pred_span = (pred_ent["start"], pred_ent["end"])
@@ -1052,6 +1133,45 @@ def evaluate_model(
                                 joint_mner_correct += 1
                                 joint_mner_matched.add(gold_idx)
                                 break
+                    pred_subtype_id = IGNORE_INDEX
+                    if fine_enabled:
+                        parent_id = ENTITY_TYPE2ID.get(
+                            pred_type,
+                            IGNORE_INDEX,
+                        )
+                        subtype_outputs = model.score_fine_subtypes(
+                            token_states=subtype_text_states,
+                            target_mask=entity_target_mask,
+                            parent_ids=torch.tensor(
+                                [parent_id],
+                                dtype=torch.long,
+                                device=subtype_text_states.device,
+                            ),
+                        )
+                        pred_subtype_id = int(
+                            subtype_outputs["predicted_subtype_ids"][
+                                0
+                            ].item()
+                        )
+                        hierarchy_prediction_count += 1
+                        hierarchy_consistent_count += int(
+                            model.fine_subtype_taxonomy.parent_id(
+                                pred_subtype_id
+                            )
+                            == parent_id
+                        )
+                        for gold_fine in gold_fine_entities:
+                            if (
+                                tuple(gold_fine["span"]) == pred_span
+                                and int(gold_fine["type_id"])
+                                == parent_id
+                            ):
+                                parent_conditioned_subtype_count += 1
+                                parent_conditioned_subtype_correct += int(
+                                    pred_subtype_id
+                                    == int(gold_fine["subtype_id"])
+                                )
+                                break
                     pred_region_index = int(grounding_logits.argmax(dim=-1).item())
                     base_pred_region_index = int(base_decode_logits.argmax(dim=-1).item())
                     multiscale_base_pred_region_index = (
@@ -1075,6 +1195,15 @@ def evaluate_model(
                         pred_box = record_region_boxes[region_index].unsqueeze(0)
                         gt_box_tensor = torch.tensor(gt_boxes, dtype=pred_box.dtype, device=pred_box.device)
                         ious = box_iou(gt_box_tensor, pred_box).squeeze(1)
+                        if fine_enabled:
+                            threshold = float(
+                                getattr(
+                                    model.config.data,
+                                    "grounding_iou_threshold",
+                                    0.5,
+                                )
+                            )
+                            return bool((ious >= threshold).any().item())
                         return bool((ious > 0.5).any().item())
 
                     def triple_is_correct(region_index: int, entity_type: str) -> bool:
@@ -1084,6 +1213,30 @@ def evaluate_model(
                                 continue
                             return region_matches(region_index, gold_ent)
                         return False
+
+                    if fine_enabled:
+                        for gold_idx, gold_fine in enumerate(
+                            gold_fine_entities
+                        ):
+                            if (
+                                tuple(gold_fine["span"]) != pred_span
+                                or int(gold_fine["subtype_id"])
+                                != pred_subtype_id
+                            ):
+                                continue
+                            if gold_idx not in fine_mner_matched:
+                                fine_mner_correct += 1
+                                fine_mner_matched.add(gold_idx)
+                            if (
+                                gold_idx not in fmnerg_matched
+                                and region_matches(
+                                    pred_region_index,
+                                    gold_fine,
+                                )
+                            ):
+                                fmnerg_correct += 1
+                                fmnerg_matched.add(gold_idx)
+                            break
 
                     if multiscale_base_decode_logits is not None:
                         multiscale_base_eeg_correct = any(
@@ -1644,5 +1797,64 @@ def evaluate_model(
         metrics["type_accuracy"] = type_correct_sum / type_count
         metrics["type_nll"] = type_nll_sum / type_count
         metrics["type_ece"] = ece
+    if fine_enabled:
+        fine_precision, fine_recall, fine_f1 = f1_counts(
+            fine_mner_correct,
+            fine_prediction_count,
+            fine_gold_count,
+        )
+        fmnerg_precision, fmnerg_recall, fmnerg_f1 = f1_counts(
+            fmnerg_correct,
+            fine_prediction_count,
+            fine_gold_count,
+        )
+        metrics.update(
+            {
+                "fine_mner_precision": fine_precision,
+                "fine_mner_recall": fine_recall,
+                "fine_mner_f1": fine_f1,
+                "fine_mner_correct": float(fine_mner_correct),
+                "fmnerg_precision": fmnerg_precision,
+                "fmnerg_recall": fmnerg_recall,
+                "fmnerg_f1": fmnerg_f1,
+                "fmnerg_correct": float(fmnerg_correct),
+                "fmnerg_score": fmnerg_f1,
+                "fine_prediction_count": float(fine_prediction_count),
+                "fine_gold_count": float(fine_gold_count),
+                "parent_conditioned_subtype_accuracy": (
+                    parent_conditioned_subtype_correct
+                    / max(parent_conditioned_subtype_count, 1)
+                ),
+                "parent_conditioned_subtype_count": float(
+                    parent_conditioned_subtype_count
+                ),
+                "hierarchy_consistency": (
+                    hierarchy_consistent_count
+                    / max(hierarchy_prediction_count, 1)
+                ),
+            }
+        )
+        if fmnerg_f1 > fine_f1 + 1e-12:
+            raise AssertionError("FMNERG F1 exceeds Fine MNER F1.")
+        if "eeg_f1" in metrics and fmnerg_f1 > metrics["eeg_f1"] + 1e-12:
+            raise AssertionError("FMNERG F1 exceeds EEG F1.")
+        gold_span_metrics = subtype_classification_metrics(
+            gold_span_subtype_predictions,
+            gold_span_subtype_targets,
+            num_classes=model.fine_subtype_head.num_subtypes,
+        )
+        metrics.update(
+            {
+                "gold_span_subtype_accuracy": gold_span_metrics[
+                    "subtype_accuracy"
+                ],
+                "gold_span_subtype_micro_f1": gold_span_metrics[
+                    "subtype_micro_f1"
+                ],
+                "gold_span_subtype_macro_f1": gold_span_metrics[
+                    "subtype_macro_f1"
+                ],
+            }
+        )
     metrics["loss"] = total_loss / max(steps, 1)
     return metrics
