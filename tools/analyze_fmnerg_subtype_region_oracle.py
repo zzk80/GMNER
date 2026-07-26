@@ -174,11 +174,7 @@ def build_train_visual_prototypes(
         num_subtypes=taxonomy.num_subtypes,
         feature_size=provider.region_feature_size,
     )
-    if counts["span_missing"]:
-        raise ValueError(
-            "Train R36 cache does not cover every gold subtype span: "
-            f"{counts['span_missing']} missing."
-        )
+    covered = int(counts["gold_entities"] - counts["span_missing"])
     report = {
         "method": (
             "IoU-weighted mean of normalized Train gold-positive R36 "
@@ -188,6 +184,7 @@ def build_train_visual_prototypes(
         "source_sha256": sha256_file(source_path),
         "expanded_cache": provider.artifact_report(),
         **{key: float(value) for key, value in counts.items()},
+        "span_coverage": covered / max(int(counts["gold_entities"]), 1),
         "prototype_subtypes_available": float(bank.available.sum().item()),
         "prototype_subtypes_missing": [
             taxonomy.labels[index]
