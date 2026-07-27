@@ -184,9 +184,13 @@ def evaluate_with_entity_count_diagnostics(
         formal, expanded = move_paired_record_batch(batch, device)
 
         # Frozen chain inference
-        hierarchy_outputs = frozen_hierarchical_context(
-            hierarchical_model, fine_model, formal, expanded
+        baseline_context = frozen_hierarchical_context(
+            hierarchical_model,
+            formal,
+            expanded,
+            decode_options=decode_options,
         )
+        hierarchy_outputs = baseline_context["outputs"]
 
         # Evidence visibility inference
         outputs = model(
