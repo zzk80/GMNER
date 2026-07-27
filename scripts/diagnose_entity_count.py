@@ -18,19 +18,66 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from gmner.data import PairedRecordCandidateDataset, PairedRecordCandidateCollator
+from gmner.data import (
+    PairedRecordCandidateDataset,
+    PairedRecordCandidateCollator,
+    RecordCandidateDataset,
+)
 from gmner.engine.evidence_visibility_evaluator import (
     _selected_span_indices,
     frozen_hierarchical_context,
     move_paired_record_batch,
 )
-from gmner.engine.fine_grounding_adapter_evaluator import load_frozen_chain
 from gmner.engine.utils import match_record_predictions
 from gmner.evidence_visibility_config import load_evidence_visibility_config
 from gmner.models.evidence_visibility import (
     EvidenceVisibilityModel,
     decode_evidence_visibility,
 )
+
+
+def resolve(path_str: str, root: Path) -> Path:
+    """Resolve path relative to project root"""
+    path = Path(path_str)
+    if path.is_absolute():
+        return path
+    return root / path
+
+
+def load_frozen_chain(config):
+    """Load frozen hierarchical and fine models - copied from train_evidence_visibility.py"""
+    from gmner.hierarchical_record_verifier_config import (
+        load_hierarchical_record_verifier_config,
+    )
+    from gmner.models.hierarchical_record_verifier import HierarchicalRecordVerifier
+    from gmner.fine_grounding_adapter_config import load_fine_grounding_adapter_config
+    from gmner.models.fine_grounding_adapter import FineGroundingAdapter
+
+    root = Path(__file__).resolve().parents[1]
+
+    # Load hierarchical verifier
+    hierarchy_config = load_hierarchical_record_verifier_config(
+        resolve(config.frozen.hierarchical_config, root)
+    )
+    hierarchy = HierarchicalRecordVerifier(hierarchy_config.model)
+    hierarchy_checkpoint = torch.load(
+        resolve(config.frozen.hierarchical_checkpoint, root),
+        map_location='cpu'
+    )
+    hierarchy.load_state_dict(hierarchy_checkpoint['model_state_dict'])
+
+    # Load fine grounding adapter
+    fine_config = load_fine_grounding_adapter_config(
+        resolve(config.frozen.fine_config, root)
+    )
+    fine_model = FineGroundingAdapter(fine_config.model)
+    fine_checkpoint = torch.load(
+        resolve(config.frozen.fine_checkpoint, root),
+        map_location='cpu'
+    )
+    fine_model.load_state_dict(fine_checkpoint['model_state_dict'])
+
+    return hierarchy, fine_model
 
 
 def compute_sha256(file_path: Path) -> str:
@@ -343,10 +390,10 @@ def main():
 
     # Load dataset
     print("\n[4/5] Loading dataset...")
-    dataset = PairedRecordCandidateDataset(
-        formal_cache=args.formal_cache,
-        expanded_cache=args.expanded_cache,
-    )
+    root = Path(__file__).resolve().parents[1]
+    formal = RecordCandidateDataset(resolve(args.formal_cache, root))
+    expanded = RecordCandidateDataset(resolve(args.expanded_cache, root))
+    dataset = PairedRecordCandidateDataset(formal, expanded)
     collator = PairedRecordCandidateCollator()
     dataloader = torch.utils.data.DataLoader(
         dataset,
