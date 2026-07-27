@@ -218,9 +218,12 @@ def evaluate_with_entity_count_diagnostics(
         has_null = expanded["region_is_null"].bool().any(dim=-1)[:, None]
         has_null = has_null.expand_as(baseline_visible)
         final_visible = decode_evidence_visibility(
-            outputs["final_visibility_logits"],
-            baseline_visible,
-            has_null_candidate=has_null,
+            outputs["final_visibility_probability"],
+            base_is_null=base_is_null,
+            baseline_visible=baseline_visible,
+            has_real_candidate=outputs["fine_has_real_candidate"],
+            has_null_region=has_null,
+            span_mask=expanded["span_mask"],
             visible_from_null_threshold=visible_from_null_threshold,
             null_from_visible_threshold=null_from_visible_threshold,
             enabled=True,
