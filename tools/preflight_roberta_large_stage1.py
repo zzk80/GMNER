@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import hashlib
 import json
 from dataclasses import asdict
@@ -193,6 +194,40 @@ def inspect_local_roberta_large(model_path: Path) -> dict[str, Any]:
     }
 
 
+def inspect_gmner_projection(config: GMNERConfig) -> dict[str, Any]:
+    from gmner.models import GMNERModel
+
+    model = GMNERModel(config=config, num_labels=9)
+    projector = model.text_projector
+    result = {
+        "text_hidden_size": int(model.text_encoder.hidden_size),
+        "shared_hidden_size": int(config.model.hidden_size),
+        "projector_class": type(projector).__name__,
+        "projector_input_size": int(
+            getattr(projector, "in_features", -1)
+        ),
+        "projector_output_size": int(
+            getattr(projector, "out_features", -1)
+        ),
+        "parameter_count": sum(
+            parameter.numel()
+            for parameter in model.parameters()
+        ),
+    }
+    if result["text_hidden_size"] != 1024:
+        raise ValueError("GMNERModel did not load a 1024-wide backbone.")
+    if result["projector_class"] != "Linear":
+        raise ValueError("RoBERTa-large requires an explicit text projector.")
+    if (
+        result["projector_input_size"] != 1024
+        or result["projector_output_size"] != 768
+    ):
+        raise ValueError("Expected a 1024 -> 768 text projector.")
+    del model
+    gc.collect()
+    return result
+
+
 def main() -> None:
     args = parse_args()
     protocol_path = resolve(args.protocol)
@@ -242,6 +277,7 @@ def main() -> None:
     backbone = inspect_local_roberta_large(
         required_paths["candidate_model"]
     )
+    gmner_projection = inspect_gmner_projection(candidate)
     result = {
         "metadata": {
             "kind": "roberta_large_stage1_phase1_preflight",
@@ -264,6 +300,7 @@ def main() -> None:
         "controlled_experiment": controlled,
         "baseline_checkpoint": baseline_checkpoint,
         "candidate_backbone": backbone,
+        "candidate_gmner_projection": gmner_projection,
         "checked_paths": {
             key: str(path.resolve())
             for key, path in required_paths.items()

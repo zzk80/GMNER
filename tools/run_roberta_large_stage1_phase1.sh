@@ -31,12 +31,18 @@ cleanup_lock() {
 }
 trap cleanup_lock EXIT
 
-free_bytes="$(df -PB1 "$ROOT" | awk 'NR == 2 {print $4}')"
-required_bytes=$((MIN_FREE_GB * 1024 * 1024 * 1024))
-if (( free_bytes < required_bytes )); then
-  echo "Insufficient disk: ${free_bytes} bytes free; need ${required_bytes}." >&2
-  exit 3
-fi
+check_disk() {
+  local free_bytes
+  local required_bytes
+  free_bytes="$(df -PB1 "$ROOT" | awk 'NR == 2 {print $4}')"
+  required_bytes=$((MIN_FREE_GB * 1024 * 1024 * 1024))
+  if (( free_bytes < required_bytes )); then
+    echo "Insufficient disk: ${free_bytes} bytes free; need ${required_bytes}." >&2
+    exit 3
+  fi
+}
+
+check_disk
 
 while true; do
   free_gpu_mb="$(
@@ -53,6 +59,8 @@ while true; do
   echo "[$(date '+%F %T')] Waiting for GPU: ${free_gpu_mb:-unknown} MiB free."
   sleep "$GPU_POLL_SECONDS"
 done
+
+check_disk
 
 echo "[$(date '+%F %T')] Running Dev-only preflight."
 PYTHONPATH=. "$PYTHON_BIN" tools/preflight_roberta_large_stage1.py \
