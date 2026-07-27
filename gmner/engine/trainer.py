@@ -497,6 +497,8 @@ class GMNERTrainer:
         self.optimizer.zero_grad(set_to_none=True)
         non_finite_steps = 0
         epochs_without_improvement = 0
+        best_epoch = None
+        best_metrics: Dict[str, float] = {}
         fixed_task_diagnostic_batch: Dict | None = None
 
         for epoch in range(1, self.config.optim.num_epochs + 1):
@@ -745,6 +747,11 @@ class GMNERTrainer:
 
             if metric_value > self.best_metric_value:
                 self.best_metric_value = metric_value
+                best_epoch = epoch
+                best_metrics = {
+                    key: float(value)
+                    for key, value in dev_metrics.items()
+                }
                 epochs_without_improvement = 0
                 self._save_checkpoint(self.best_checkpoint_path, epoch=epoch, metrics=dev_metrics)
                 self.logger.info(
@@ -773,6 +780,8 @@ class GMNERTrainer:
             "best_metric_name": self.best_metric_name,
             "best_metric_value": self.best_metric_value,
             "best_checkpoint": str(self.best_checkpoint_path),
+            "best_epoch": best_epoch,
+            "best_metrics": best_metrics,
         }
         with (self.output_dir / "train_summary.json").open("w", encoding="utf-8") as fp:
             json.dump(summary, fp, ensure_ascii=False, indent=2)

@@ -21,6 +21,7 @@ bert-base-multilingual-cased/
 bertweet-base/
 clip-vit-base-patch32/
 roberta-base/
+roberta-large/
 siglip2-base-patch16-224/
 GMNER-main/Twitter10000_v2.0/images/
 GMNER-main/Twitter10000_v2.0/VinVL/

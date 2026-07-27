@@ -19,7 +19,7 @@ from gmner.models.heads import GroundingResidualAdapter, TokenClassificationHead
 from gmner.models.multiscale_grounding import MultiScaleGroundingAligner
 from gmner.utils.bio import entity_masks_from_bio, first_entity_mask_from_bio
 from gmner.utils.io import maybe_convert_conll
-from gmner.utils.metrics import entity_micro_f1, token_micro_f1
+from gmner.utils.metrics import entity_micro_f1, span_micro_f1, token_micro_f1
 
 
 def test_token_f1_excludes_o_labels():
@@ -34,6 +34,14 @@ def test_entity_f1_requires_exact_span_and_type():
 
     assert exact["entity_f1"] > 0.999
     assert wrong_type["entity_f1"] == 0.0
+
+
+def test_span_f1_ignores_type_but_requires_exact_boundary():
+    wrong_type = span_micro_f1([[3, 4, 0]], [[1, 2, 0]])
+    wrong_boundary = span_micro_f1([[1, 0, 0]], [[1, 2, 0]])
+
+    assert wrong_type["span_f1"] > 0.999
+    assert wrong_boundary["span_f1"] == 0.0
 
 
 def test_alignment_objective_prefers_matching_pairs():

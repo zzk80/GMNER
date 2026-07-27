@@ -161,6 +161,33 @@ def entity_micro_f1(preds: List[List[int]], labels: List[List[int]]) -> Dict[str
     return {"entity_precision": precision, "entity_recall": recall, "entity_f1": f1}
 
 
+def span_micro_f1(preds: List[List[int]], labels: List[List[int]]) -> Dict[str, float]:
+    """Compute exact-boundary entity F1 while ignoring the entity type."""
+
+    id2label = {value: key for key, value in DEFAULT_LABEL2ID.items()}
+    predicted = set()
+    gold = set()
+
+    for sequence_idx, (pred_seq, label_seq) in enumerate(zip(preds, labels)):
+        tokens = [str(idx) for idx in range(max(len(pred_seq), len(label_seq)))]
+        for entity in extract_entities_from_word_labels(pred_seq, tokens, id2label):
+            predicted.add((sequence_idx, entity["start"], entity["end"]))
+        for entity in extract_entities_from_word_labels(label_seq, tokens, id2label):
+            gold.add((sequence_idx, entity["start"], entity["end"]))
+
+    tp = len(predicted & gold)
+    fp = len(predicted - gold)
+    fn = len(gold - predicted)
+    precision = tp / (tp + fp + 1e-8)
+    recall = tp / (tp + fn + 1e-8)
+    f1 = 2 * precision * recall / (precision + recall + 1e-8)
+    return {
+        "span_precision": precision,
+        "span_recall": recall,
+        "span_f1": f1,
+    }
+
+
 def grounding_accuracy(preds: List[int], labels: List[int]) -> Dict[str, float]:
     preds_arr = np.asarray(preds)
     labels_arr = np.asarray(labels)

@@ -25,6 +25,7 @@ from gmner.utils.metrics import (
     extract_entities_from_word_labels,
     entity_micro_f1,
     grounding_accuracy,
+    span_micro_f1,
     token_micro_f1,
     word_labels_from_subwords,
 )
@@ -1404,6 +1405,7 @@ def evaluate_model(
                         break
 
     metrics = token_micro_f1(all_token_preds, all_token_labels)
+    metrics.update(span_micro_f1(all_token_preds, all_token_labels))
     metrics.update(entity_micro_f1(all_token_preds, all_token_labels))
     if joint_enabled:
         metrics["base_entity_precision"] = metrics["entity_precision"]
