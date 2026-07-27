@@ -230,7 +230,7 @@ def evaluate_with_entity_count_diagnostics(
         )
 
         # Get region indices
-        fine_indices = fine_outputs["final_region_indices"]
+        fine_indices = outputs["fine_top1_region_index"]
         expanded_null = expanded["region_is_null"].bool().argmax(dim=-1)
 
         baseline_indices = torch.where(
