@@ -51,7 +51,7 @@ def load_frozen_chain(config, root, device):
     )
     from gmner.models.hierarchical_record_verifier import HierarchicalRecordVerifier
     from gmner.fine_grounding_adapter_config import load_fine_grounding_adapter_config
-    from gmner.models.fine_grounding_adapter import FineGroundingAdapter
+    from gmner.models.fine_grounding_adapter import CorrectionPreservationGroundingAdapter
 
     # Load fine config first
     fine_config_path = resolve(config.frozen.fine_config, root)
@@ -69,7 +69,7 @@ def load_frozen_chain(config, root, device):
     hierarchy.load_state_dict(hierarchy_checkpoint['model_state_dict'])
 
     # Load fine grounding adapter
-    fine_model = FineGroundingAdapter(fine_config.model)
+    fine_model = CorrectionPreservationGroundingAdapter(fine_config.model)
     fine_checkpoint = torch.load(
         resolve(config.frozen.fine_checkpoint, root),
         map_location='cpu'
