@@ -52,6 +52,10 @@ def load_frozen_chain(config, root, device):
     from gmner.models.hierarchical_record_verifier import HierarchicalRecordVerifier
     from gmner.fine_grounding_adapter_config import load_fine_grounding_adapter_config
     from gmner.models.fine_grounding_adapter import CorrectionPreservationGroundingAdapter
+    from gmner.models.coarse_region_selector import (
+        RecallPreservingCoarseSelector,
+        CoarseRegionSelectorConfig,
+    )
 
     # Load fine config first
     fine_config_path = resolve(config.frozen.fine_config, root)
@@ -67,18 +71,28 @@ def load_frozen_chain(config, root, device):
         map_location='cpu'
     )
     hierarchy.load_state_dict(hierarchy_checkpoint['model_state_dict'])
+    hierarchy.to(device).eval()
+
+    # Load coarse selector (from fine config's frozen)
+    coarse_checkpoint_path = resolve(fine_config.frozen.coarse_checkpoint, root)
+    coarse_checkpoint = torch.load(coarse_checkpoint_path, map_location="cpu")
+    coarse_config = CoarseRegionSelectorConfig(
+        **coarse_checkpoint["config"]["model"]
+    )
+    coarse = RecallPreservingCoarseSelector(coarse_config)
+    coarse.load_state_dict(coarse_checkpoint["model_state_dict"])
+    coarse.eval()
 
     # Load fine grounding adapter
-    fine_model = CorrectionPreservationGroundingAdapter(fine_config.model)
+    fine_model = CorrectionPreservationGroundingAdapter(fine_config.model, coarse)
     fine_checkpoint = torch.load(
         resolve(config.frozen.fine_checkpoint, root),
         map_location='cpu'
     )
     fine_model.load_state_dict(fine_checkpoint['model_state_dict'])
+    fine_model.to(device).eval()
 
     # Freeze models
-    hierarchy.to(device).eval()
-    fine_model.to(device).eval()
     for frozen_model in (fine_model, hierarchy):
         for parameter in frozen_model.parameters():
             parameter.requires_grad = False
