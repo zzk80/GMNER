@@ -1,0 +1,87 @@
+kind: fmnerg_subtype_encoder_final_test_protocol
+format_version: 2
+
+method:
+  name: f3_lr6_lower_double
+  encoder_scope: all
+  selection_source: dev
+  selection_metric: fmnerg_f1
+  seeds: [41, 42, 43]
+  report: mean_std
+  select_best_seed_on_test: false
+  architecture_and_hyperparameters_frozen: true
+  dev_winner: lr6_lower_double
+  optimization:
+    parameter: backbone_lower_learning_rate
+    baseline_value: 0.000001
+    frozen_value: 0.000002
+
+source_freeze:
+  tag: f3-dev-frozen
+  require_clean_tracked_worktree: true
+
+test_access_contract:
+  prior_test_results_known: true
+  repository_test_access_count_before: 1
+  repository_test_access_count_after: 2
+  method_test_access_count: 1
+  rerun_forbidden_after_completion: true
+
+artifacts:
+  encoder_config:
+    path: sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml
+    sha256: cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912
+  f3_p1_protocol:
+    path: sidecars/fmnerg_subtype/f3_p1_protocol.yaml
+    sha256: d10c6bcf8ae58fe5647117599b7c230c4e86b7510d0c690ecff644bde1948d24
+  dev_screen:
+    path: docs/experiments/fmnerg_subtype_f3_p1_screen_seed42.json
+    sha256: 06e03347d0c6d25f64178ad683af1f594ffdf2377251c3cb459f40f5cdb2d7a1
+  dev_summary:
+    path: docs/experiments/fmnerg_subtype_f3_p1_dev_summary.json
+    sha256: 4911c5dbc9f75598d24f8dd4601c499f9bab3d32baa1d8907ab90d1c22e30d62
+  prior_f2_test_result:
+    path: sidecars/fmnerg_subtype/roberta128_encoder_final_test_result.json
+    sha256: 791964579e2b056232e2a40e734a04a9a7d6741a0d65f9030384db16215d64ad
+  taxonomy:
+    path: sidecars/fmnerg_subtype/taxonomy_twitter10000.json
+    sha256: 84d6bae4298d383aea989b7a559c4d5d68d465733fcdfe1b3da288380e622f40
+  stage1_checkpoint:
+    path: outputs/fmnerg_stage1_roberta128/best_model.pt
+    sha256: efc617f09e5a7cda818560a4640d606623a2f386cf4035f3b90c3fc620a4d29d
+  evidence_config:
+    path: configs/fmnerg_twitter10000_evidence_visibility.yaml
+    sha256: bc90e550547bca42fac9c02f00e3e9b0af915b787bb318718ae307829cd22eea
+  evidence_checkpoint:
+    path: outputs/fmnerg_roberta128_evidence_visibility/best_model.pt
+    sha256: 666fe9731b46580983a0b5a93fb5f3169f59d7bff0931fbfad915b511d1f8989
+
+checkpoints:
+  - seed: 41
+    path: outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed41/best_model.pt
+    sha256: 58a9189235e147fab7874e7e780fb947b905c182f3bec22a7e81456ec79e616a
+  - seed: 42
+    path: outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed42/best_model.pt
+    sha256: 096e767f5a0ac605b9f721d4b6fdf80339ec6209437f7d434e0e8377187ce84b
+  - seed: 43
+    path: outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed43/best_model.pt
+    sha256: ec4c9ab6eff08bb79aa5146a8142705939ef1ecf5c751f5f75396cac5fa9d98d
+
+test_data:
+  source:
+    path: GMNER-main/Twitter10000_v2.0/txt_fine/test.txt
+    sha256: 70e726cc49fa8f9003c29857294f9bb68fe017af4a63a95ad22f2d58c526277e
+  formal_cache:
+    path: knowledge/record_candidates/roberta128/fmnerg_test_hierarchical.pt
+    sha256: ba8ba18f86fa7143a7c05e61a4cbc2041827cbbc8900a828b6edd0540a0cdf90
+  expanded_cache:
+    path: knowledge/record_candidates/roberta128/fmnerg_test_hierarchical_r36.pt
+    sha256: 105d068601c66c6f4577580d93eac59ba16fc6b672f5946aac7158acc5e25da5
+
+expected_test_main_chain:
+  coarse_mner_f1: 0.81843
+  eeg_f1: 0.65216
+  gmner_f1: 0.61529
+  tolerance: 0.00005
+
+output_dir: outputs/fmnerg_subtype_f3_final_test

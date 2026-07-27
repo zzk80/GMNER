@@ -595,6 +595,31 @@ configs/**/*.yaml
 Evidence、Release、RoBERTa 或 coarse type，则不再满足该条件，需要重新审计
 甚至重建整链 OOF。
 
+## F3-P1：受控学习率诊断
+
+F2 已冻结为当前 FMNERG 正式方案。F3-P1 只对 F2 全量解冻训练的三个学习率
+组分别进行 `0.5x/2.0x` 单变量诊断，不重训 F2 基线，不访问 Test，也不修改
+GMNER 正式预测。
+
+完整方法契约、唯一胜者规则、三种子 Gate 和运行命令见：
+
+```text
+sidecars/fmnerg_subtype/F3_PROTOCOL.md
+sidecars/fmnerg_subtype/f3_p1_protocol.yaml
+```
+
+当前状态：
+
+```text
+工程实现：完成
+F3-P1 Dev 训练：通过
+唯一胜者：lr6_lower_double
+三 seed mean FMNERG：0.520522136994
+相对 F2 mean：+0.003229713363
+三 seed GMNER：严格保持 0.621316108195
+F3 Test：尚未访问
+```
+
 ## 从 Windows 同步到云端
 
 PowerShell 中将目标替换为实际可解析的 SSH 地址，不要继续使用未配置的

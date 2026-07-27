@@ -24,6 +24,7 @@ from sidecars.fmnerg_subtype.final_test import (
     FINAL_TEST_SEEDS,
     aggregate_seed_metrics,
     load_final_test_protocol,
+    validate_dev_acceptance,
 )
 from sidecars.fmnerg_subtype.online_data import (
     OnlineSubtypeCollator,
@@ -326,6 +327,36 @@ class SubtypeEncoderTest(unittest.TestCase):
             [item["seed"] for item in protocol["checkpoints"]],
             list(FINAL_TEST_SEEDS),
         )
+
+    def test_f3_final_test_protocol_uses_passed_dev_winner(self):
+        protocol = load_final_test_protocol(
+            ROOT
+            / "sidecars"
+            / "fmnerg_subtype"
+            / "f3_final_test.yaml",
+            ROOT,
+        )
+        self.assertEqual(protocol["format_version"], 2)
+        self.assertEqual(protocol["method"]["dev_winner"], "lr6_lower_double")
+        self.assertEqual(
+            protocol["source_freeze"]["tag"],
+            "f3-dev-frozen",
+        )
+        self.assertEqual(
+            protocol["test_access_contract"][
+                "repository_test_access_count_after"
+            ],
+            2,
+        )
+        summary = validate_dev_acceptance(
+            ROOT
+            / "docs"
+            / "experiments"
+            / "fmnerg_subtype_f3_p1_dev_summary.json",
+            protocol,
+        )
+        self.assertEqual(summary["_dev_winner"], "lr6_lower_double")
+        self.assertTrue(summary["passed"])
 
     def test_final_test_aggregation_has_no_seed_selection(self):
         rows = [{"fmnerg_f1": value} for value in (0.5, 0.52, 0.51)]

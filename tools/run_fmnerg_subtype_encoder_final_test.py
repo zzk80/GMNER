@@ -103,6 +103,37 @@ def git_commit(root: Path) -> str:
     ).strip()
 
 
+def validate_source_freeze(
+    *,
+    root: Path,
+    protocol: dict[str, Any],
+    current_commit: str,
+) -> dict[str, Any]:
+    source_freeze = dict(protocol.get("source_freeze") or {})
+    if not source_freeze:
+        return {}
+    tag = str(source_freeze["tag"])
+    tag_commit = subprocess.check_output(
+        ["git", "rev-parse", f"refs/tags/{tag}^{{commit}}"],
+        cwd=root,
+        text=True,
+    ).strip()
+    if tag_commit != current_commit:
+        raise ValueError(
+            f"Final Test must run from tag {tag}; "
+            f"tag={tag_commit}, HEAD={current_commit}."
+        )
+    if source_freeze.get("require_clean_tracked_worktree") is True:
+        tracked_changes = subprocess.check_output(
+            ["git", "status", "--porcelain"],
+            cwd=root,
+            text=True,
+        ).strip()
+        if tracked_changes:
+            raise ValueError("Worktree changed after the frozen tag.")
+    return {"tag": tag, "tag_commit": tag_commit}
+
+
 def verify_checkpoint(
     *,
     specification: dict[str, Any],
@@ -167,6 +198,11 @@ def main() -> None:
                 "Final FMNERG Test is already complete; rerun is forbidden."
             )
         current_commit = git_commit(root)
+        source_freeze = validate_source_freeze(
+            root=root,
+            protocol=protocol,
+            current_commit=current_commit,
+        )
         non_test_paths = {
             name: validate_artifact(specification, root)
             for name, specification in protocol["artifacts"].items()
@@ -197,9 +233,8 @@ def main() -> None:
                         "status": "preflight_passed",
                         "protocol_sha256": protocol["_protocol_sha256"],
                         "code_commit": current_commit,
-                        "dev_winner": dev_summary[
-                            "best_scope_by_mean_dev_fmnerg"
-                        ],
+                        "source_freeze": source_freeze,
+                        "dev_winner": dev_summary["_dev_winner"],
                         "seeds": list(FINAL_TEST_SEEDS),
                         "test_accessed": False,
                     },
@@ -233,15 +268,26 @@ def main() -> None:
                 "protocol_sha256": protocol["_protocol_sha256"],
                 "code_commit": current_commit,
                 "method_selected_on": "dev",
-                "dev_winner": dev_summary[
-                    "best_scope_by_mean_dev_fmnerg"
-                ],
+                "source_freeze": source_freeze,
+                "dev_winner": dev_summary["_dev_winner"],
                 "seeds": list(FINAL_TEST_SEEDS),
                 "report": "mean_std",
                 "select_best_seed_on_test": False,
                 "architecture_and_hyperparameters_frozen": True,
                 "test_accessed": True,
                 "test_access_count": 1,
+                "repository_test_access_count": int(
+                    dict(protocol.get("test_access_contract") or {}).get(
+                        "repository_test_access_count_after",
+                        1,
+                    )
+                ),
+                "prior_test_results_known": bool(
+                    dict(protocol.get("test_access_contract") or {}).get(
+                        "prior_test_results_known",
+                        False,
+                    )
+                ),
             }
             save_json_atomic(seal, seal_path)
 
@@ -427,6 +473,7 @@ def main() -> None:
                 "protocol": protocol["_protocol_path"],
                 "protocol_sha256": protocol["_protocol_sha256"],
                 "code_commit": current_commit,
+                "source_freeze": source_freeze,
                 "method": protocol["method"],
                 "selection_source": "dev",
                 "seeds": list(FINAL_TEST_SEEDS),
@@ -436,6 +483,18 @@ def main() -> None:
                 "gmner_identity_exact": True,
                 "test_accessed": True,
                 "test_access_count": 1,
+                "repository_test_access_count": int(
+                    dict(protocol.get("test_access_contract") or {}).get(
+                        "repository_test_access_count_after",
+                        1,
+                    )
+                ),
+                "prior_test_results_known": bool(
+                    dict(protocol.get("test_access_contract") or {}).get(
+                        "prior_test_results_known",
+                        False,
+                    )
+                ),
                 "formal_predictions": str(formal_path),
                 "formal_predictions_sha256": sha256_file(formal_path),
             },

@@ -1,0 +1,176 @@
+{
+  "metadata": {
+    "kind": "fmnerg_subtype_f3_p1_screen_summary",
+    "format_version": 1,
+    "protocol_path": "/home/zzk/gmner/sidecars/fmnerg_subtype/f3_p1_protocol.yaml",
+    "protocol_sha256": "d10c6bcf8ae58fe5647117599b7c230c4e86b7510d0c690ecff644bde1948d24",
+    "selection_source": "dev",
+    "selection_metric": "fmnerg_f1",
+    "screen_seed": 42,
+    "formal_gmner_frozen": true,
+    "test_accessed": false
+  },
+  "runs": [
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr1_head_half/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5195801372628179,
+      "fine_mner_f1": 0.6782398062171983,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 12,
+      "config_sha256": "716f52f40eb0961b54d58c5d13056021ce9c47d3635b5db775b42879f06f5a69",
+      "candidate_id": "lr1_head_half",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr1_head_half.yaml",
+      "candidate_config_sha256": "716f52f40eb0961b54d58c5d13056021ce9c47d3635b5db775b42879f06f5a69"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr2_head_double/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5171578522406137,
+      "fine_mner_f1": 0.6750100928542593,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 10,
+      "config_sha256": "fa6850f1552263c528c7cf46364846da02f83e24dd137c0aa5e80070b0260b12",
+      "candidate_id": "lr2_head_double",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr2_head_double.yaml",
+      "candidate_config_sha256": "fa6850f1552263c528c7cf46364846da02f83e24dd137c0aa5e80070b0260b12"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr3_upper_half/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5167541380702463,
+      "fine_mner_f1": 0.6733952361727896,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 10,
+      "config_sha256": "99796940d2e5fda0f322a37fe93eb7f364fcaf5b41a0e633cf2501346e6e9b92",
+      "candidate_id": "lr3_upper_half",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr3_upper_half.yaml",
+      "candidate_config_sha256": "99796940d2e5fda0f322a37fe93eb7f364fcaf5b41a0e633cf2501346e6e9b92"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr4_upper_double/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5183689947517158,
+      "fine_mner_f1": 0.6782398062171983,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 10,
+      "config_sha256": "1089fd2985cadd253d255658afe39980ec5b77e4a6c19e1c2536f833b07ef771",
+      "candidate_id": "lr4_upper_double",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr4_upper_double.yaml",
+      "candidate_config_sha256": "1089fd2985cadd253d255658afe39980ec5b77e4a6c19e1c2536f833b07ef771"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr5_lower_half/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5159467097295116,
+      "fine_mner_f1": 0.6758175211949939,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 11,
+      "config_sha256": "9439057bab9eabb55386a724b5315b37116510e32abe9091b988d0dbb9ab785a",
+      "candidate_id": "lr5_lower_half",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr5_lower_half.yaml",
+      "candidate_config_sha256": "9439057bab9eabb55386a724b5315b37116510e32abe9091b988d0dbb9ab785a"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5211949939442875,
+      "fine_mner_f1": 0.6806620912394025,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 11,
+      "config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912",
+      "candidate_id": "lr6_lower_double",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml",
+      "candidate_config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912"
+    }
+  ],
+  "selection": {
+    "screen_seed": 42,
+    "minimum_paired_delta": 0.002,
+    "one_triple_tolerance": 0.000404,
+    "candidates": [
+      {
+        "candidate_id": "lr1_head_half",
+        "seed": 42,
+        "fmnerg_f1": 0.5195801372628179,
+        "baseline_fmnerg_f1": 0.5183689947517158,
+        "paired_delta": 0.0012111425111021035,
+        "passes_screen_delta": false,
+        "conservative_rank": 0
+      },
+      {
+        "candidate_id": "lr2_head_double",
+        "seed": 42,
+        "fmnerg_f1": 0.5171578522406137,
+        "baseline_fmnerg_f1": 0.5183689947517158,
+        "paired_delta": -0.0012111425111021035,
+        "passes_screen_delta": false,
+        "conservative_rank": 3
+      },
+      {
+        "candidate_id": "lr3_upper_half",
+        "seed": 42,
+        "fmnerg_f1": 0.5167541380702463,
+        "baseline_fmnerg_f1": 0.5183689947517158,
+        "paired_delta": -0.0016148566814695453,
+        "passes_screen_delta": false,
+        "conservative_rank": 1
+      },
+      {
+        "candidate_id": "lr4_upper_double",
+        "seed": 42,
+        "fmnerg_f1": 0.5183689947517158,
+        "baseline_fmnerg_f1": 0.5183689947517158,
+        "paired_delta": 0.0,
+        "passes_screen_delta": false,
+        "conservative_rank": 4
+      },
+      {
+        "candidate_id": "lr5_lower_half",
+        "seed": 42,
+        "fmnerg_f1": 0.5159467097295116,
+        "baseline_fmnerg_f1": 0.5183689947517158,
+        "paired_delta": -0.002422285022204207,
+        "passes_screen_delta": false,
+        "conservative_rank": 2
+      },
+      {
+        "candidate_id": "lr6_lower_double",
+        "seed": 42,
+        "fmnerg_f1": 0.5211949939442875,
+        "baseline_fmnerg_f1": 0.5183689947517158,
+        "paired_delta": 0.0028259991925716488,
+        "passes_screen_delta": true,
+        "conservative_rank": 5
+      }
+    ],
+    "passing_candidate_count": 1,
+    "winner_id": "lr6_lower_double",
+    "near_tied_candidate_ids": [
+      "lr6_lower_double"
+    ],
+    "selection_reason": "largest_paired_delta",
+    "advance_to_confirmation": true
+  },
+  "winner_id": "lr6_lower_double",
+  "winner_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml",
+  "winner_config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912"
+}
