@@ -203,6 +203,7 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 | SigLIP2 Reliability | N/A | Dev full-fit | VinVL/SigLIP2/Fusion AUROC：0.5773/0.5759/0.6003；Fusion risk +9 | **NO_GO** | |
 | M3.5B 动作 Oracle | N/A（gold analysis） | Dev full-fit | Top-1/2/4/8/16 净上限：+233/+326/+372/+403/+411 | **ORACLE** | 候选充足，选择困难 |
 | Subtype R36 Oracle | N/A（gold analysis） | Dev full-fit | Top-4 每 seed 仅新增约 5.33 个恢复；Top-4 已等于 R36 上限 | **ORACLE** | 视觉 subtype 路线 no-go |
+| Scene-conditioned routing | Train strict 10-fold OOF features；Dev formal predicted entities | Dev only | gold-count 历史结果 1.0000（泄漏，无效）；可部署 predicted-count / OOF classifier 最佳 0.8893，低于 0.95 Gate | **NO_GO** | 停在 Task 1；不接入 decoder，不搜索阈值 |
 
 ### P2 理论上限的假设标注
 

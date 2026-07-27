@@ -276,8 +276,25 @@ def main():
                        help="Output directory")
     parser.add_argument("--baseline-only", action="store_true",
                        help="Only run simple baseline (fast)")
+    parser.add_argument(
+        "--allow-gold-count-leakage-audit",
+        action="store_true",
+        help=(
+            "Run the historical gold-count audit. This mode is not a "
+            "deployable Scene Analyzer and must not be reported as a model."
+        ),
+    )
 
     args = parser.parse_args()
+
+    if not args.allow_gold_count_leakage_audit:
+        parser.error(
+            "This historical script derives both features and labels from "
+            "gold entity count and is therefore leakage-prone. Use "
+            "scripts/generate_scene_predictions.py with formal deployed "
+            "predictions. Pass --allow-gold-count-leakage-audit only to "
+            "reproduce the invalid historical audit."
+        )
 
     # Phase 1: 快速基线验证
     logger.info("Phase 1: Running simple feature baseline...")
