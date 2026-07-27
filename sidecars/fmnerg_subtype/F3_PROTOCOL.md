@@ -166,6 +166,35 @@ the exact `f3-dev-frozen` tag with a clean tracked worktree. It writes the
 access seal before loading any Test artifact, records the known F2 Test result
 as prior information, and forbids a completed rerun.
 
+## Frozen Test Result
+
+The one-time Test run completed under the frozen tag and protocol:
+
+| Seed | Fine MNER F1 | FMNERG F1 | Paired FMNERG delta vs F2 |
+| ---: | ---: | ---: | ---: |
+| 41 | 0.663137254902 | 0.502745098039 | +0.000784313725 |
+| 42 | 0.667058823529 | 0.505098039216 | +0.005490196078 |
+| 43 | 0.665098039216 | 0.505098039216 | +0.002352941176 |
+
+```text
+Fine MNER = 0.665098039216 +/- 0.001600973688
+FMNERG = 0.504313725490 +/- 0.001109187108
+mean FMNERG delta vs F2 = +0.002875816993
+MNER = 0.818431372549
+EEG = 0.652156862745
+GMNER = 0.615294117647
+test_accessed = true
+F3 test_access_count = 1
+repository_test_access_count = 2
+```
+
+No seed was selected using Test. The completed access seal forbids rerunning
+the method. The compact frozen result is stored at:
+
+```text
+sidecars/fmnerg_subtype/f3_final_test_result.json
+```
+
 ## OOF Boundary
 
 F3-P1 is not an OOF experiment. It uses the accepted F2 supervised contract:

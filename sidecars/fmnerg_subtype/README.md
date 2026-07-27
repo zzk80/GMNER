@@ -617,7 +617,46 @@ F3-P1 Dev 训练：通过
 三 seed mean FMNERG：0.520522136994
 相对 F2 mean：+0.003229713363
 三 seed GMNER：严格保持 0.621316108195
-F3 Test：尚未访问
+F3 Test：已按冻结协议一次性完成
+```
+
+### F3 Final Test（冻结结果）
+
+| Seed | Epoch | Fine MNER F1 | FMNERG F1 | 相对 F2 FMNERG |
+| ---: | ---: | ---: | ---: | ---: |
+| 41 | 14 | 0.66314 | 0.50275 | +0.00078 |
+| 42 | 11 | 0.66706 | 0.50510 | +0.00549 |
+| 43 | 15 | 0.66510 | 0.50510 | +0.00235 |
+| **Mean ± Std** | - | **0.66510 ± 0.00160** | **0.50431 ± 0.00111** | **+0.00288** |
+
+冻结主链在三个 seed 上保持：
+
+```text
+MNER  = 0.818431372549
+EEG   = 0.652156862745
+GMNER = 0.615294117647
+formal_stage1_mutated = false
+gmner_identity_exact = true
+```
+
+一次性访问契约：
+
+```text
+Frozen tag: f3-dev-frozen
+Frozen commit: 34bcfb1a09c8622a5a6c255994dc7241f08f0636
+F3 Test access count: 1
+Repository formal Test access count: 2（F2 + F3）
+Prior F2 Test known: true
+Select best seed on Test: false
+Protocol SHA-256: 8e2cacddb9d9ff029d54cd93f340e41bae06575dc6414932c8d6737ec1fff618
+```
+
+冻结快照：
+
+```text
+sidecars/fmnerg_subtype/f3_final_test_result.json
+docs/experiments/fmnerg_subtype_f3_final_test_summary.json
+docs/experiments/fmnerg_subtype_f3_test_access_seal.json
 ```
 
 ## 从 Windows 同步到云端

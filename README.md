@@ -12,20 +12,23 @@ subtype-aware R16 工程保留用于复现。协议与结果见
 ## Current Status
 
 ```text
-Current formal method: M3.3A
+Current formal Model-G: M3.3A
+Current formal Model-F: F3 lower-LR subtype sidecar
 Formal Dev GMNER:      0.621316
 Formal Test MNER:      0.81843
-Formal Test Fine MNER: 0.66144 +/- 0.00037
+Formal Test Fine MNER: 0.66510 +/- 0.00160
 Formal Test EEG:       0.65216
 Formal Test GMNER:     0.61529
-Formal Test FMNERG:    0.50144 +/- 0.00133
+Formal Test FMNERG:    0.50431 +/- 0.00111
 ```
 
 - Dev/Test 结果已经冻结。
 - M3.6 NULL Release 没有访问 Test，也没有进入正式链路。
 - GMNER 与 FMNERG 都是主任务；51 类 subtype 由独立 sidecar 评估。
-- FMNERG 使用 Dev 选定的全量解冻 RoBERTa 副本，Test 固定报告三个预定
-  seed 的 mean/std，不按 Test 选择 seed。
+- FMNERG 使用 Dev 选定的全量解冻 RoBERTa 副本；F3 仅将 lower backbone
+  learning rate 从 `1e-6` 调整为 `2e-6`。
+- F3 Test 固定报告三个预定 seed 的 mean/std，不按 Test 选择 seed；F2 Test
+  是执行 F3 前已知的历史正式基线。
 
 ## Formal Architecture
 
@@ -52,19 +55,20 @@ RoBERTa Stage1
 | Split | Span F1 | MNER F1 | Fine MNER F1 | EEG F1 | GMNER F1 | FMNERG F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | OOF Train | 0.870900 | 0.811690 | - | 0.651135 | 0.610849 | - |
-| Dev | 0.87283 | 0.816714 | 0.67488 ± 0.00243 | 0.660880 | 0.621316 | 0.51729 ± 0.00083 |
-| Test | 0.86980 | 0.818431 | 0.66144 ± 0.00037 | 0.652157 | 0.615294 | 0.50144 ± 0.00133 |
+| Dev | 0.87283 | 0.816714 | 0.68039 ± 0.00297 | 0.660880 | 0.621316 | 0.52052 ± 0.00219 |
+| Test | 0.86980 | 0.818431 | 0.66510 ± 0.00160 | 0.652157 | 0.615294 | 0.50431 ± 0.00111 |
 
 **说明：**
 - **OOF Train:** 10-fold 整链 OOF，7000 条记录严格 pooled micro F1；fold-level mean ± std = 0.610869 ± 0.010907
-- **Dev/Test:** 正式锁定结果，符合一次性 Test 协议（`test_accessed=false` 直到最终提交）
+- **Dev/Test:** 正式锁定结果；F3 在原子 seal 后一次性访问 Test
 - **Fine MNER/FMNERG:** 三 seed (41/42/43) 报告 mean ± std，其他指标逐记录保持不变
+- **F3 vs F2 Test:** Fine MNER `+0.00366`，FMNERG `+0.00288`
 
 ### 完整实验结果
 
 详细的阶段结果、历史对照、Oracle 诊断和验收标准见：
 
-- **[实验结果总表](docs/EXPERIMENT_RESULTS_TABLE.md)** — 所有有效实验的统一索引（30+ 实验）
+- **[实验结果总表](docs/EXPERIMENT_RESULTS_TABLE.md)** — 所有有效实验的统一索引（31+ 实验）
 - **[实验验收标准](docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md)** — 7 种状态标签的验收规则
 
 **状态标签体系：**
@@ -157,8 +161,8 @@ PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
 
 - **FMNERG J0 matched control**：C1 continued-F2 与 fixed-region visual
   fusion 的三 seed Dev 最优均为 epoch 0，J0 相对 C1 的 FMNERG 增量为
-  `0.000000`；按预注册规则 no-go，未读取 Test。F2 继续作为当前 FMNERG
-  最优方案，J0/J1/J2 不再推进。
+  `0.000000`；按预注册规则 no-go，未读取 Test。该结论关闭 J0/J1/J2，
+  后续 F3 仅采用独立的学习率单变量优化。
 - **Subtype-region successor gate**：在实现
   `Top-K regions + subtype-conditioned attention` 前，先使用 Train 视觉
   subtype centroid 对 Dev 的“GMNER 正确但 subtype 错误”切片执行只读 R36

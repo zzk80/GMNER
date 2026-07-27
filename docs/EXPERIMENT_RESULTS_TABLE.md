@@ -34,7 +34,7 @@ RoBERTa Stage1
 → GMNER 三元组输出
 ```
 
-### Model-F：F2 Subtype Sidecar
+### Model-F：F3 Subtype Sidecar
 
 ```
 冻结 Model-G 的 span / coarse type / region
@@ -42,6 +42,7 @@ RoBERTa Stage1
 → start/end/mean span pooling
 → 51 类 subtype head
 → predicted-parent hard mask
+→ lower RoBERTa LR 由 1e-6 调整为 2e-6
 → FMNERG 输出
 ```
 
@@ -49,14 +50,15 @@ RoBERTa Stage1
 - Model-G: 完整 Train 训练，Dev 选择配置与 checkpoint
 - Model-F: gold span + gold parent supervision on Train；end-to-end evaluation 使用 frozen Model-G 的 predicted span + predicted parent
 - 两条链都不是 OOF 训练
-- 一次性 Test 评估（3 seeds for F2）
+- F3 仅在 Dev 上完成单变量学习率选择，随后冻结三个 seed
+- 一次性 Test 评估（F2 历史 Test 已知；F3 为新的冻结方法 Test）
 
 ### 正式结果
 
 | Split | Span F1 | MNER | Fine MNER | EEG | GMNER | FMNERG |
 |-------|---------|------|-----------|-----|-------|--------|
-| **Dev** | 0.87283 | 0.816714 | 0.67488 ± 0.00243 | 0.660880 | 0.621316 | 0.51729 ± 0.00083 |
-| **Test** | 0.86980 | 0.818431 | 0.66144 ± 0.00037 | 0.652157 | 0.615294 | 0.50144 ± 0.00133 |
+| **Dev** | 0.87283 | 0.816714 | 0.68039 ± 0.00297 | 0.660880 | 0.621316 | 0.52052 ± 0.00219 |
+| **Test** | 0.86980 | 0.818431 | 0.66510 ± 0.00160 | 0.652157 | 0.615294 | 0.50431 ± 0.00111 |
 
 **状态：** FORMAL
 
@@ -167,6 +169,8 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 | RoBERTa Last-4 | 0.49926 ± 0.00238 | **VALID_DEV** | 有效提升 |
 | **RoBERTa All F2** | **0.51729 ± 0.00083** | **FORMAL** | Dev 接受，正式方案 |
 | **F2 Final Test** | Test **0.50144 ± 0.00133** | **FORMAL** | 三 seed 一次性 Test |
+| **F3 lower-LR ×2** | Dev **0.52052 ± 0.00219** | **FORMAL** | 三 seed paired delta `+0.00323`，预注册 Gate 通过 |
+| **F3 Final Test** | Test **0.50431 ± 0.00111** | **FORMAL** | 相对 F2 `+0.00288`；三 seed 均冻结 |
 | Class-weighted CE | 0.46723 | **NO_GO** | 低频提升但总体下降 |
 | Effective-number CE | 0.46642 | **NO_GO** | |
 | Parent-specific head | 0.47490 | **NO_GO** | 低于 shared 0.47719 |
@@ -177,11 +181,12 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 
 ### 训练-推理协议说明
 
-**Model-F (F2 Subtype Sidecar):**
+**Model-F (F3 Subtype Sidecar):**
 - **Training:** gold span + gold parent supervision on Train
 - **Evaluation:** frozen Model-G predicted span + predicted parent on Dev/Test
 - **协议类型:** teacher-forced training + predicted-input end-to-end evaluation
 - **分布差异:** 存在训练-推理输入分布差异（transparent disclosure）
+- **F3 唯一变化:** RoBERTa lower learning rate `1e-6 → 2e-6`
 
 **不变性保证：**
 - 三个 seed 的 MNER、EEG、GMNER 均逐记录保持不变
@@ -241,9 +246,18 @@ Model-G (M3.3A):
 ### FMNERG 正式 Test（FORMAL）
 
 ```
-Model-F (F2 Subtype Sidecar):
-  Fine MNER = 0.66144 ± 0.00037
-  FMNERG    = 0.50144 ± 0.00133
+Model-F (F3 Subtype Sidecar):
+  Fine MNER = 0.66510 ± 0.00160
+  FMNERG    = 0.50431 ± 0.00111
+
+Paired improvement over frozen F2:
+  Fine MNER = +0.00366
+  FMNERG    = +0.00288
+
+Test access metadata:
+  F3 method access count = 1
+  Repository formal access count = 2 (F2 + F3)
+  Select best seed on Test = false
 ```
 
 ### 严格 10-fold Train-OOF（VALID_AUDIT）
@@ -275,7 +289,7 @@ P3 Same-Type Assignment: +0.00969 (24 entities)
 - **正式结果来源:** [README.md](../README.md)
 - **M3.3A 链路:** [HIERARCHICAL_RECORD_VERIFIER.md](HIERARCHICAL_RECORD_VERIFIER.md)
 - **OOF 协议:** [OOF_NULL_RELEASE.md](OOF_NULL_RELEASE.md)
-- **FMNERG F2:** [sidecars/fmnerg_subtype/README.md](../sidecars/fmnerg_subtype/README.md)
+- **FMNERG F2/F3:** [sidecars/fmnerg_subtype/README.md](../sidecars/fmnerg_subtype/README.md)
 - **P3 C1 结果:** [README_M33A_P3_C1.md](../README_M33A_P3_C1.md)
 - **Oracle 诊断:** [outputs/diagnostics/m33a_oracles/report.md](../outputs/diagnostics/m33a_oracles/report.md)
 - **实验时间线:** [EXPERIMENT_SUMMARY.md](EXPERIMENT_SUMMARY.md)
@@ -285,7 +299,7 @@ P3 Same-Type Assignment: +0.00969 (24 entities)
 ## 9. 版本信息
 
 - **最后更新:** 2026-07-27
-- **Total valid experiments tracked:** 30+
+- **Total valid experiments tracked:** 31+
 - **正式 Test 协议:** 仅锁定后的 FORMAL Model-G 和 Model-F 结果用于最终 Test 报告
 - **历史 Test 访问:** 早期探索性 Test 结果客观存在，均标为 ENGINEERING_HISTORY，不用于当前模型选择、正式消融或显著性结论
 - **OOF protocols:** 10-fold Train-OOF cross-fitting for generalization audit

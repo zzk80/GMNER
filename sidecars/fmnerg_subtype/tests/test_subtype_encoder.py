@@ -385,6 +385,32 @@ class SubtypeEncoderTest(unittest.TestCase):
         )
         self.assertNotIn("best_seed", result)
 
+    def test_frozen_f3_test_result_preserves_main_chain(self):
+        path = (
+            ROOT
+            / "sidecars"
+            / "fmnerg_subtype"
+            / "f3_final_test_result.json"
+        )
+        result = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(result["test_access_count"], 1)
+        self.assertEqual(result["repository_test_access_count"], 2)
+        self.assertTrue(result["prior_test_results_known"])
+        self.assertFalse(result["select_best_seed_on_test"])
+        self.assertEqual(
+            [row["seed"] for row in result["per_seed"]],
+            list(FINAL_TEST_SEEDS),
+        )
+        self.assertAlmostEqual(
+            result["fixed_main_chain_metrics"]["gmner_f1"],
+            0.6152941176470589,
+        )
+        self.assertGreater(
+            result["aggregate"]["fmnerg_f1"]["mean_delta_vs_f2"],
+            0.0,
+        )
+        self.assertNotIn("best_seed", result)
+
 
 if __name__ == "__main__":
     unittest.main()
