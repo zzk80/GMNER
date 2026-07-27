@@ -105,8 +105,14 @@ def analyze_slice_metrics(
     # 创建子集
     from torch.utils.data import Subset
     subset = Subset(dataset, indices)
+
+    # Get null region index
+    null_region_index = -1
+    if hasattr(dataset, 'metadata') and dataset.metadata:
+        null_region_index = dataset.metadata.get('null_region_index', -1)
+
     collator = HierarchicalRecordCandidateCollator(
-        null_region_index=dataset.null_region_index
+        null_region_index=null_region_index
     )
     loader = DataLoader(
         subset,
@@ -190,7 +196,12 @@ def main():
     print("\n[2/7] Loading dataset...")
     dataset = RecordCandidateDataset(args.formal_cache)
     print(f"  Total records: {len(dataset)}")
-    print(f"  Null region index: {dataset.null_region_index}")
+
+    # Get null region index from metadata
+    null_region_index = -1
+    if hasattr(dataset, 'metadata') and dataset.metadata:
+        null_region_index = dataset.metadata.get('null_region_index', -1)
+    print(f"  Null region index: {null_region_index}")
 
     # Load model
     print("\n[3/7] Loading model...")
