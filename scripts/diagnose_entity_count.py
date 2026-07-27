@@ -181,7 +181,9 @@ def evaluate_with_entity_count_diagnostics(
     records_output = []
 
     for batch in dataloader:
-        formal, expanded = move_paired_record_batch(batch, device)
+        paired = move_paired_record_batch(batch, device)
+        formal = paired["formal"]
+        expanded = paired["expanded"]
 
         # Frozen chain inference
         baseline_context = frozen_hierarchical_context(
