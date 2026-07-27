@@ -31,7 +31,7 @@ from gmner.engine.evidence_visibility_evaluator import (
 from gmner.engine.utils import match_record_predictions
 from gmner.evidence_visibility_config import load_evidence_visibility_config
 from gmner.models.evidence_visibility import (
-    EvidenceVisibilityModel,
+    RegionEvidenceVisibilityHead,
     decode_evidence_visibility,
 )
 
@@ -44,8 +44,8 @@ def resolve(path_str: str, root: Path) -> Path:
     return root / path
 
 
-def load_frozen_chain(config):
-    """Load frozen hierarchical and fine models - copied from train_evidence_visibility.py"""
+def load_frozen_chain(config, root, device):
+    """Load frozen chain and evidence model - copied from train_evidence_visibility.py"""
     from gmner.hierarchical_record_verifier_config import (
         load_hierarchical_record_verifier_config,
     )
@@ -53,23 +53,22 @@ def load_frozen_chain(config):
     from gmner.fine_grounding_adapter_config import load_fine_grounding_adapter_config
     from gmner.models.fine_grounding_adapter import FineGroundingAdapter
 
-    root = Path(__file__).resolve().parents[1]
+    # Load fine config first
+    fine_config_path = resolve(config.frozen.fine_config, root)
+    fine_config = load_fine_grounding_adapter_config(fine_config_path)
 
-    # Load hierarchical verifier
+    # Load hierarchical verifier (from fine config's frozen)
     hierarchy_config = load_hierarchical_record_verifier_config(
-        resolve(config.frozen.hierarchical_config, root)
+        resolve(fine_config.frozen.hierarchical_config, root)
     )
     hierarchy = HierarchicalRecordVerifier(hierarchy_config.model)
     hierarchy_checkpoint = torch.load(
-        resolve(config.frozen.hierarchical_checkpoint, root),
+        resolve(fine_config.frozen.hierarchical_checkpoint, root),
         map_location='cpu'
     )
     hierarchy.load_state_dict(hierarchy_checkpoint['model_state_dict'])
 
     # Load fine grounding adapter
-    fine_config = load_fine_grounding_adapter_config(
-        resolve(config.frozen.fine_config, root)
-    )
     fine_model = FineGroundingAdapter(fine_config.model)
     fine_checkpoint = torch.load(
         resolve(config.frozen.fine_checkpoint, root),
@@ -77,7 +76,17 @@ def load_frozen_chain(config):
     )
     fine_model.load_state_dict(fine_checkpoint['model_state_dict'])
 
-    return hierarchy, fine_model
+    # Freeze models
+    hierarchy.to(device).eval()
+    fine_model.to(device).eval()
+    for frozen_model in (fine_model, hierarchy):
+        for parameter in frozen_model.parameters():
+            parameter.requires_grad = False
+
+    # Create evidence visibility model
+    model = RegionEvidenceVisibilityHead(config.model).to(device)
+
+    return model, fine_model, hierarchy
 
 
 def compute_sha256(file_path: Path) -> str:
@@ -363,6 +372,7 @@ def main():
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    root = Path(__file__).resolve().parents[1]
 
     print("=" * 80)
     print("M3.3A Entity Count Diagnostic Analysis")
@@ -371,21 +381,17 @@ def main():
     # Load config
     print("\n[1/5] Loading config...")
     config = load_evidence_visibility_config(args.config)
+    device = torch.device(args.device)
 
     # Load frozen chain
     print("\n[2/5] Loading frozen chain...")
-    hierarchical_model, fine_model = load_frozen_chain(config)
-    hierarchical_model.to(args.device)
-    fine_model.to(args.device)
-    hierarchical_model.eval()
-    fine_model.eval()
+    model, fine_model, hierarchical_model = load_frozen_chain(config, root, device)
 
-    # Load evidence visibility model
-    print("\n[3/5] Loading evidence visibility model...")
-    model = EvidenceVisibilityModel(config.model)
-    checkpoint = torch.load(args.checkpoint, map_location='cpu')
+    # Load evidence visibility checkpoint
+    print("\n[3/5] Loading evidence visibility checkpoint...")
+    checkpoint = torch.load(resolve(args.checkpoint, root), map_location='cpu')
     model.load_state_dict(checkpoint['model_state_dict'])
-    model.to(args.device)
+    model.to(device)
     model.eval()
 
     # Load dataset
@@ -409,7 +415,7 @@ def main():
         fine_model=fine_model,
         hierarchical_model=hierarchical_model,
         dataloader=dataloader,
-        device=torch.device(args.device),
+        device=device,
         decode_options=dict(config.decode),
         output_jsonl=output_dir / 'records.jsonl',
     )
