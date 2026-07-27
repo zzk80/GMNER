@@ -89,7 +89,7 @@ docs/experiments/roberta_large_stage1_phase1_protocol.yaml
 
 ## 云端执行
 
-先下载最小模型文件：
+推荐用一个可恢复的后台任务依次完成下载、预检和训练：
 
 ```bash
 cd ~/gmner
@@ -99,18 +99,29 @@ export HF_HUB_DOWNLOAD_TIMEOUT=300
 export HF_HUB_ETAG_TIMEOUT=60
 export HF_HUB_DISABLE_XET=1
 
-PYTHONPATH=. /home/zzk/miniconda3/envs/gmner/bin/python \
-  tools/download_roberta_large.py
+nohup env \
+  PYTHON_BIN=/home/zzk/miniconda3/envs/gmner/bin/python \
+  MIN_FREE_GB=4 \
+  MIN_GPU_FREE_MB=22000 \
+  GPU_RESERVE_GB=8 \
+  bash tools/bootstrap_roberta_large_stage1_phase1.sh \
+  > roberta_large_stage1_bootstrap.log 2>&1 < /dev/null &
+
+echo $! > roberta_large_stage1_bootstrap.pid
+tail -f roberta_large_stage1_bootstrap.log
 ```
 
-前台预检：
+下载器使用 `aria2c` 多连接断点续传。若网络中断，重新执行同一命令会从
+`.aria2` 控制文件继续，不会重下已完成文件。
+
+独立前台预检：
 
 ```bash
 PYTHONPATH=. /home/zzk/miniconda3/envs/gmner/bin/python \
   tools/preflight_roberta_large_stage1.py
 ```
 
-后台训练：
+模型已下载时，也可只启动训练：
 
 ```bash
 nohup env \

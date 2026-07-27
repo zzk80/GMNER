@@ -31,7 +31,7 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def download_with_curl(
+def download_with_aria2(
     *,
     endpoint: str,
     model_id: str,
@@ -39,39 +39,37 @@ def download_with_curl(
     output_dir: Path,
 ) -> Path:
     destination = output_dir / filename
-    if destination.exists() and destination.stat().st_size > 0:
+    control_file = Path(str(destination) + ".aria2")
+    if (
+        destination.exists()
+        and destination.stat().st_size > 0
+        and not control_file.exists()
+    ):
         return destination
-    partial = destination.with_suffix(destination.suffix + ".part")
     url = (
         f"{endpoint.rstrip('/')}/{model_id}/resolve/main/{filename}"
     )
-    base_command = [
-        "curl",
-        "--http1.1",
-        "--fail",
-        "--location",
-        "--retry",
-        "10",
-        "--retry-all-errors",
-        "--connect-timeout",
-        "30",
-        "--speed-time",
-        "120",
-        "--speed-limit",
-        "1024",
-        "--output",
-        str(partial),
+    command = [
+        "aria2c",
+        "--allow-overwrite=true",
+        "--auto-file-renaming=false",
+        "--continue=true",
+        "--file-allocation=none",
+        "--max-connection-per-server=4",
+        "--split=4",
+        "--min-split-size=1M",
+        "--connect-timeout=30",
+        "--timeout=120",
+        "--max-tries=0",
+        "--retry-wait=5",
+        "--summary-interval=30",
+        f"--dir={output_dir}",
+        f"--out={filename}",
         url,
     ]
-    command = [*base_command[:13], "--continue-at", "-", *base_command[13:]]
-    try:
-        subprocess.run(command, check=True)
-    except subprocess.CalledProcessError:
-        if not partial.exists():
-            raise
-        partial.unlink()
-        subprocess.run(base_command, check=True)
-    partial.replace(destination)
+    subprocess.run(command, check=True)
+    if not destination.exists() or control_file.exists():
+        raise RuntimeError(f"Incomplete aria2 download: {destination}")
     return destination
 
 
@@ -86,7 +84,7 @@ def main() -> None:
         "https://huggingface.co",
     )
     downloaded = [
-        download_with_curl(
+        download_with_aria2(
             endpoint=endpoint,
             model_id=args.model_id,
             filename=filename,
