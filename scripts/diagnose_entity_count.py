@@ -100,7 +100,7 @@ def load_frozen_chain(config, root, device):
     # Create evidence visibility model
     model = RegionEvidenceVisibilityHead(config.model).to(device)
 
-    return model, fine_model, hierarchy
+    return model, fine_model, hierarchy, hierarchy_config
 
 
 def compute_sha256(file_path: Path) -> str:
@@ -124,6 +124,18 @@ def get_git_commit() -> str:
         return result.stdout.strip()
     except:
         return "unknown"
+
+
+def decode_options(config) -> dict:
+    """Extract decode options from hierarchical config"""
+    decode = config.decode
+    return {
+        "entity_threshold": decode.entity_threshold,
+        "decode_strategy": decode.strategy,
+        "stage1_spans_only": decode.stage1_spans_only,
+        "visible_from_null_threshold": getattr(decode, 'visible_from_null_threshold', 0.8),
+        "null_from_visible_threshold": getattr(decode, 'null_from_visible_threshold', 0.2),
+    }
 
 
 @torch.no_grad()
@@ -399,7 +411,7 @@ def main():
 
     # Load frozen chain
     print("\n[2/5] Loading frozen chain...")
-    model, fine_model, hierarchical_model = load_frozen_chain(config, root, device)
+    model, fine_model, hierarchical_model, hierarchy_config = load_frozen_chain(config, root, device)
 
     # Load evidence visibility checkpoint
     print("\n[3/5] Loading evidence visibility checkpoint...")
@@ -430,7 +442,7 @@ def main():
         hierarchical_model=hierarchical_model,
         dataloader=dataloader,
         device=device,
-        decode_options=dict(config.decode),
+        decode_options=decode_options(hierarchy_config),
         output_jsonl=output_dir / 'records.jsonl',
     )
 
