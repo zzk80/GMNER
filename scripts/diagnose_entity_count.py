@@ -198,43 +198,37 @@ def evaluate_with_entity_count_diagnostics(
             decode_options=decode_options,
         )
         hierarchy_outputs = baseline_context["outputs"]
+        decoded = baseline_context["decoded"]
+        baseline_visible = baseline_context["visible_mask"]
+        base_is_null = decoded["base_is_null"].bool()
+
+        # Fine model inference
+        fine_outputs = fine_model(expanded)
 
         # Evidence visibility inference
         outputs = model(
-            formal_span_features=formal["span_features"],
-            expanded_span_features=expanded["span_features"],
-            expanded_region_features=expanded["region_features"],
-            expanded_span_mask=expanded["span_mask"],
-            expanded_region_mask=expanded["region_mask"],
-            base_region_scores=expanded["base_region_scores"],
-            fine_top1_region_index=hierarchy_outputs["fine_top1_region_index"],
-            fine_top1_region_score=hierarchy_outputs["fine_top1_region_score"],
-            base_top1_region_score=hierarchy_outputs["base_top1_region_score"],
-            base_fine_agreement=hierarchy_outputs["base_fine_agreement"],
-            all_rankers_agree=hierarchy_outputs["all_rankers_agree"],
-            fine_probability_margin=hierarchy_outputs["fine_probability_margin"],
+            fine_outputs,
+            hierarchy_outputs,
+            expanded,
+            baseline_visible_mask=baseline_visible,
+            base_is_null_mask=base_is_null,
         )
 
         # Decode visibility
-        baseline_visible, final_visible = decode_evidence_visibility(
-            base_visibility_logits=outputs["base_visibility_logits"],
-            visibility_correction_logits=outputs[
-                "unbounded_visibility_correction_logits"
-            ],
+        has_null = expanded["region_is_null"].bool().any(dim=-1)[:, None]
+        has_null = has_null.expand_as(baseline_visible)
+        final_visible = decode_evidence_visibility(
+            outputs["final_visibility_logits"],
+            baseline_visible,
+            has_null_candidate=has_null,
             visible_from_null_threshold=visible_from_null_threshold,
             null_from_visible_threshold=null_from_visible_threshold,
+            enabled=True,
         )
 
         # Get region indices
-        fine_indices = hierarchy_outputs["fine_top1_region_index"].long()
-        expanded_null = torch.tensor(
-            [
-                int(metadata.get("null_region_index", -1))
-                for metadata in expanded["metadata"]
-            ],
-            device=device,
-            dtype=torch.long,
-        )[:, None].expand_as(fine_indices)
+        fine_indices = fine_outputs["final_region_indices"]
+        expanded_null = expanded["region_is_null"].bool().argmax(dim=-1)
 
         baseline_indices = torch.where(
             baseline_visible, fine_indices, expanded_null
