@@ -1,0 +1,59 @@
+data:
+  formal_train_cache: knowledge/record_candidates/roberta128/fmnerg_train_hierarchical.pt
+  expanded_train_cache: knowledge/record_candidates/roberta128/fmnerg_train_hierarchical_r36.pt
+  formal_dev_cache: knowledge/record_candidates/roberta128/fmnerg_dev_hierarchical.pt
+  expanded_dev_cache: knowledge/record_candidates/roberta128/fmnerg_dev_hierarchical_r36.pt
+  num_workers: 0
+  # Seed42 MVP only. Formal reporting requires an aligned OOF full-chain cache.
+  require_oof_train_cache: false
+
+frozen:
+  evidence_config: configs/fmnerg_twitter10000_evidence_visibility.yaml
+  evidence_checkpoint: outputs/fmnerg_roberta128_evidence_visibility/best_model.pt
+
+model:
+  hidden_size: 256
+  scalar_count: 11
+  dropout: 0.1
+  residual_scale: 1.0
+  # Loaded through constants.py; retained here as a checked contract.
+  per_type_id: 1
+  min_visible_same_type_count: 2
+  # C1. C2 may use 0.2 only after the preregistered damage condition.
+  override_margin: 0.0
+
+loss:
+  lambda_correction: 1.0
+  lambda_preserve_kl: 1.0
+  lambda_preserve_margin: 0.5
+  lambda_residual: 0.05
+  preserve_margin: 0.2
+  kl_temperature: 1.0
+
+candidate:
+  use_full_fine_candidate_mask: true
+  top_k_union: 0
+  include_null: false
+
+optim:
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 10
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: outputs/fmnerg_roberta128_same_type_region_resolver_c1
+  save_best_metric: gmner_score
+  save_best_tie_breakers:
+    - base_correct_trigger_preservation_rate
+    - gmner_net_correction
+  early_stop_patience: 3
+  log_every_steps: 50
+  expected_dev_baseline_gmner: 0.6213161081953977
+  baseline_tolerance: 0.000005

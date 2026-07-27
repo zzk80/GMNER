@@ -34,6 +34,10 @@ from .layered_action_verifier_loss import (
     layered_action_supervision,
     layered_action_verifier_loss,
 )
+from .same_type_region_resolver_loss import (
+    same_type_region_resolver_loss,
+    same_type_region_supervision,
+)
 
 __all__ = [
     "alignment_objective",
@@ -57,5 +61,7 @@ __all__ = [
     "siglip2_region_reliability_supervision",
     "layered_action_verifier_loss",
     "layered_action_supervision",
+    "same_type_region_resolver_loss",
+    "same_type_region_supervision",
     "weighted_masked_cross_entropy",
 ]

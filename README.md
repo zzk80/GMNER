@@ -52,20 +52,29 @@ RoBERTa Stage1
 | Split | Span F1 | MNER F1 | Fine MNER F1 | EEG F1 | GMNER F1 | FMNERG F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | OOF Train | 0.870900 | 0.811690 | - | 0.651135 | 0.610849 | - |
-| Dev | - | 0.816714 | 0.67488 +/- 0.00243 | 0.660880 | 0.621316 | 0.51729 +/- 0.00083 |
-| Test | - | 0.81843 | 0.66144 +/- 0.00037 | 0.65216 | 0.61529 | 0.50144 +/- 0.00133 |
+| Dev | 0.87283 | 0.816714 | 0.67488 ± 0.00243 | 0.660880 | 0.621316 | 0.51729 ± 0.00083 |
+| Test | 0.86980 | 0.818431 | 0.66144 ± 0.00037 | 0.652157 | 0.615294 | 0.50144 ± 0.00133 |
 
-OOF Train 是 10 个 heldout fold、7000 条记录的严格 micro-average，不是
-fold ensemble，也不会改变正式 Dev/Test 结果。其 fold GMNER 为
-`0.610869 +/- 0.010907`，并满足：
+**说明：**
+- **OOF Train:** 10-fold 整链 OOF，7000 条记录严格 pooled micro F1；fold-level mean ± std = 0.610869 ± 0.010907
+- **Dev/Test:** 正式锁定结果，符合一次性 Test 协议（`test_accessed=false` 直到最终提交）
+- **Fine MNER/FMNERG:** 三 seed (41/42/43) 报告 mean ± std，其他指标逐记录保持不变
 
-```text
-10 folds
-700 records per fold
-7000 unique records
-no overlap / no missing records
-test_accessed=false
-```
+### 完整实验结果
+
+详细的阶段结果、历史对照、Oracle 诊断和验收标准见：
+
+- **[实验结果总表](docs/EXPERIMENT_RESULTS_TABLE.md)** — 所有有效实验的统一索引（30+ 实验）
+- **[实验验收标准](docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md)** — 7 种状态标签的验收规则
+
+**状态标签体系：**
+- **FORMAL:** 锁定且符合正式 Test 协议（Test 主表或消融表）
+- **VALID_DEV:** 有效 Dev 实验或消融
+- **VALID_AUDIT:** Train-OOF、cross-fit、分布和协议审计
+- **ORACLE:** 使用 gold 的理想理论上限（方法空间分析）
+- **ENGINEERING_ONLY:** 有信号但协议不满足正式报告要求
+- **NO_GO:** 预注册 Gate 失败，分支关闭
+- **ENGINEERING_HISTORY:** 早期探索和历史 Test 结果（仅归档）
 
 ## Repository Layout
 

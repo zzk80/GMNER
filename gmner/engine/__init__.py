@@ -9,6 +9,7 @@ __all__ = [
     "evaluate_evidence_visibility",
     "evaluate_siglip2_region_reliability",
     "evaluate_layered_action_verifier",
+    "evaluate_same_type_region_resolver",
 ]
 
 
@@ -57,4 +58,10 @@ def __getattr__(name):
         )
 
         return evaluate_layered_action_verifier
+    if name == "evaluate_same_type_region_resolver":
+        from .same_type_region_resolver_evaluator import (
+            evaluate_same_type_region_resolver,
+        )
+
+        return evaluate_same_type_region_resolver
     raise AttributeError(name)

@@ -17,6 +17,8 @@ __all__ = [
     "LayeredActionVerifierConfig",
     "LayeredActionVerifier",
     "NullReleaseVerifier",
+    "SameTypeRegionResolverConfig",
+    "ConditionalSameTypeRegionResolver",
 ]
 
 
@@ -109,4 +111,21 @@ def __getattr__(name):
         from .null_release_verifier import NullReleaseVerifier
 
         return NullReleaseVerifier
+    if name in {
+        "SameTypeRegionResolverConfig",
+        "ConditionalSameTypeRegionResolver",
+    }:
+        from .same_type_region_resolver import (
+            ConditionalSameTypeRegionResolver,
+            SameTypeRegionResolverConfig,
+        )
+
+        return {
+            "SameTypeRegionResolverConfig": (
+                SameTypeRegionResolverConfig
+            ),
+            "ConditionalSameTypeRegionResolver": (
+                ConditionalSameTypeRegionResolver
+            ),
+        }[name]
     raise AttributeError(name)
