@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
+import subprocess
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,26 +31,76 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def download_with_curl(
+    *,
+    endpoint: str,
+    model_id: str,
+    filename: str,
+    output_dir: Path,
+) -> Path:
+    destination = output_dir / filename
+    if destination.exists() and destination.stat().st_size > 0:
+        return destination
+    partial = destination.with_suffix(destination.suffix + ".part")
+    url = (
+        f"{endpoint.rstrip('/')}/{model_id}/resolve/main/{filename}"
+    )
+    base_command = [
+        "curl",
+        "--http1.1",
+        "--fail",
+        "--location",
+        "--retry",
+        "10",
+        "--retry-all-errors",
+        "--connect-timeout",
+        "30",
+        "--speed-time",
+        "120",
+        "--speed-limit",
+        "1024",
+        "--output",
+        str(partial),
+        url,
+    ]
+    command = [*base_command[:13], "--continue-at", "-", *base_command[13:]]
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError:
+        if not partial.exists():
+            raise
+        partial.unlink()
+        subprocess.run(base_command, check=True)
+    partial.replace(destination)
+    return destination
+
+
 def main() -> None:
     args = parse_args()
-    from huggingface_hub import snapshot_download
     from transformers import AutoConfig, AutoTokenizer
 
     output_dir = Path(args.output_dir).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    snapshot_download(
-        repo_id=args.model_id,
-        local_dir=output_dir,
-        allow_patterns=[
+    endpoint = os.environ.get(
+        "HF_ENDPOINT",
+        "https://huggingface.co",
+    )
+    downloaded = [
+        download_with_curl(
+            endpoint=endpoint,
+            model_id=args.model_id,
+            filename=filename,
+            output_dir=output_dir,
+        )
+        for filename in (
             "config.json",
             "merges.txt",
             "vocab.json",
             "tokenizer.json",
             "tokenizer_config.json",
-            "special_tokens_map.json",
             "model.safetensors",
-        ],
-    )
+        )
+    ]
     config = AutoConfig.from_pretrained(
         output_dir,
         local_files_only=True,
@@ -79,6 +131,14 @@ def main() -> None:
         "num_hidden_layers": int(config.num_hidden_layers),
         "tokenizer_class": type(tokenizer).__name__,
         "tokenizer_is_fast": bool(tokenizer.is_fast),
+        "download_endpoint": endpoint,
+        "files": [
+            {
+                "path": str(path),
+                "bytes": path.stat().st_size,
+            }
+            for path in downloaded
+        ],
         "weight_file": str(weight_path),
         "weight_bytes": weight_path.stat().st_size,
         "weight_sha256": sha256_file(weight_path),
