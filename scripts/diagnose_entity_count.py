@@ -130,11 +130,18 @@ def decode_options(config) -> dict:
     """Extract decode options from hierarchical config"""
     decode = config.decode
     return {
-        "entity_threshold": decode.entity_threshold,
-        "decode_strategy": decode.strategy,
-        "stage1_spans_only": decode.stage1_spans_only,
-        "visible_from_null_threshold": getattr(decode, 'visible_from_null_threshold', 0.8),
-        "null_from_visible_threshold": getattr(decode, 'null_from_visible_threshold', 0.2),
+        "enable_visibility_correction": decode.enable_visibility_correction,
+        "enable_region_override": decode.enable_region_override,
+        "visible_from_null_threshold": decode.visible_from_null_threshold,
+        "null_from_visible_threshold": decode.null_from_visible_threshold,
+        "region_override_mode": decode.region_override_mode,
+        "region_override_logit_margin": decode.region_override_logit_margin,
+        "region_override_probability_margin": decode.region_override_probability_margin,
+        "override_damage_cost": decode.override_damage_cost,
+        "override_utility_threshold": decode.override_utility_threshold,
+        "enable_action_controller": decode.enable_action_controller,
+        "action_top_k": decode.action_top_k,
+        "action_execution_margin": decode.action_execution_margin,
     }
 
 
@@ -147,6 +154,7 @@ def evaluate_with_entity_count_diagnostics(
     device: torch.device,
     *,
     decode_options: dict,
+    hierarchy_config,
     output_jsonl: Path,
 ):
     """
@@ -157,15 +165,12 @@ def evaluate_with_entity_count_diagnostics(
     fine_model.eval()
     hierarchical_model.eval()
 
-    entity_threshold = decode_options.get("entity_threshold", 0.0)
-    decode_strategy = decode_options.get("strategy", "interval")
-    stage1_spans_only = decode_options.get("stage1_spans_only", True)
-    visible_from_null_threshold = decode_options.get(
-        "visible_from_null_threshold", 0.8
-    )
-    null_from_visible_threshold = decode_options.get(
-        "null_from_visible_threshold", 0.2
-    )
+    # Span selection parameters (not for region decoding)
+    entity_threshold = hierarchy_config.decode.entity_threshold
+    decode_strategy = hierarchy_config.decode.strategy
+    stage1_spans_only = hierarchy_config.decode.stage1_spans_only
+    visible_from_null_threshold = hierarchy_config.decode.visible_from_null_threshold
+    null_from_visible_threshold = hierarchy_config.decode.null_from_visible_threshold
 
     # 整体计数器
     overall_counts = Counter()
@@ -449,6 +454,7 @@ def main():
         dataloader=dataloader,
         device=device,
         decode_options=decode_options(hierarchy_config),
+        hierarchy_config=hierarchy_config,
         output_jsonl=output_dir / 'records.jsonl',
     )
 
