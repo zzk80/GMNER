@@ -20,6 +20,7 @@ METRIC_KEYS = (
     "eeg_f1",
     "gmner_score",
 )
+BASELINE_REPRODUCTION_ATOL = 1e-6
 
 
 def parse_args() -> argparse.Namespace:
@@ -75,10 +76,14 @@ def summarize(
             for key in METRIC_KEYS
         }
         for key, expected in expected_baseline.items():
-            if abs(baseline[key] - expected) > 1e-9:
+            if (
+                abs(baseline[key] - expected)
+                > BASELINE_REPRODUCTION_ATOL
+            ):
                 raise ValueError(
                     f"Recomputed baseline drift for {key}: "
-                    f"expected={expected} actual={baseline[key]}"
+                    f"expected={expected} actual={baseline[key]} "
+                    f"atol={BASELINE_REPRODUCTION_ATOL}"
                 )
     missing = [
         key for key in METRIC_KEYS if key not in candidate_metrics

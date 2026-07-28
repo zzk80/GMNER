@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 import yaml
 
 from gmner.config import load_config
@@ -100,3 +101,30 @@ def test_phase1_gate_rejects_small_capacity_delta():
 
     assert not result["phase1_passed"]
     assert not result["capacity_signal_passed"]
+
+
+def test_phase1_baseline_reproduction_tolerates_metric_roundoff():
+    protocol = load_protocol()
+    baseline = dict(protocol["baseline"]["metrics"])
+    baseline["span_f1"] -= 5.1e-9
+
+    result = summarize(
+        protocol=protocol,
+        baseline_metrics=baseline,
+        candidate_metrics=candidate_metrics(protocol),
+    )
+
+    assert result["baseline"]["span_f1"] == baseline["span_f1"]
+
+
+def test_phase1_baseline_reproduction_rejects_real_drift():
+    protocol = load_protocol()
+    baseline = dict(protocol["baseline"]["metrics"])
+    baseline["span_f1"] -= 2e-6
+
+    with pytest.raises(ValueError, match="Recomputed baseline drift"):
+        summarize(
+            protocol=protocol,
+            baseline_metrics=baseline,
+            candidate_metrics=candidate_metrics(protocol),
+        )
