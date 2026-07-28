@@ -32,4 +32,5 @@ knowledge/siglip2_region_cache/
 knowledge/grounding/
 knowledge/fmnerg_subtype_sidecar/
 knowledge/null_release_oof/roberta128/folds/
+knowledge/stage1_candidate_selector_oof/
 configs/oof/

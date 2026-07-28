@@ -12,6 +12,8 @@ __all__ = [
     "Siglip2RegionFeatureCache",
     "Siglip2PairedRecordDataset",
     "Siglip2PairedRecordCollator",
+    "Stage1CandidateSelectorDataset",
+    "Stage1CandidateSelectorCollator",
     "encode_words_with_alignment",
     "infer_model_input_limit",
     "load_word_aligned_tokenizer",
@@ -71,6 +73,19 @@ def __getattr__(name):
             "Siglip2RegionFeatureCache": Siglip2RegionFeatureCache,
             "Siglip2PairedRecordDataset": Siglip2PairedRecordDataset,
             "Siglip2PairedRecordCollator": Siglip2PairedRecordCollator,
+        }[name]
+    if name in {
+        "Stage1CandidateSelectorDataset",
+        "Stage1CandidateSelectorCollator",
+    }:
+        from .stage1_candidate_selector import (
+            Stage1CandidateSelectorCollator,
+            Stage1CandidateSelectorDataset,
+        )
+
+        return {
+            "Stage1CandidateSelectorDataset": Stage1CandidateSelectorDataset,
+            "Stage1CandidateSelectorCollator": Stage1CandidateSelectorCollator,
         }[name]
     if name in {
         "encode_words_with_alignment",

@@ -461,8 +461,8 @@ AUROC 未明显提升前，不得接入最终 Visibility 或运行 test。
 SigLIP 2 的 mention/context/type 与 local/context/global 三尺度旁路。其同口径结果
 为 VinVL `0.5773`、SigLIP2 `0.5759`、Fusion `0.6003`；Fusion 风险净纠错为 `+9`，
 仍未达到 `0.70/+15` 门槛。M3.4A 因此 no-go，不进入 M3.4B，也不读取 test。旧版与
-M3.4A 的 A/B 集合不同，不能写成直接性能回退。完整口径、结果和 dev 切片入口见
-[M3.4A SigLIP2 归档](experiments/SIGLIP2_REGION_RELIABILITY.md)。
+M3.4A 的 A/B 集合不同，不能写成直接性能回退。保留结论见
+[实验结果总表](EXPERIMENT_RESULTS_TABLE.md)。
 
 ## 13. Milestone 3.5：实例对应与集合级诊断
 
@@ -699,23 +699,10 @@ run fold
 -> run next fold
 ```
 
-清理入口为 `tools/archive_null_release_oof_fold.py`。它不属于实验源码树指纹，且默认
-dry-run。执行前强制验证：pipeline 已封存、8 个阶段完整、未访问 test、fold proof
-绑定未变化、proof 中 artifact SHA-256 均能对应现存文件、heldout ID 完整互斥、
-固定 Top-4 合法，以及冻结 payload 只包含张量和基础值而不依赖外部路径。
-
-```bash
-PYTHONPATH=. python tools/archive_null_release_oof_fold.py \
-  --fold-id 0 \
-  --fold-work knowledge/null_release_oof/roberta128/fold0 \
-  --output-work-root outputs/null_release_oof/roberta128/fold0
-
-PYTHONPATH=. python tools/archive_null_release_oof_fold.py \
-  --fold-id 0 \
-  --fold-work knowledge/null_release_oof/roberta128/fold0 \
-  --output-work-root outputs/null_release_oof/roberta128/fold0 \
-  --execute
-```
+历史折级清理在执行前强制验证：pipeline 已封存、8 个阶段完整、未访问 test、fold
+proof 绑定未变化、proof 中 artifact SHA-256 均能对应现存文件、heldout ID 完整互斥、
+固定 Top-4 合法，以及冻结 payload 只包含张量和基础值而不依赖外部路径。该实验已经
+封存，旧清理入口不再作为当前仓库的可执行工具保留。
 
 永久保留 heldout 冻结特征、proof、pipeline manifest、配置、日志、metrics 和
 checkpoint 哈希清单；checkpoint 本体应先同步到服务器外部存储。删除范围被限制为
@@ -724,29 +711,12 @@ SHA-256 记录在 `fold_archive_manifest.json`；清理后再次从磁盘加载�
 默认每折保留上限为 500 MB，任何闸门失败都不会开始删除。
 
 Stage1 若在完整写出 `train_summary.json`、best checkpoint 和 tokenizer 后，仅在
-解释器退出阶段出现 `SIGSEGV: 11`，使用
-`tools/recover_completed_oof_stage.py` 做受限恢复。工具默认 dry-run，并核验
-checkpoint 可加载、summary 指标一致、训练完成标记、外层 SIGSEGV 记录、test-free
-配置、fold ID 和当前源码树指纹；通过后显式 `--execute` 才会备份原 pipeline 并写入
-恢复 receipt。它不接受普通异常、OOM、中途崩溃或缺少完成标记的产物。
+解释器退出阶段出现 `SIGSEGV: 11`，历史流水线只允许在 checkpoint 可加载、summary
+指标一致、训练完成标记、外层 SIGSEGV 记录、test-free 配置、fold ID 和源码树指纹
+全部通过后执行受限恢复。普通异常、OOM、中途崩溃或缺少完成标记的产物均不可恢复。
+该 OOF 实验已经封存，旧恢复工具不再作为当前仓库的可执行入口保留。
 
-Fold 2–9 的正式流式入口为：
-
-```bash
-nohup env \
-  START_FOLD=2 \
-  END_FOLD=9 \
-  PREPARE_PREDECESSOR=1 \
-  MIN_FREE_GB=5 \
-  MIN_GPU_FREE_MB=10000 \
-  POLL_SECONDS=300 \
-  GPU_POLL_SECONDS=300 \
-  ALLOW_HASH_ONLY_CHECKPOINT_RETENTION=1 \
-  bash tools/run_null_release_oof_folds_streaming.sh \
-  > null_release_oof_folds2_9_master.log 2>&1 &
-```
-
-入口会等待当前 Fold 1 物化完成并先封存清理，然后严格串行处理 Fold 2–9。每折只有在
+历史 Fold 2–9 由流式入口严格串行执行。每折只有在
 sealed、八阶段完整、test-free、proof/hash、700 条 heldout、固定 Top-4、特征自包含
 和清理后复载全部通过后，才进入下一折。`ALLOW_HASH_ONLY_CHECKPOINT_RETENTION=1`
 明确授权删除 checkpoint 本体；服务器永久保留的是冻结特征、证明、配置、日志、指标
@@ -815,5 +785,5 @@ mean/std 为 `0.610869/0.010907`。
 
 NULL Release 在严格 OOF 下没有稳定超过 epoch-0 KEEP，因此 M3.6A-r2 判定
 **no-go**。它不接入正式推理、不读取 test，也不再继续扫描阈值或扩展控制器。
-当前正式结果保持 Dev `0.621316`、Test `0.61529`。完整 OOF 契约和归档边界见
-[Strict OOF and NULL Release](OOF_NULL_RELEASE.md)。
+当前正式结果保持 Dev `0.621316`、Test `0.61529`。保留结果与归档边界见
+[实验结果总表](EXPERIMENT_RESULTS_TABLE.md)。
