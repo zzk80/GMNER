@@ -1,0 +1,43 @@
+{
+  "kind": "s3_stage1_baseline_lock",
+  "format_version": 1,
+  "status": "frozen",
+  "scope": "formal_stage1_dev",
+  "git_base_commit": "67cad8807b182a25cc18e673745d7dca814c4efd",
+  "config": {
+    "path": "configs/fmnerg_twitter10000_stage1.yaml",
+    "sha256": "6b6c1ed8cc3cfe453ae67f0483568ca82b667726839edb8bd6d5dd65f9c91171"
+  },
+  "checkpoint": {
+    "formal_cloud_path": "/home/zzk/gmner/outputs/fmnerg_stage1_roberta128/best_model.pt",
+    "sha256": "efc617f09e5a7cda818560a4640d606623a2f386cf4035f3b90c3fc620a4d29d",
+    "present_in_repository": false
+  },
+  "grounding_null_prior_contract": {
+    "entity_expanded_forward": "entity_specific",
+    "formal_predicted_span_decode": "legacy_neutral_0.5",
+    "reason": "The frozen evaluator and candidate builder do not pass grounding_null_prior when rescoring decoded spans.",
+    "s3_0_policy": "Compare full entity-specific priors on gold expanded entities and preserve the legacy neutral prior for the formal prediction digest."
+  },
+  "dev": {
+    "records": 1500,
+    "prediction_count": 2516,
+    "gold_count": 2450,
+    "prediction_sha256": "10a573c862a0b7223f8df58872ce5c9339ea44894cdb614d6db6e5fa08d03229",
+    "span_precision": 0.8593004769475358,
+    "span_recall": 0.8824489795918368,
+    "span_f1": 0.8707209021345148,
+    "span_correct": 2162,
+    "mner_f1": 0.8147402335884012,
+    "mner_correct": 2023,
+    "eeg_f1": 0.6459927507047926,
+    "eeg_correct": 1604,
+    "gmner_f1": 0.6073298429319373,
+    "gmner_correct": 1508
+  },
+  "provenance": [
+    "docs/experiments/stage1_gradient_conflicts_train_seed42_summary.json",
+    "docs/experiments/stage1_candidate_selector_seed42_summary.json"
+  ],
+  "test_accessed": false
+}
