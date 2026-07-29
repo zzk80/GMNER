@@ -19,7 +19,7 @@
   "test_accessed": false,
   "p4_1_authorized": false,
   "implementation": {
-    "git_head": "1bcae9471eb6fb96175123939ead4c9e7179223f",
+    "git_head": "5d56bab33dbd125ed175028d2443f773fc53f561",
     "contract_path": "gmner/data/p4_actionability_contract.py",
     "contract_sha256": "07202632bdbf991258c54726716c77d862976607ae1839616a18d93807eab7b7",
     "driver_path": "scripts/prepare_p4_actionability_sources.py",
@@ -1381,5 +1381,5 @@
     "frozen_model_g_formal_span_coordinates_unavailable",
     "joint_candidate_score_composition_not_frozen"
   ],
-  "manifest_sha256": "248c993cb12dde9f7354a6fafa2ace2ac3b147c36b1ec13b21a8680c0e193fb9"
+  "manifest_sha256": "b43bf116387b08274528dcf165b0b038efddb64c0e915330398287e244406a71"
 }
