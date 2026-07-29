@@ -1,0 +1,83 @@
+{
+  "kind": "p4_r0_full_chain_oof_r16_regeneration_preregistration",
+  "format_version": 1,
+  "status": "R0_A_AUDIT_AUTHORIZED",
+  "foundation_commit": "bcaf28e061aac31acd79daeadeb6ea24f076a5df",
+  "artifact_identity": "REGENERATED_FULL_CHAIN_OOF_R16",
+  "method_state": {
+    "p4_hypothesis": "UNTESTED",
+    "p4_0_engineering": "PROTOCOL_VALID",
+    "p4_0_evidence": "BLOCKED",
+    "blocker": "FORMAL_OOF_ARTIFACT_LOST"
+  },
+  "authorization": {
+    "r0_a_read_only_audit": true,
+    "r0_a_checkpoint_replay_execution": false,
+    "r0_b_full_oof_retraining": false,
+    "checkpoint_or_cache_deserialization": false,
+    "model_execution": false,
+    "candidate_generation": false,
+    "oracle": false,
+    "p4_1": false,
+    "downstream_rebuild": false,
+    "calibration_folds_8_9": false,
+    "dev_access": false,
+    "test_access": false
+  },
+  "development_folds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "required_supervised_stages": [
+    "stage1",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+    "reliability"
+  ],
+  "r0_a_required_evidence": {
+    "records_per_heldout_fold": 700,
+    "records_per_training_fold": 6300,
+    "heldout_exclusion": true,
+    "exact_checkpoint_sha256_for_every_stage_and_fold": true,
+    "exact_config_sha256_for_every_stage_and_fold": true,
+    "exact_train_and_heldout_source_sha256": true,
+    "source_tree_exactly_recoverable": true,
+    "text_tokenizer_fingerprint_available": true,
+    "vinvl_input_fingerprint_available": true,
+    "grounding_prior_fingerprints_available": true,
+    "siglip_input_fingerprints_available": true,
+    "candidate_command_provenance_available": true
+  },
+  "r0_a_gate": {
+    "all_folds_must_pass": true,
+    "checkpoint_payloads_loaded": 0,
+    "candidate_payloads_loaded": 0,
+    "training_records_parsed": 0,
+    "calibration_folds_opened": false,
+    "dev_accessed": false,
+    "test_accessed": false,
+    "oracle_labels_computed": false,
+    "pass_status": "P4_R0_A_CHECKPOINT_REPLAY_FEASIBLE",
+    "fail_status": "P4_R0_A_CHECKPOINT_REPLAY_BLOCKED"
+  },
+  "post_gate_authorization": {
+    "on_pass": "REQUEST_SEPARATE_HELDOUT_R16_REPLAY_APPROVAL",
+    "on_fail": "STOP_WITHOUT_AUTHORIZING_R0_B"
+  },
+  "semantic_consistency_gate": {
+    "record_ids_and_order_exact": true,
+    "shared_compact_fields_exact": true,
+    "formal_span_coordinates_valid": true,
+    "canonical_formal_triple_digest_required": true,
+    "gold_free_decode": true,
+    "mix_old_and_new_fold_outputs": false
+  }
+}
