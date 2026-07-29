@@ -99,6 +99,25 @@ def test_ten_fold_manifest_is_complete_disjoint_and_reproducible(
     assert validate_fold_manifest(path, expected_num_folds=10) == manifest
 
 
+def test_manifest_can_verify_only_authorized_fold_files(
+    tmp_path, monkeypatch
+) -> None:
+    path, manifest = _build_manifest(tmp_path, monkeypatch)
+    for fold_id in (8, 9):
+        fold = fold_from_manifest(manifest, fold_id)
+        Path(fold["train_file"]).unlink()
+        Path(fold["heldout_file"]).unlink()
+
+    validated = validate_fold_manifest(
+        path,
+        expected_num_folds=10,
+        verify_fold_ids=range(8),
+    )
+    assert validated["records"] == 20
+    with pytest.raises(FileNotFoundError):
+        validate_fold_manifest(path, expected_num_folds=10)
+
+
 def test_pipeline_contract_requires_all_supervised_fold_specific_stages(
     tmp_path, monkeypatch
 ) -> None:
