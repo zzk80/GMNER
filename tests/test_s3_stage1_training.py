@@ -12,6 +12,7 @@ from gmner.engine.s3_stage1_evaluator import (
 from gmner.engine.s3_stage1_training import (
     build_s3_optimizer,
     derive_static_lambdas,
+    late_training_static_scaling_unresolved,
 )
 from gmner.s3_config import S3Stage1Config, load_s3_config
 
@@ -172,3 +173,24 @@ def test_s3_optimizer_assigns_all_roberta_layers_to_backbone_lr(
     assert "S3.1 optimizer groups:" in output
     assert "backbone: lr=3.00e-06" in output
     assert "first_parameters=[" in output
+
+
+def test_late_training_scaling_ignores_step100_but_requires_late_persistence(
+) -> None:
+    audits = [
+        {
+            "label": "formal_step_100",
+            "weighted_max_min_ratio_by_region": {"layer": 20.0},
+        },
+        {
+            "label": "epoch_1_end",
+            "weighted_max_min_ratio_by_region": {"layer": 150.0},
+        },
+        {
+            "label": "best_checkpoint",
+            "weighted_max_min_ratio_by_region": {"layer": 200.0},
+        },
+    ]
+    assert late_training_static_scaling_unresolved(audits)
+    audits[-1]["weighted_max_min_ratio_by_region"]["layer"] = 50.0
+    assert not late_training_static_scaling_unresolved(audits)

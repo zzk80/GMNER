@@ -423,6 +423,40 @@ def summarize_weighted_gradient_ratios(
     }
 
 
+def late_training_static_scaling_unresolved(
+    audits: list[dict[str, Any]],
+    *,
+    threshold: float = 100.0,
+) -> bool:
+    """Detect persistent imbalance at epoch 1 and the selected checkpoint."""
+
+    late_labels = {"epoch_1_end", "best_checkpoint"}
+    late_audits = [
+        audit for audit in audits if audit.get("label") in late_labels
+    ]
+    if {audit.get("label") for audit in late_audits} != late_labels:
+        return False
+    regions = {
+        region
+        for audit in late_audits
+        for region in audit.get(
+            "weighted_max_min_ratio_by_region", {}
+        )
+    }
+    return any(
+        all(
+            float(
+                audit["weighted_max_min_ratio_by_region"].get(
+                    region, 0.0
+                )
+            )
+            >= float(threshold)
+            for audit in late_audits
+        )
+        for region in regions
+    )
+
+
 def audit_task_gradients(
     *,
     model,

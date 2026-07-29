@@ -23,6 +23,7 @@ from gmner.data.s3_stage1_builder import (
 from gmner.engine.s3_stage1_evaluator import evaluate_s3_stage1
 from gmner.engine.s3_stage1_training import (
     S3Stage1Trainer,
+    late_training_static_scaling_unresolved,
     load_and_apply_scaling_report,
     verify_student_backbone_initialization,
 )
@@ -173,22 +174,10 @@ def main() -> None:
         key: value
         for key, value in scaling_report["derived_lambdas"].items()
     }
-    audit_regions = {
-        region
-        for audit in gradient_report["audits"]
-        for region in audit[
-            "weighted_max_min_ratio_by_region"
-        ]
-    }
-    final_report["gradient_audit_static_scaling_unresolved"] = any(
-        all(
-            audit["weighted_max_min_ratio_by_region"].get(
-                region, 0.0
-            )
-            >= 100.0
-            for audit in gradient_report["audits"]
+    final_report["gradient_audit_static_scaling_unresolved"] = (
+        late_training_static_scaling_unresolved(
+            gradient_report["audits"]
         )
-        for region in audit_regions
     )
     final_path = output_dir / "dev_seed42_gate.json"
     final_path.write_text(

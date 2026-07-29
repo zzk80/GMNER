@@ -144,18 +144,21 @@ shared RoBERTa / graph / cross-modal representation
 └── record-level alignment
 ```
 
-P0 and the S3.0 forward/decode equivalence foundation are complete. S3.1 is
-implemented on an isolated branch, but its Train-only scaling probe and
-Seed42 method Gate remain pending. Utility is not part of S3.1; S3.2 remains
-conditional on the S3.1 result. The joint experiment uses all Train records
-and does not require OOF. OOF remains mandatory only for a separately trained
-selector after Stage1 is frozen. A downstream M3.3A rebuild is allowed only
-after the Stage1 and three-seed gates pass.
+P0 and the S3.0 forward/decode equivalence foundation are complete. The
+corrected S3.1 Seed42 run was engineering-valid but failed its method Gate.
+Relative to the frozen Stage1, Span/MNER changed by only
+`+0.00128/+0.00082`, while EEG/GMNER changed by
+`-0.00580/-0.00382`; correct GMNER triples fell by 11 and formal-gold
+preservation was `0.95292`. S3.1 is therefore `NO_GO`. Seeds 41/43, S3.2,
+and the downstream M3.3A rebuild are not run. Test was not accessed and the
+formal Model-G results remain unchanged.
 
 The formal contract and current execution commands are recorded in
 [`docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md`](docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md)
 and
 [`docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md`](docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md).
+The compact result is archived in
+[`docs/experiments/s3_1_seed42_dev_summary.json`](docs/experiments/s3_1_seed42_dev_summary.json).
 
 ## Repository Layout
 

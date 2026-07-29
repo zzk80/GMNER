@@ -2,7 +2,7 @@
 
 **Engineering status**: implemented
 
-**Method status**: scaling probe and Seed42 Gate pending
+**Method status**: Seed42 `NO_GO`
 
 **Data scope**: Train and Dev only
 
@@ -26,6 +26,42 @@ to exactly one group and every RoBERTa backbone parameter belongs to the
 backbone group. The startup log reports each group name, learning rate,
 parameter tensor count, trainable element count, and first five names.
 The pre-amendment scaling report is invalid and must not be reused.
+
+## Seed42 Result
+
+The corrected run selected epoch 1 exclusively by Stage1 Dev GMNER. The
+frozen baseline was reproduced exactly and all optimizer/provenance checks
+passed, so this is a valid method result rather than an engineering failure.
+
+| Metric | Frozen Stage1 | S3.1 | Delta |
+| --- | ---: | ---: | ---: |
+| Span F1 | 0.870721 | 0.872002 | +0.001281 |
+| MNER F1 | 0.814740 | 0.815561 | +0.000821 |
+| EEG F1 | 0.645993 | 0.640194 | -0.005799 |
+| GMNER F1 | 0.607330 | 0.603507 | -0.003822 |
+
+Boundary corrections were nearly neutral (`11` corrected, `10` damaged);
+Type corrections were exactly neutral (`14/14`). Grounding dominated the
+failure: the final model produced `60` corrected and `71` damaged GMNER
+triples, reducing the correct count from `1508` to `1497`. Formal-gold
+preservation was `0.952918`, below the required `0.99`.
+
+The formal training audit also recorded a clipping rate of `0.649399`.
+Weighted gradient max/min ratios at the selected checkpoint were
+`11594.82/18712.59/5119.70` for RoBERTa layers 0/5/11. Static scaling did
+not preserve late-training balance even though the step-100 ratios were
+below 100.
+
+Per the preregistered decision rule, correct GMNER count decreased and
+formal preservation failed. Therefore:
+
+```text
+S3.1 Seed42: NO_GO
+Seeds 41/43: not run
+S3.2 Utility: locked
+Downstream rebuild: not run
+Test: not accessed
+```
 
 ## Scope
 
