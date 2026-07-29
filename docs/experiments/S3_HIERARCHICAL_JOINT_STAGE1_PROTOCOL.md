@@ -1,6 +1,8 @@
 # S3 层次化联合 Stage1 最终实施协议
 
-**状态**：P0 与 S3.0 已批准；首个实现批次不包含 S3.1。
+**状态**：P0 已实现；S3.0 按批准的数值容差修订正式通过；S3.1
+已授权但尚未实现。S3.2 仍为有条件授权，S3.3/S3.4、后半链与 Test
+仍未授权。
 
 ## 实现审计备注
 
@@ -533,6 +535,27 @@ test_accessed=false
 正式容差写入 `s3_stage1_baseline_lock.json`。CLI 只允许在显式
 `--diagnostic-only` 模式覆盖容差；该模式的结果不得标记为正式 Gate
 通过。
+
+正式 Dev 复跑结果：
+
+```text
+evaluated commit:
+2f970cf252c40d7eff72448ba1e82aa24ce2d968
+
+original_numerical_gate_passed = false
+amended_numerical_gate_passed  = true
+formal_gate_eligible           = true
+formal_gate_passed             = true
+test_accessed                  = false
+```
+
+完整原始报告归档于：
+
+```text
+docs/experiments/s3_0_forward_equivalence_dev.json
+SHA256:
+a0627884ce5e6274ac6f1e471fd0f6b8784af14eacfadf26227315a6809a4ae6
+```
 
 并检查：
 

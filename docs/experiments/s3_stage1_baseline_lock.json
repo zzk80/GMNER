@@ -24,7 +24,7 @@
     "candidate_positive_mask_role": "Training and grounding diagnostics only; it must not replace the formal EEG/GMNER paper metric."
   },
   "s3_0_gate": {
-    "status": "numerical_tolerance_amendment_approved",
+    "status": "passed_with_approved_numerical_tolerance_amendment",
     "emission_tolerance": 1e-06,
     "original_grounding_tolerance": 1e-05,
     "grounding_tolerance": 3e-05,
@@ -32,7 +32,16 @@
     "original_numerical_gate_passed": false,
     "amended_numerical_gate_passed": true,
     "reason": "FP32 reduction-order difference between scalar entity execution and batched CUDA einsum; all discrete decisions, prediction digests, metrics, and correct counts remained exactly equal.",
-    "approved_date": "2026-07-29"
+    "approved_date": "2026-07-29",
+    "formal_report": {
+      "path": "docs/experiments/s3_0_forward_equivalence_dev.json",
+      "sha256": "a0627884ce5e6274ac6f1e471fd0f6b8784af14eacfadf26227315a6809a4ae6",
+      "evaluated_commit": "2f970cf252c40d7eff72448ba1e82aa24ce2d968",
+      "metric_contract_fix_commit": "30a4900f28f908b800228ffa6e1fc82510ed3a89",
+      "formal_gate_eligible": true,
+      "formal_gate_passed": true,
+      "test_accessed": false
+    }
   },
   "dev": {
     "records": 1500,

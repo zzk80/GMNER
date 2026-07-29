@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import hashlib
+import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import torch
@@ -287,3 +290,30 @@ def test_amended_grounding_gate_preserves_original_failure() -> None:
     }
     assert _grounding_numerical_gate(errors, 1e-5) is False
     assert _grounding_numerical_gate(errors, 3e-5) is True
+
+
+def test_archived_formal_s3_gate_matches_baseline_lock() -> None:
+    root = Path(__file__).resolve().parents[1]
+    lock = json.loads(
+        (
+            root
+            / "docs"
+            / "experiments"
+            / "s3_stage1_baseline_lock.json"
+        ).read_text(encoding="utf-8")
+    )
+    gate = lock["s3_0_gate"]
+    report_path = root / gate["formal_report"]["path"]
+    payload = report_path.read_bytes()
+    report = json.loads(payload.decode("utf-8"))
+
+    assert hashlib.sha256(payload).hexdigest() == (
+        gate["formal_report"]["sha256"]
+    )
+    assert report["original_numerical_gate_passed"] is False
+    assert report["amended_numerical_gate_passed"] is True
+    assert report["formal_gate_eligible"] is True
+    assert report["formal_gate_passed"] is True
+    assert report["test_accessed"] is False
+    assert all(report["checks"].values())
+    assert all(report["baseline_checks"].values())
