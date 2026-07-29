@@ -21,6 +21,7 @@ __all__ = [
     "ConditionalSameTypeRegionResolver",
     "Stage1CandidateSelectorConfig",
     "Stage1CandidateSelector",
+    "LegacyStage1RecordWrapper",
 ]
 
 
@@ -143,4 +144,8 @@ def __getattr__(name):
             "Stage1CandidateSelectorConfig": Stage1CandidateSelectorConfig,
             "Stage1CandidateSelector": Stage1CandidateSelector,
         }[name]
+    if name == "LegacyStage1RecordWrapper":
+        from .stage1 import LegacyStage1RecordWrapper
+
+        return LegacyStage1RecordWrapper
     raise AttributeError(name)

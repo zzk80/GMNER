@@ -11,6 +11,7 @@ __all__ = [
     "evaluate_layered_action_verifier",
     "evaluate_same_type_region_resolver",
     "evaluate_stage1_candidate_selector",
+    "evaluate_s3_forward_equivalence",
 ]
 
 
@@ -71,4 +72,10 @@ def __getattr__(name):
         )
 
         return evaluate_stage1_candidate_selector
+    if name == "evaluate_s3_forward_equivalence":
+        from .s3_forward_equivalence import (
+            evaluate_s3_forward_equivalence,
+        )
+
+        return evaluate_s3_forward_equivalence
     raise AttributeError(name)

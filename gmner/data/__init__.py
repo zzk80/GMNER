@@ -14,6 +14,8 @@ __all__ = [
     "Siglip2PairedRecordCollator",
     "Stage1CandidateSelectorDataset",
     "Stage1CandidateSelectorCollator",
+    "RecordLevelStage1Dataset",
+    "RecordLevelStage1Collator",
     "encode_words_with_alignment",
     "infer_model_input_limit",
     "load_word_aligned_tokenizer",
@@ -87,6 +89,14 @@ def __getattr__(name):
             "Stage1CandidateSelectorDataset": Stage1CandidateSelectorDataset,
             "Stage1CandidateSelectorCollator": Stage1CandidateSelectorCollator,
         }[name]
+    if name == "RecordLevelStage1Dataset":
+        from .record_level_stage1_dataset import RecordLevelStage1Dataset
+
+        return RecordLevelStage1Dataset
+    if name == "RecordLevelStage1Collator":
+        from .record_level_stage1_collator import RecordLevelStage1Collator
+
+        return RecordLevelStage1Collator
     if name in {
         "encode_words_with_alignment",
         "infer_model_input_limit",
