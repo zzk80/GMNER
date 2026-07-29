@@ -19,6 +19,10 @@
     "reason": "The frozen evaluator and candidate builder do not pass grounding_null_prior when rescoring decoded spans.",
     "s3_0_policy": "Compare full entity-specific priors on gold expanded entities and preserve the legacy neutral prior for the formal prediction digest."
   },
+  "paper_metric_contract": {
+    "eeg_and_gmner_region_rule": "XML ground-truth box match with IoU strictly greater than 0.5; NULL is correct only when the entity name has no XML boxes.",
+    "candidate_positive_mask_role": "Training and grounding diagnostics only; it must not replace the formal EEG/GMNER paper metric."
+  },
   "dev": {
     "records": 1500,
     "prediction_count": 2516,

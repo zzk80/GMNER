@@ -141,8 +141,12 @@ class LegacyStage1RecordWrapper(nn.Module):
             device=fused_tokens.device,
             dtype=fused_tokens.dtype,
         )
-        numerator = torch.einsum("bel,blh->beh", masks, fused_tokens)
-        denominator = masks.sum(dim=-1, keepdim=True).clamp_min(1.0)
+        # Preserve the legacy masked_mean reduction order over subwords.
+        weighted_tokens = (
+            fused_tokens[:, None, :, :] * masks[:, :, :, None]
+        )
+        numerator = weighted_tokens.sum(dim=2)
+        denominator = masks.sum(dim=2, keepdim=True).clamp_min(1.0)
         entity_states = numerator / denominator
         raw_logits = vectorized_legacy_grounding(
             entity_states=entity_states,

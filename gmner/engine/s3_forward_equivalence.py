@@ -7,9 +7,10 @@ import json
 from typing import Any
 
 import torch
+from torchvision.ops import box_iou
 
 from gmner.constants import DEFAULT_LABEL2ID, ENTITY_TYPE2ID
-from gmner.engine.utils import f1_counts, match_record_predictions
+from gmner.engine.utils import f1_counts
 from gmner.knowledge.region_compatibility import compatibility_score
 from gmner.models.stage1 import LegacyStage1RecordWrapper
 from gmner.utils.metrics import extract_entities_from_word_labels
@@ -299,27 +300,125 @@ def _gold_for_record(
     row: int,
 ) -> list[dict[str, Any]]:
     gold = []
+    tokens = list(batch["metadata"][row].get("tokens") or [])
     entity_indices = torch.nonzero(
         batch["gold_entity_mask"][row],
         as_tuple=False,
     ).squeeze(-1)
     for entity_index in entity_indices.tolist():
+        span = batch["gold_spans"][row, entity_index].tolist()
         positive = torch.nonzero(
             batch["gold_region_positive_mask"][row, entity_index],
             as_tuple=False,
         ).squeeze(-1)
         gold.append(
             {
-                "span": batch["gold_spans"][
-                    row, entity_index
-                ].tolist(),
+                "span": span,
                 "type_id": int(
                     batch["gold_type_ids"][row, entity_index].item()
                 ),
+                "text": " ".join(tokens[int(span[0]) : int(span[1])]),
                 "region_positive_indices": positive.tolist(),
             }
         )
     return gold
+
+
+def _formal_region_matches(
+    *,
+    region_index: int,
+    gold_entity: dict[str, Any],
+    metadata: dict[str, Any],
+    region_boxes: torch.Tensor,
+    null_region_index: int,
+) -> bool:
+    """Apply the frozen Stage1 paper-metric region rule exactly."""
+
+    gold_name = str(gold_entity.get("text", "")).strip().lower()
+    gt_boxes = (metadata.get("gt_boxes_by_name") or {}).get(
+        gold_name,
+        [],
+    )
+    if not gt_boxes:
+        return int(region_index) == int(null_region_index)
+    if int(region_index) == int(null_region_index):
+        return False
+    predicted_box = region_boxes[int(region_index)].unsqueeze(0)
+    targets = torch.tensor(
+        gt_boxes,
+        dtype=predicted_box.dtype,
+        device=predicted_box.device,
+    )
+    ious = box_iou(targets, predicted_box).squeeze(1)
+    return bool((ious > 0.5).any().item())
+
+
+def _match_formal_record_predictions(
+    *,
+    predictions: list[dict[str, Any]],
+    gold: list[dict[str, Any]],
+    metadata: dict[str, Any],
+    region_boxes: torch.Tensor,
+    null_region_index: int,
+) -> dict[str, set[int]]:
+    """Match predictions with the same stopping rules as evaluator.py."""
+
+    matched = {name: set() for name in _METRICS}
+    for prediction in predictions:
+        pred_span = tuple(prediction["span"])
+        pred_type = int(prediction["type_id"])
+        pred_region = int(prediction["region_index"])
+
+        for gold_index, target in enumerate(gold):
+            if gold_index in matched["span"]:
+                continue
+            if tuple(target["span"]) == pred_span:
+                matched["span"].add(gold_index)
+                break
+
+        for gold_index, target in enumerate(gold):
+            if gold_index in matched["mner"]:
+                continue
+            if (
+                tuple(target["span"]) == pred_span
+                and int(target["type_id"]) == pred_type
+            ):
+                matched["mner"].add(gold_index)
+                break
+
+        for gold_index, target in enumerate(gold):
+            if gold_index in matched["eeg"]:
+                continue
+            if tuple(target["span"]) != pred_span:
+                continue
+            if _formal_region_matches(
+                region_index=pred_region,
+                gold_entity=target,
+                metadata=metadata,
+                region_boxes=region_boxes,
+                null_region_index=null_region_index,
+            ):
+                matched["eeg"].add(gold_index)
+            break
+
+        for gold_index, target in enumerate(gold):
+            if gold_index in matched["gmner"]:
+                continue
+            if (
+                tuple(target["span"]) != pred_span
+                or int(target["type_id"]) != pred_type
+            ):
+                continue
+            if _formal_region_matches(
+                region_index=pred_region,
+                gold_entity=target,
+                metadata=metadata,
+                region_boxes=region_boxes,
+                null_region_index=null_region_index,
+            ):
+                matched["gmner"].add(gold_index)
+            break
+    return matched
 
 
 def _metric_report(
@@ -581,7 +680,15 @@ def evaluate_s3_forward_equivalence(
             _update_digest(old_digest, record_id, old_predictions)
             _update_digest(new_digest, record_id, new_predictions)
             gold = _gold_for_record(batch, row)
-            matches = match_record_predictions(new_predictions, gold)
+            matches = _match_formal_record_predictions(
+                predictions=new_predictions,
+                gold=gold,
+                metadata=metadata,
+                region_boxes=batch["region_boxes"][row],
+                null_region_index=int(
+                    batch["null_region_index"][row].item()
+                ),
+            )
             for name in _METRICS:
                 correct[name] += len(matches[name])
             record_count += 1

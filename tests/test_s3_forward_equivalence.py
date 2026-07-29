@@ -7,6 +7,7 @@ import torch.nn as nn
 
 from gmner.constants import DEFAULT_LABEL2ID, ENTITY_TYPE2ID, IGNORE_INDEX
 from gmner.engine.s3_forward_equivalence import (
+    _match_formal_record_predictions,
     evaluate_s3_forward_equivalence,
 )
 from gmner.knowledge.region_compatibility import compatibility_score
@@ -229,3 +230,44 @@ def test_wrapper_cannot_enter_training_mode() -> None:
         assert "eval-only" in str(error)
     else:
         raise AssertionError("S3.0 wrapper unexpectedly entered train mode.")
+
+
+def test_formal_metric_does_not_treat_candidate_missing_as_null() -> None:
+    predictions = [
+        {
+            "span": [0, 1],
+            "type_id": ENTITY_TYPE2ID["PER"],
+            "region_index": 2,
+        }
+    ]
+    gold = [
+        {
+            "span": [0, 1],
+            "type_id": ENTITY_TYPE2ID["PER"],
+            "text": "Alice",
+            # The training target falls back to NULL because no candidate
+            # reached the threshold. The paper metric still sees XML boxes.
+            "region_positive_indices": [2],
+        }
+    ]
+    matches = _match_formal_record_predictions(
+        predictions=predictions,
+        gold=gold,
+        metadata={
+            "gt_boxes_by_name": {
+                "alice": [[0.0, 0.0, 10.0, 10.0]],
+            }
+        },
+        region_boxes=torch.tensor(
+            [
+                [20.0, 20.0, 30.0, 30.0],
+                [40.0, 40.0, 50.0, 50.0],
+                [0.0, 0.0, 0.0, 0.0],
+            ]
+        ),
+        null_region_index=2,
+    )
+    assert len(matches["span"]) == 1
+    assert len(matches["mner"]) == 1
+    assert len(matches["eeg"]) == 0
+    assert len(matches["gmner"]) == 0

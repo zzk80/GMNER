@@ -28,6 +28,21 @@ formal predicted-span grounding：
 该差异只作为基线实现事实归档，不构成新方法。是否统一 predicted-span
 NULL prior 必须另行预注册，当前批次禁止修改。
 
+正式指标还必须沿用旧 evaluator 的论文口径：
+
+```text
+EEG / GMNER region correctness：
+XML ground-truth box 与预测候选框 IoU 严格大于 0.5
+
+NULL correctness：
+实体名称在 XML 中不存在任何 GT box
+```
+
+`region_positive_mask` 只用于训练与 grounding 条件诊断。候选集中没有
+IoU 合格框时，该 mask 会把 NULL 作为训练目标，但正式 EEG/GMNER 仍将
+该实体视为 visible 且不可由当前候选恢复，因此不能用 positive mask
+代替正式指标计算。
+
 ## 一、批准范围
 
 当前正式批准：
