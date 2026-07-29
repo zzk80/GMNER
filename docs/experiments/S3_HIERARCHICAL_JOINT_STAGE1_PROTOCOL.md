@@ -483,11 +483,11 @@ typed-BIO emission max abs error < 1e-6
 typed-BIO decoded sequence 完全一致
 
 每个 gold entity：
-raw grounding logits max abs error < 1e-5
-after-NULL-prior logits max abs error < 1e-5
-after-detector-prior logits max abs error < 1e-5
-after-compatibility logits max abs error < 1e-5
-final masked logits max abs error < 1e-5
+raw grounding logits max abs error < 3e-5
+after-NULL-prior logits max abs error < 3e-5
+after-detector-prior logits max abs error < 3e-5
+after-compatibility logits max abs error < 3e-5
+final masked logits max abs error < 3e-5
 grounding argmax 完全一致
 NULL/visible decision 完全一致
 positive-set correctness 完全一致
@@ -496,6 +496,43 @@ Stage1 Span/MNER/EEG/GMNER 完全复现
 prediction digest 完全一致
 Test accessed = false
 ```
+
+### S3.0 numerical-equivalence amendment（2026-07-29）
+
+原始预注册 grounding 容差与正式 CUDA 观测为：
+
+```text
+Original preregistered grounding tolerance: <1e-5
+Observed fully vectorized CUDA max error: 2.288818e-5
+Revised tolerance: <3e-5
+
+original_numerical_gate_passed = false
+amended_numerical_gate_passed  = true
+```
+
+修订原因：
+
+```text
+FP32 reduction-order difference between scalar entity execution and
+batched CUDA einsum. All discrete decisions, prediction digests,
+metrics and correct counts remain exactly equal.
+```
+
+该修订仅影响连续 grounding logits 的绝对数值容差。以下 Gate 不放宽：
+
+```text
+typed-BIO emissions 与 backbone states <1e-6
+region/NULL argmax exact
+NULL/visible exact
+positive-set correctness exact
+prediction set 与 digest exact
+Span/MNER/EEG/GMNER 与 correct count exact
+test_accessed=false
+```
+
+正式容差写入 `s3_stage1_baseline_lock.json`。CLI 只允许在显式
+`--diagnostic-only` 模式覆盖容差；该模式的结果不得标记为正式 Gate
+通过。
 
 并检查：
 

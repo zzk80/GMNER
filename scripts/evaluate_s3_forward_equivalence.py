@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -34,12 +35,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--emission-tolerance",
         type=float,
-        default=1e-6,
+        default=None,
+        help=(
+            "Diagnostic override. Formal runs must equal the baseline lock."
+        ),
     )
     parser.add_argument(
         "--grounding-tolerance",
         type=float,
-        default=1e-5,
+        default=None,
+        help=(
+            "Diagnostic override. Formal runs must equal the baseline lock."
+        ),
+    )
+    parser.add_argument(
+        "--diagnostic-only",
+        action="store_true",
+        help=(
+            "Allow unlocked tolerances, but make the result ineligible for "
+            "the formal S3.0 Gate."
+        ),
     )
     parser.add_argument(
         "--output",
@@ -63,6 +78,60 @@ def _sha256(path: Path) -> str:
 
 def main() -> None:
     args = parse_args()
+    root = Path(__file__).resolve().parents[1]
+    config_path = _resolve(args.config, root)
+    checkpoint_path = _resolve(args.checkpoint, root)
+    lock_path = _resolve(args.baseline_lock, root)
+    output_path = _resolve(args.output, root)
+    baseline_lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    gate_lock = dict(baseline_lock.get("s3_0_gate") or {})
+    if not gate_lock:
+        raise ValueError("Baseline lock is missing the S3.0 Gate contract.")
+    locked_emission_tolerance = float(
+        gate_lock["emission_tolerance"]
+    )
+    locked_grounding_tolerance = float(
+        gate_lock["grounding_tolerance"]
+    )
+    original_grounding_tolerance = float(
+        gate_lock["original_grounding_tolerance"]
+    )
+    emission_tolerance = (
+        locked_emission_tolerance
+        if args.emission_tolerance is None
+        else float(args.emission_tolerance)
+    )
+    grounding_tolerance = (
+        locked_grounding_tolerance
+        if args.grounding_tolerance is None
+        else float(args.grounding_tolerance)
+    )
+    tolerance_matches_lock = (
+        math.isclose(
+            emission_tolerance,
+            locked_emission_tolerance,
+            rel_tol=0.0,
+            abs_tol=0.0,
+        )
+        and math.isclose(
+            grounding_tolerance,
+            locked_grounding_tolerance,
+            rel_tol=0.0,
+            abs_tol=0.0,
+        )
+    )
+    if not tolerance_matches_lock and not args.diagnostic_only:
+        raise ValueError(
+            "Formal S3.0 tolerances are locked. Use --diagnostic-only "
+            "for a non-formal tolerance experiment."
+        )
+    if _sha256(config_path) != baseline_lock["config"]["sha256"]:
+        raise ValueError("Formal Stage1 config differs from the baseline lock.")
+    if _sha256(checkpoint_path) != baseline_lock["checkpoint"]["sha256"]:
+        raise ValueError(
+            "Formal Stage1 checkpoint differs from the baseline lock."
+        )
+
     from gmner.config import load_config
     from gmner.constants import DEFAULT_LABEL2ID
     from gmner.data import (
@@ -78,19 +147,6 @@ def main() -> None:
     )
     from gmner.models import GMNERModel, LegacyStage1RecordWrapper
     from gmner.utils.io import maybe_convert_conll
-
-    root = Path(__file__).resolve().parents[1]
-    config_path = _resolve(args.config, root)
-    checkpoint_path = _resolve(args.checkpoint, root)
-    lock_path = _resolve(args.baseline_lock, root)
-    output_path = _resolve(args.output, root)
-    baseline_lock = json.loads(lock_path.read_text(encoding="utf-8"))
-    if _sha256(config_path) != baseline_lock["config"]["sha256"]:
-        raise ValueError("Formal Stage1 config differs from the baseline lock.")
-    if _sha256(checkpoint_path) != baseline_lock["checkpoint"]["sha256"]:
-        raise ValueError(
-            "Formal Stage1 checkpoint differs from the baseline lock."
-        )
 
     config = load_config(config_path)
     if args.text_model_name:
@@ -163,26 +219,47 @@ def main() -> None:
     )
     teacher.to(device).eval()
     wrapper = LegacyStage1RecordWrapper(teacher).to(device).eval()
+    formal_gate_eligible = (
+        args.max_records is None
+        and not args.diagnostic_only
+        and tolerance_matches_lock
+    )
     report = evaluate_s3_forward_equivalence(
         teacher=teacher,
         wrapper=wrapper,
         dataloader=dataloader,
         device=device,
-        emission_tolerance=args.emission_tolerance,
-        grounding_tolerance=args.grounding_tolerance,
+        emission_tolerance=emission_tolerance,
+        grounding_tolerance=grounding_tolerance,
+        original_grounding_tolerance=(
+            original_grounding_tolerance
+        ),
         expected_baseline=(
-            baseline_lock if args.max_records is None else None
+            baseline_lock if formal_gate_eligible else None
         ),
     )
     report["config_sha256"] = _sha256(config_path)
     report["checkpoint_sha256"] = _sha256(checkpoint_path)
+    report["locked_tolerances"] = {
+        "emission": locked_emission_tolerance,
+        "grounding": locked_grounding_tolerance,
+        "original_grounding": original_grounding_tolerance,
+    }
+    report["tolerance_matches_lock"] = tolerance_matches_lock
+    report["diagnostic_only"] = bool(args.diagnostic_only)
+    report["formal_gate_eligible"] = formal_gate_eligible
+    report["formal_gate_passed"] = bool(
+        formal_gate_eligible and report["gate_passed"]
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
         json.dumps(report, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    if not report["gate_passed"]:
+    if formal_gate_eligible and not report["formal_gate_passed"]:
+        raise SystemExit(2)
+    if not formal_gate_eligible and not report["gate_passed"]:
         raise SystemExit(2)
 
 

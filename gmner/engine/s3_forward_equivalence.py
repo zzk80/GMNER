@@ -18,6 +18,14 @@ from gmner.utils.metrics import extract_entities_from_word_labels
 
 _ID2LABEL = {value: key for key, value in DEFAULT_LABEL2ID.items()}
 _METRICS = ("span", "mner", "eeg", "gmner")
+_GROUNDING_STAGES = (
+    "raw_logits",
+    "after_entity_null_prior",
+    "after_global_null_bias",
+    "after_detector_prior",
+    "after_compatibility_prior",
+    "formal_logits",
+)
 
 
 def _max_abs(left: torch.Tensor, right: torch.Tensor) -> float:
@@ -443,6 +451,18 @@ def _metric_report(
     return output
 
 
+def _grounding_numerical_gate(
+    errors: dict[str, float],
+    tolerance: float,
+) -> bool:
+    """Evaluate the preregistered grounding stages at one tolerance."""
+
+    return all(
+        float(errors[name]) < float(tolerance)
+        for name in _GROUNDING_STAGES
+    )
+
+
 @torch.no_grad()
 def evaluate_s3_forward_equivalence(
     *,
@@ -452,6 +472,7 @@ def evaluate_s3_forward_equivalence(
     device: torch.device,
     emission_tolerance: float = 1e-6,
     grounding_tolerance: float = 1e-5,
+    original_grounding_tolerance: float = 1e-5,
     expected_baseline: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Compare old scalar and new record-level paths on fixed Dev records."""
@@ -466,14 +487,7 @@ def evaluate_s3_forward_equivalence(
         "fused_global": 0.0,
         "alignment_score": 0.0,
     }
-    grounding_errors = {
-        "raw_logits": 0.0,
-        "after_entity_null_prior": 0.0,
-        "after_global_null_bias": 0.0,
-        "after_detector_prior": 0.0,
-        "after_compatibility_prior": 0.0,
-        "formal_logits": 0.0,
-    }
+    grounding_errors = {name: 0.0 for name in _GROUNDING_STAGES}
     emission_error = 0.0
     decoded_equal = True
     grounding_argmax_equal = True
@@ -699,6 +713,14 @@ def evaluate_s3_forward_equivalence(
     new_sha = new_digest.hexdigest()
     old_sha = old_digest.hexdigest()
     prediction_set_equal &= old_sha == new_sha
+    original_numerical_gate_passed = _grounding_numerical_gate(
+        grounding_errors,
+        original_grounding_tolerance,
+    )
+    amended_numerical_gate_passed = _grounding_numerical_gate(
+        grounding_errors,
+        grounding_tolerance,
+    )
     checks: dict[str, bool] = {
         "backbone_forward_states": all(
             value < emission_tolerance
@@ -776,6 +798,29 @@ def evaluate_s3_forward_equivalence(
         "tolerance": {
             "emissions_and_states": float(emission_tolerance),
             "grounding": float(grounding_tolerance),
+            "original_grounding": float(
+                original_grounding_tolerance
+            ),
+        },
+        "original_numerical_gate_passed": (
+            original_numerical_gate_passed
+        ),
+        "amended_numerical_gate_passed": (
+            amended_numerical_gate_passed
+        ),
+        "numerical_gate_history": {
+            "original_grounding_tolerance": float(
+                original_grounding_tolerance
+            ),
+            "amended_grounding_tolerance": float(
+                grounding_tolerance
+            ),
+            "original_numerical_gate_passed": (
+                original_numerical_gate_passed
+            ),
+            "amended_numerical_gate_passed": (
+                amended_numerical_gate_passed
+            ),
         },
         "max_abs_error": {
             "backbone_states": state_errors,

@@ -7,6 +7,7 @@ import torch.nn as nn
 
 from gmner.constants import DEFAULT_LABEL2ID, ENTITY_TYPE2ID, IGNORE_INDEX
 from gmner.engine.s3_forward_equivalence import (
+    _grounding_numerical_gate,
     _match_formal_record_predictions,
     evaluate_s3_forward_equivalence,
 )
@@ -216,6 +217,8 @@ def test_eval_wrapper_matches_scalar_teacher_and_digest() -> None:
         device=torch.device("cpu"),
     )
     assert report["gate_passed"] is True
+    assert report["original_numerical_gate_passed"] is True
+    assert report["amended_numerical_gate_passed"] is True
     assert report["checks"]["prediction_set"] is True
     assert (
         report["max_abs_error"]["grounding"]["formal_logits"] < 1e-6
@@ -271,3 +274,16 @@ def test_formal_metric_does_not_treat_candidate_missing_as_null() -> None:
     assert len(matches["mner"]) == 1
     assert len(matches["eeg"]) == 0
     assert len(matches["gmner"]) == 0
+
+
+def test_amended_grounding_gate_preserves_original_failure() -> None:
+    errors = {
+        "raw_logits": 2.288818359375e-5,
+        "after_entity_null_prior": 2.288818359375e-5,
+        "after_global_null_bias": 2.288818359375e-5,
+        "after_detector_prior": 2.288818359375e-5,
+        "after_compatibility_prior": 2.288818359375e-5,
+        "formal_logits": 2.288818359375e-5,
+    }
+    assert _grounding_numerical_gate(errors, 1e-5) is False
+    assert _grounding_numerical_gate(errors, 3e-5) is True
