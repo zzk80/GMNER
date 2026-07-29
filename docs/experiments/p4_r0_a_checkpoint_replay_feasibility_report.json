@@ -1,0 +1,2476 @@
+{
+  "kind": "p4_r0_a_checkpoint_replay_feasibility_report",
+  "format_version": 1,
+  "phase": "P4-R0-A_checkpoint_replay_feasibility",
+  "status": "P4_R0_A_CHECKPOINT_REPLAY_BLOCKED",
+  "implementation": {
+    "git_head": "ca8729351a4ae9899666e12e92842b6943bfc5b0",
+    "contract_path": "gmner/data/p4_r0_replay_contract.py",
+    "contract_sha256": "10350c22b0f8964f0c5541209eae16694a0351290b4bfd1d950a6451bc723395",
+    "driver_path": "scripts/audit_p4_r0_checkpoint_replay.py",
+    "driver_sha256": "de2d8b036a22c61496cd7263a86ee628238de2490d9300e627f8c93133c8036f",
+    "preregistration_path": "docs/experiments/p4_r0_full_chain_oof_r16_regeneration_preregistration.json",
+    "preregistration_sha256": "35f279e6893774596b9bc4e02ad020eb590df08f75a0bdb6faa036a93b457743",
+    "external_inventory_path": "docs/experiments/p4_r0_a_external_artifact_inventory.json",
+    "external_inventory_sha256": "c812c68a9a218debc7c91f6938042dd2e0ec73d54305a9044e14e32a0a0522ea"
+  },
+  "authorization": {
+    "r0_a_read_only_audit": true,
+    "r0_a_checkpoint_replay_execution": false,
+    "r0_b_full_oof_retraining": false,
+    "checkpoint_or_cache_deserialization": false,
+    "model_execution": false,
+    "candidate_generation": false,
+    "oracle": false,
+    "p4_1": false,
+    "downstream_rebuild": false,
+    "calibration_folds_8_9": false,
+    "dev_access": false,
+    "test_access": false
+  },
+  "access_contract": {
+    "folds_read": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "checkpoint_payloads_loaded": 0,
+    "candidate_payloads_loaded": 0,
+    "training_records_parsed": 0,
+    "calibration_folds_opened": false,
+    "dev_accessed": false,
+    "test_accessed": false,
+    "oracle_labels_computed": false,
+    "model_executed": false
+  },
+  "fold_provenance": [
+    {
+      "fold_id": 0,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "eedd3798aa76c70c56ecff4970cd44246dee3899a2575c71a498e8bb0bb624d4",
+      "heldout_record_ids_sha256": "b4f02911a85ddb40cd1d228ed124404f39941a61a4baf9b28f3894eb8bad3115",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 0,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "8385e925240c1e1cd6cc38da14ce77356806148d852d63851516d07e9ee894e0"
+        },
+        {
+          "fold_id": 0,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "a36de5ed912168a0e7e51ca1f822c0767c61b0b438d0a9cdd1b006557e155dec"
+        },
+        {
+          "fold_id": 0,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "4fd05ac3a2f1ad492d4fa3f6c7252a704a5836e5363bfc63a6af049b70e141bd"
+        },
+        {
+          "fold_id": 0,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "5f6ec94883cbf0c46dda9c0b78e9f5e228e7dfcd39b31331a97932f7f14a7bc1"
+        },
+        {
+          "fold_id": 0,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "8bab4165347e2b851c051e5d7fa5c9f8b211cfce4fbb0d01de28dfeb9e5fc599"
+        },
+        {
+          "fold_id": 0,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "5ce6acb585142232d9b7412b60b8b2db4b6bf7da9825fb049c5d61747e690d10"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 0,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold0/configs/stage1.yaml",
+          "sha256": "0862362e4805ee2579964b4bb159f0a5f5ce8a5e2020ee0d5bfa719ee9480d7c",
+          "seed": 42
+        },
+        {
+          "fold_id": 0,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold0/configs/hierarchical.yaml",
+          "sha256": "990064ab0e12baecae06f5fb80d6eaec9de1b4f582da9e1f3013ed360107822d",
+          "seed": 42
+        },
+        {
+          "fold_id": 0,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold0/configs/coarse.yaml",
+          "sha256": "0c1f5df740da8114a31ceb11b5111239f25b33be362e13082ff6fc6b444805cb",
+          "seed": 42
+        },
+        {
+          "fold_id": 0,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold0/configs/fine.yaml",
+          "sha256": "7cb8edaa7a8a6a382bff6f28e19c700b4417e8ca8d41d34d21c33d59549a6bae",
+          "seed": 42
+        },
+        {
+          "fold_id": 0,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold0/configs/evidence.yaml",
+          "sha256": "fe503473363d94330c908096c647064dd76934c64e0237282ac5cf0271de5a7c",
+          "seed": 42
+        },
+        {
+          "fold_id": 0,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold0/configs/reliability.yaml",
+          "sha256": "a09c7612b70e4592fca4932e4b0ac688fa1fc3aa1d30b368773ead67c1f96982",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 0,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 0,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold0.jsonl",
+          "basename": "train_fold0.jsonl",
+          "expected_sha256": "c4e9f9842c87a4487764f9b2e2a142b4251f06623f562b7fbffa78b88ec421ea"
+        },
+        {
+          "fold_id": 0,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold0.jsonl",
+          "basename": "heldout_fold0.jsonl",
+          "expected_sha256": "93851c535075ae440822715b84f661e89a0ed569b9d529a82175c686534fe6c5"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "b3ee511598112d084a014ace55b4dcd408fb67688a3ffabb0bfea5705acb0d91",
+        "expanded_cache_sha256": "6ac622170e98db635bb2a6c52b504293e78b810f2ff2cf773370db8ed348a59f",
+        "siglip2_manifest_sha256": "a4576b68d995889b78b29891f2efb25e081873b833ad183f9bdd1d175ceb3a35",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "5068a24b0c26722f5cfb06383aa7c26c96d8bf7273ff30357a46d1d36f858ff0",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 1,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "6575095714c27ae5ea89fd277125a6b6bbfab0e78cf27f7442eb7f07856e715b",
+      "heldout_record_ids_sha256": "6d2d51fdb412a122ae1c76bd91d0f1d2aedb6367d79e1250f5050b72557f1c8c",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 1,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "46e24a4877375d0f59587be28cc88e13219f5b8013d1fde4e925d3b8a3b87b4d"
+        },
+        {
+          "fold_id": 1,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "8eb4e260fec4571abae817dfe24a887cfd2bc1bf70a3a642e2801a46f2cbdff1"
+        },
+        {
+          "fold_id": 1,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "cb4d69665768a6964dad9ef7e8fa13062c25643c5b40483fd6eacd391fa14d55"
+        },
+        {
+          "fold_id": 1,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "f1ec78d78fcc883f9b6c4ea797a29b15f9eab7991696edd56bde56bc1ad5656e"
+        },
+        {
+          "fold_id": 1,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "22e72cbf2e24817b1ca351bb56ca88b4d3ed524ad3e3e5e9eb8c75fbb4371d71"
+        },
+        {
+          "fold_id": 1,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "99bd5fc83a64267abcaea2cf84365fe4297ceaec52f0187f273442c8ba5abba7"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 1,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold1/configs/stage1.yaml",
+          "sha256": "cbbf61aef1dd4ce5ba0a3cd988da6b6c63389ddfa85e2fe0ce9fce31efc66bbb",
+          "seed": 42
+        },
+        {
+          "fold_id": 1,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold1/configs/hierarchical.yaml",
+          "sha256": "c9c476e2c8ffac5c2cef175ce4b4c49df80e9745b51a89c627dc833fcccca8e3",
+          "seed": 42
+        },
+        {
+          "fold_id": 1,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold1/configs/coarse.yaml",
+          "sha256": "8bd699f549634e6621e1029e71b01f01879c671de7c601e9aec930a01ea56639",
+          "seed": 42
+        },
+        {
+          "fold_id": 1,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold1/configs/fine.yaml",
+          "sha256": "1a4b2df4edace4b0a60fe749e648467e5db19a822c5ec96232b76d4775eed1fb",
+          "seed": 42
+        },
+        {
+          "fold_id": 1,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold1/configs/evidence.yaml",
+          "sha256": "40e6f3ccffcf89e34320d71fc842fae6d9641bfa302cebb643cc4dc73edd4a4f",
+          "seed": 42
+        },
+        {
+          "fold_id": 1,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold1/configs/reliability.yaml",
+          "sha256": "fdc5ad9f5d23cb58b02cf8f7c6ae47c9a4d20252bcab90da147cb98f80ee765d",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 1,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 1,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold1.jsonl",
+          "basename": "train_fold1.jsonl",
+          "expected_sha256": "a99bd7b6af76ee4bfc09bd5989eae08ee7361147f2a23cd60e34fce5cd3bcb7e"
+        },
+        {
+          "fold_id": 1,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold1.jsonl",
+          "basename": "heldout_fold1.jsonl",
+          "expected_sha256": "44cb3c3742f99bc48c88afc3fa6c49b48a30c2014d8873bfe7ad0625f005ea2d"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "17f546845ec4f3c168b4d5f7b3865cf6be97d622af03274f992d45bfeb3a978a",
+        "expanded_cache_sha256": "850771e9002b8b412fa20bd34ab75c2f3fc2488e20a9879482407a43c4d69c6a",
+        "siglip2_manifest_sha256": "9aa411d5dd20c2668208ff0999f6e6ebce01caa5803e66e8b99e3f281f40a37c",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "34de33567e90671992c84c8c97df1c6b0015a82e6831340f80514e1b84560524",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 2,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "67455b7c461963d687f271338d3377af11744156edd7281500b3d9bd8071cb1f",
+      "heldout_record_ids_sha256": "35f89f8712e18150fb521d26bbee7cc3db1b538d2d2a12dfbf0a2875f74722d6",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 2,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "f762aae149a10b9e24e6c3a4c0e218745045bd977d2808995e9901ae72192234"
+        },
+        {
+          "fold_id": 2,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "28fbcc13dc886669b40d5a9379988054cb61b9e8ae872526ee224b3f997d6d65"
+        },
+        {
+          "fold_id": 2,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "4e6b03985b1ba196fd5989de68a314137f434df596cbbfea7cd18c57716eadee"
+        },
+        {
+          "fold_id": 2,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "73412803acfa2241b463318ed3b27e9278df1d9777a237760863066292f56724"
+        },
+        {
+          "fold_id": 2,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "0ea86b0ca4c8f5a18db08950e3a8d1d8bd2086ce4b418ae06cd6dc1c185a0a34"
+        },
+        {
+          "fold_id": 2,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "d6903c287c7147a11dfe0b46f1089bf3b43f7a874e59fa35e875199578ee7bf1"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 2,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold2/configs/stage1.yaml",
+          "sha256": "6332a0778d4e5c2824b726fe0339d4f0e4724ab21c61dbdb68b281e3da326ab5",
+          "seed": 42
+        },
+        {
+          "fold_id": 2,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold2/configs/hierarchical.yaml",
+          "sha256": "a0200417e269f94e1f32356c5a878ed1e2f46603c68d95e0b762b66aac099e80",
+          "seed": 42
+        },
+        {
+          "fold_id": 2,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold2/configs/coarse.yaml",
+          "sha256": "7ca49a8b84cacf965ed04956a8335ea2d09201833fd8b7889352289e520b8163",
+          "seed": 42
+        },
+        {
+          "fold_id": 2,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold2/configs/fine.yaml",
+          "sha256": "204c9404e6c3e921cff8fd91dbf8922878cc63909d7294195ad01bc01030641e",
+          "seed": 42
+        },
+        {
+          "fold_id": 2,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold2/configs/evidence.yaml",
+          "sha256": "48fe1283c61fd0bf5cf6cd75c4000ae10a33145e7d9d68fe3476c9d8eaae76d8",
+          "seed": 42
+        },
+        {
+          "fold_id": 2,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold2/configs/reliability.yaml",
+          "sha256": "f5b26d7955ccee86f8200181e938bbd720fe1f5714dd205a05cfa1ab4a837395",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 2,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 2,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold2.jsonl",
+          "basename": "train_fold2.jsonl",
+          "expected_sha256": "28b11cb7b62d1aad734b6f6117489bc8113d7ad8d3a8a5ba148a40fb655e3f0e"
+        },
+        {
+          "fold_id": 2,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold2.jsonl",
+          "basename": "heldout_fold2.jsonl",
+          "expected_sha256": "0be10acd467bf4f9fa78e7637442bcdc5eae66baab93b43fda26deba1988efa5"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "078fb5c8d8ea677a1dad696f9201c3e3c7791cff6a2c36e7bd56ce2e32e2aec3",
+        "expanded_cache_sha256": "68188577975c78b8f95ed30da06e68c9652215017ed3d26dd6bd2bc0b1a72348",
+        "siglip2_manifest_sha256": "400b7d6f7131631dcfaa03f41e1a9ba9989cf2c0e143043add789076a3202042",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "0bd6d7ca35fa45b74a143995381f500ba77a01cf4a4c6d102a8e4ff1b9515337",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 3,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "760e31876a4f3b2805f5c753dc72aa1c6290a491a085afa93c8681e85c503a19",
+      "heldout_record_ids_sha256": "610226e90e6ac0935526f653402971b761bc8e8826090e68ac8f741434697359",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 3,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "843f6b2d90074a15fe88d6e4d590eadebdd66bdfbd29ba7e5a541a163ef7f168"
+        },
+        {
+          "fold_id": 3,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "16eb266112ec265dafe84c61bb4e026386024d60dd9a50060b09f8a3acca3452"
+        },
+        {
+          "fold_id": 3,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "fd459aa6b0546ef06769792127ba67062c8c2e8f8234820d3b425a0869b1e4ef"
+        },
+        {
+          "fold_id": 3,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "8148acbcbe2fb7585c1d9773089837ad0254e28563661bbd3f8a7db9ff231397"
+        },
+        {
+          "fold_id": 3,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "0dea33c66a051aa8b9719cd534508a3b858d2518c5764866461e0713ff07a1ba"
+        },
+        {
+          "fold_id": 3,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "58e4459566634faacf58d9d75bcb23062bd4724eade5d2e4011a5d73e534dc5d"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 3,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold3/configs/stage1.yaml",
+          "sha256": "a8f4d11a65a96618eb6c2230aa60eafcb1bfc1a12c4cfdc23275729b71ec7ffd",
+          "seed": 42
+        },
+        {
+          "fold_id": 3,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold3/configs/hierarchical.yaml",
+          "sha256": "270335db5e1c01095a580231d6ccb6c510bee5768bd4a8444e52190f905659a4",
+          "seed": 42
+        },
+        {
+          "fold_id": 3,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold3/configs/coarse.yaml",
+          "sha256": "04c66f18ce12d7c3cc9207447296ad20cda832dc27b42b4cdd054a835a980238",
+          "seed": 42
+        },
+        {
+          "fold_id": 3,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold3/configs/fine.yaml",
+          "sha256": "82ca29f14f8be556cb315a3293fccc3545ad6c57e9af1b385dd29f8d44c76db1",
+          "seed": 42
+        },
+        {
+          "fold_id": 3,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold3/configs/evidence.yaml",
+          "sha256": "08d826c59c047ce10647fb6d2392437787a31d3c29bb2b7ebd874963e44440b0",
+          "seed": 42
+        },
+        {
+          "fold_id": 3,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold3/configs/reliability.yaml",
+          "sha256": "32c916cd2e7e1ba83a9d40af52c0a18b8b9418ce5c4130a119645dbec8baa0cc",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 3,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 3,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold3.jsonl",
+          "basename": "train_fold3.jsonl",
+          "expected_sha256": "606516493513790021ad4fa01daaaf0af2c8cb32d4486eb08a3897db6c149e34"
+        },
+        {
+          "fold_id": 3,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold3.jsonl",
+          "basename": "heldout_fold3.jsonl",
+          "expected_sha256": "6204ab2debd18083d16131dca1c127f3b12c2c04ebab3d6b45d76413454087f0"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "dc9430308165a17a863a527a2e07f9a5c6d5cd159b700e9794afe9abdaee90a1",
+        "expanded_cache_sha256": "be6e5594c2e87897249ed73339b09a93c0b2f05b4b3d7a220ed67671379b9d03",
+        "siglip2_manifest_sha256": "6e823b3b6fcb99a5351ad6d1703af72216299d5dabebb85e9697b7f098034949",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "f1884138d4a1865dea73af429556b06baa0dd24ce353f2c0116a34b7b49135b0",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 4,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "041ed1fd1acb9594e0c88896ef18b560a117ce3366c4afefab9b43a85bc0fee5",
+      "heldout_record_ids_sha256": "2e569cdf987df0034fbf439326e888fe155ca9cfa982597d6b829aa5c0e55dee",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 4,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "68f8faab067d3316f721ded1688d4d0790b2258cf658fc8c76abf2a59abedbb1"
+        },
+        {
+          "fold_id": 4,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "6bb80f944131903e78b2e1c7fd6560cccf34d73a6ab0a1f5cf0434c1f55d8e89"
+        },
+        {
+          "fold_id": 4,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "0179335abc0807d326bae83964b03c18de4d99a8c60e8c16388a7ad7c7f5a172"
+        },
+        {
+          "fold_id": 4,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "aaa5ae2e4f025927bb985f8b2984dee467da9a7c88ee8d006256f34b8dd4b3a4"
+        },
+        {
+          "fold_id": 4,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "61f422604e561be37e861854d1feb5c4ffe2a256e23f2da5ce9bec8f34248f38"
+        },
+        {
+          "fold_id": 4,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "9311819b86dbacc2da7d4a97e77fb4298511b68410c2c7b707da45cce9900b58"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 4,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold4/configs/stage1.yaml",
+          "sha256": "6822d1b9469909a433fb415e4ce1816a9e73860417ee1e6c5604d64db55d9f50",
+          "seed": 42
+        },
+        {
+          "fold_id": 4,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold4/configs/hierarchical.yaml",
+          "sha256": "f4cee85ed4ab8604d17a09453c4ddc39cd8c261590448c67d0d32292f38be7d5",
+          "seed": 42
+        },
+        {
+          "fold_id": 4,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold4/configs/coarse.yaml",
+          "sha256": "9dc0e644b3bf6650c6d248d679b4155b8bad7a5d0a99eaa680a423808d7638c5",
+          "seed": 42
+        },
+        {
+          "fold_id": 4,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold4/configs/fine.yaml",
+          "sha256": "c5315c4ad256ccd5c98dfaca28ebd0d3116829c88c426f097a2f1b476c79fbd1",
+          "seed": 42
+        },
+        {
+          "fold_id": 4,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold4/configs/evidence.yaml",
+          "sha256": "59cf62fffb18e70503653814e505d1f1f74ddd0a650c10d34cbd8e818bdc5a7d",
+          "seed": 42
+        },
+        {
+          "fold_id": 4,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold4/configs/reliability.yaml",
+          "sha256": "0ad149d945521fc738e5314abdf97c9f2cdac768168b62bbf03f45da7f2c723a",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 4,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 4,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold4.jsonl",
+          "basename": "train_fold4.jsonl",
+          "expected_sha256": "c06154b063b83dd61f6d505438f62dc89352f7b31c1138b142bdf95ba41dd04b"
+        },
+        {
+          "fold_id": 4,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold4.jsonl",
+          "basename": "heldout_fold4.jsonl",
+          "expected_sha256": "ba3c31b85e88b116bdc0ef67fa0e5ab6517e686da8a7ad7d0390517a15bab907"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "560d50dea68f8e66c2cee4c7712e2c4517de80c47d33fdb23d51196fbf9d12c2",
+        "expanded_cache_sha256": "2232fbf7e009b5a69d36711859480aaaa57570e013e538db1d374fdf3ac5256c",
+        "siglip2_manifest_sha256": "d358f9f8a6b3251be76d2f1049cf6c69ec1f22565d09fe2db78a95dea7abf7c6",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "a7ec424dc46df5dac509ac1a1319905847677ae9515ed57a0f56880c9deb1e27",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 5,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "c1842981bec2fdb8d1a86a1c6c67b0b4c867fb3ea111a41f59276446ff1c81e8",
+      "heldout_record_ids_sha256": "f399389134cf353de75e9a089b6db324ac08d6f561b97c4f575163839d1422b5",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 5,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "a6ac40ff345c042a82e640a6bb52c2b54a05216da107a1a574357787936ccedb"
+        },
+        {
+          "fold_id": 5,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "2a3c0f423f8f1b661de50cb76bd35af37c539da67d33c00637d7eae4409654e1"
+        },
+        {
+          "fold_id": 5,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "1b91ac062923e351b84d47088e188d67b40231091d1b1e852da22f2241cd31f4"
+        },
+        {
+          "fold_id": 5,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "49f282b0abd628723ea6aef08943a7c23cdb5141fbdc53cc0082651458b835cf"
+        },
+        {
+          "fold_id": 5,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "13ec3a4e15909990807293dca141250c2f5d796be3db80454a1a76359d83810c"
+        },
+        {
+          "fold_id": 5,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "59a3515f6d84de37fc195d8355a04a6b79e65debdd752ec44d5e579a1818a9d4"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 5,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold5/configs/stage1.yaml",
+          "sha256": "39879b1efe932bc6078c70ff04ace5528bc313c8f9a1652857fc74d9cadfb74c",
+          "seed": 42
+        },
+        {
+          "fold_id": 5,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold5/configs/hierarchical.yaml",
+          "sha256": "2c4bf9da984c3c6aee52173352c4a03b0575f1e56703b57c3bf0620e21cb90b0",
+          "seed": 42
+        },
+        {
+          "fold_id": 5,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold5/configs/coarse.yaml",
+          "sha256": "a3a5324449619c3e85eeceab478a894606b49b522c294636711d93537dea01cf",
+          "seed": 42
+        },
+        {
+          "fold_id": 5,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold5/configs/fine.yaml",
+          "sha256": "8b4d45b1dcb9634ad02ac3fce0e9b21aacd555bc3b521667cafcd5bbdb69af0e",
+          "seed": 42
+        },
+        {
+          "fold_id": 5,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold5/configs/evidence.yaml",
+          "sha256": "5537f8b2f7eb938c41262d7dc2f049407fdf30302118d41f3d49bdeb6048701c",
+          "seed": 42
+        },
+        {
+          "fold_id": 5,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold5/configs/reliability.yaml",
+          "sha256": "bebfa583d1b29742a8597e384bfd7bf2f0ee398ca86f119ffcb446205c1a7a18",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 5,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 5,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold5.jsonl",
+          "basename": "train_fold5.jsonl",
+          "expected_sha256": "682b19921cd23d611f5417308e9c8eab3a2993edf5828eb2119329090266b5eb"
+        },
+        {
+          "fold_id": 5,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold5.jsonl",
+          "basename": "heldout_fold5.jsonl",
+          "expected_sha256": "09ef6e7d27ba41775b85a61abe6e712ffc78563e562be0dd691dd347668be981"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "60048d936830ecbc09eb9f341cd779d2e909fb143e6d6c5e1ca5d12e2c67ff00",
+        "expanded_cache_sha256": "b87098b09b00ecc35d19c43c34b569cef56cad0b2e50225ca62997527f8986e0",
+        "siglip2_manifest_sha256": "3b38777bf093d62b71c0eede25a7f3ae5417392647f4d4686c9eae3ad1c9a505",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "e1b71d34a9b9c6ae5f33c8704d8eb82c819fe917df545de2dcc7ce26bae3d23e",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 6,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "5788a4df966f7fbf0ae65fdcd96e05fcd4e0654498cdbbb5a68948ab541d7e24",
+      "heldout_record_ids_sha256": "4afe149317f6d9a76a209202d7a53aadcb0bdf21a3a32aa03312bd57a92671df",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 6,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "26d05aec71068414feaa6158b01d11a17f0d1b2b39b32ea92cd44f662f919cf9"
+        },
+        {
+          "fold_id": 6,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "0774c328e5edbeda61c3484fcb3502dd5b005d26f5ae8caffdea8c5ee7b65443"
+        },
+        {
+          "fold_id": 6,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "01265d6a6706cd639688976f0ba95d77bf040fd50a7064cc12b37652824294cf"
+        },
+        {
+          "fold_id": 6,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "8da310c54629d00a022dd666807ee8cd7c795c46928b6179f4187f52e8b5ce68"
+        },
+        {
+          "fold_id": 6,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "cd3716af2f42233ccba0c91732c9ee0670ce25efb3c275bc3a8dac077ef658e0"
+        },
+        {
+          "fold_id": 6,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "b4fc3d9e2e126c1e3232ced0e262106084c786650fc6cadcaae3c1033684ec3d"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 6,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold6/configs/stage1.yaml",
+          "sha256": "0e82312c093858283fb9cd0accc07e740f68ed9fa5265170608bbe1fd2168234",
+          "seed": 42
+        },
+        {
+          "fold_id": 6,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold6/configs/hierarchical.yaml",
+          "sha256": "88159c1320bc004672d67fd84b1f8fcb9c053e7c722da17b95489bfb3ff3398d",
+          "seed": 42
+        },
+        {
+          "fold_id": 6,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold6/configs/coarse.yaml",
+          "sha256": "d14bb9dce6e8f237fc2bebc2df1ae13aaf194c77364a52ff8c5b44ae3462a086",
+          "seed": 42
+        },
+        {
+          "fold_id": 6,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold6/configs/fine.yaml",
+          "sha256": "31b7f04e5986ce95a257d2a8697e2648c565a3c67cc2235bd5418defe404be8e",
+          "seed": 42
+        },
+        {
+          "fold_id": 6,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold6/configs/evidence.yaml",
+          "sha256": "6690e7c227b302b859d5ef5710ebfffec1d60aabfc1b26a0ed5b9ca9a0f73766",
+          "seed": 42
+        },
+        {
+          "fold_id": 6,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold6/configs/reliability.yaml",
+          "sha256": "b63177f03b461969e7cb5f86a12693ff4c7076908b42669e882d6874480ed950",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 6,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 6,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold6.jsonl",
+          "basename": "train_fold6.jsonl",
+          "expected_sha256": "31b5388512eb5996c8a6b8aa7e6352cdf4a30eb74f9a4215d908b63e62aa246f"
+        },
+        {
+          "fold_id": 6,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold6.jsonl",
+          "basename": "heldout_fold6.jsonl",
+          "expected_sha256": "c6bc5a082c4d7aeebbfc7edb8e36542e78676fed53d31fd7c87e69c2cfdb5769"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "0282ce6e247273a64dc3602be2b7a148224fb5df2d401650de8c8e7da62279b6",
+        "expanded_cache_sha256": "994e2b818ab115ce62a729565da8f207804b7a9e5df268577c422522e8ac5612",
+        "siglip2_manifest_sha256": "665bc76935d6d404cef8fe319beff44861f610ea94981e12bb3d1950010e73b8",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "19c01fd02caaa28dd35be0bfc61ee74ffd503d83e2071c619069a98a7a9bd7bd",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "fold_id": 7,
+      "status": "PROVENANCE_VALID",
+      "records": {
+        "training": 6300,
+        "heldout": 700
+      },
+      "train_record_ids_sha256": "2469d30b7d45ca0b26d71b941d48d3ebfff2ac11e02193e564b6066aa242568d",
+      "heldout_record_ids_sha256": "b09afe749e67be21e0a63bbb4598bc03fcd933c31bfc41e55c55e7e0e2610176",
+      "heldout_excluded": true,
+      "source_tree_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+      "checkpoint_expectations": [
+        {
+          "fold_id": 7,
+          "stage": "stage1",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/stage1/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "59335a96c252f26bde47f8ba06e881a806a4e53c77748a9d42215c6fdd327942"
+        },
+        {
+          "fold_id": 7,
+          "stage": "hierarchical",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/hierarchical/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "8bc03b8ea42dee976ad7b77b5636236b1eeaca1ae31fdec8114f76b9bdfc390e"
+        },
+        {
+          "fold_id": 7,
+          "stage": "coarse",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/coarse/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "665238ec48ddc080ac86c8afe14c8808eb9344e895e60f41249e8f22552a4299"
+        },
+        {
+          "fold_id": 7,
+          "stage": "fine",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/fine/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "ead6be9f5c53f73426668d3c269796b6e2438a3caa170f16ac94c0b3c55cf615"
+        },
+        {
+          "fold_id": 7,
+          "stage": "evidence",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/evidence/best_model.pt",
+          "basename": "best_model.pt",
+          "expected_sha256": "0289799da651a657f827a186839ac0aa6c37e0723225daf72b66b71390cd9411"
+        },
+        {
+          "fold_id": 7,
+          "stage": "reliability",
+          "artifact_kind": "checkpoint",
+          "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/reliability/best_ab_model.pt",
+          "basename": "best_ab_model.pt",
+          "expected_sha256": "fc410bab8c6928742d797d278fc4c7ea5bbb2abad7fd7644e81f1125406c683c"
+        }
+      ],
+      "config_artifacts": [
+        {
+          "fold_id": 7,
+          "stage": "stage1",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold7/configs/stage1.yaml",
+          "sha256": "60cdc63b433ff43e34209b674aa5fefb451aa3f8291054b148433804d4b01002",
+          "seed": 42
+        },
+        {
+          "fold_id": 7,
+          "stage": "hierarchical",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold7/configs/hierarchical.yaml",
+          "sha256": "ba5414468f2ea02da966513b37873b5050b3bfea4c7644798cc500599dad35f6",
+          "seed": 42
+        },
+        {
+          "fold_id": 7,
+          "stage": "coarse",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold7/configs/coarse.yaml",
+          "sha256": "9b59c6c34e74b6cceb942b0d865002c12427534c592774dc426b12d506a040bb",
+          "seed": 42
+        },
+        {
+          "fold_id": 7,
+          "stage": "fine",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold7/configs/fine.yaml",
+          "sha256": "440568a4a96d628d5157b3dab285db774e99673722fbaf73d55b2b20c77c95bd",
+          "seed": 42
+        },
+        {
+          "fold_id": 7,
+          "stage": "evidence",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold7/configs/evidence.yaml",
+          "sha256": "66e5178f37023cda8c83ec998203b84e68fa8d71549857af548b399e65a613de",
+          "seed": 42
+        },
+        {
+          "fold_id": 7,
+          "stage": "reliability",
+          "artifact_kind": "config",
+          "path": "C:/Users/Administrator/Desktop/代码/GMNER/knowledge/null_release_oof/roberta128/fold7/configs/reliability.yaml",
+          "sha256": "70a07f44c47ae1b8d152612da198060a1f49df329e642ae10077f77a7af752be",
+          "seed": 42
+        }
+      ],
+      "config_seeds": {
+        "stage1": 42,
+        "hierarchical": 42,
+        "coarse": 42,
+        "fine": 42,
+        "evidence": 42,
+        "reliability": 42
+      },
+      "fold_source_expectations": [
+        {
+          "fold_id": 7,
+          "artifact_kind": "fold_summary",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+          "basename": "fold_summary.json",
+          "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+        },
+        {
+          "fold_id": 7,
+          "artifact_kind": "train_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold7.jsonl",
+          "basename": "train_fold7.jsonl",
+          "expected_sha256": "806d31b893e1e147347b75cbbaef17e2a77eb4c97bc6a2151a6fc4901c8dac3c"
+        },
+        {
+          "fold_id": 7,
+          "artifact_kind": "heldout_source",
+          "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold7.jsonl",
+          "basename": "heldout_fold7.jsonl",
+          "expected_sha256": "2e7de58710175c2ef5567c4d04fb87f33521e5e58b3ea47003de57081e529047"
+        }
+      ],
+      "recorded_input_fingerprints": {
+        "formal_cache_sha256": "258487562edbf1c1a9d5905763b64139fdb9345ad79fb920c7171db4fd7de6e8",
+        "expanded_cache_sha256": "108240b4f7f3468f55d033f7e48cb1ee348eb7c083074b413c27e41db8d64058",
+        "siglip2_manifest_sha256": "95e77f89fbd2820c68a80d45133883a0dca7f6ba92790871749f71beea184579",
+        "vinvl_feature_tree_sha256": null,
+        "text_tokenizer_tree_sha256": null,
+        "grounding_prior_bundle_sha256": null
+      },
+      "candidate_command_sha256": "2858ba065677eae6125fb6581ec8658ce0f888584f63b521759edfb7c2b2b3c6",
+      "checkpoint_payloads_loaded": 0,
+      "candidate_payloads_loaded": 0,
+      "training_records_parsed": 0,
+      "dev_accessed": false,
+      "test_accessed": false
+    }
+  ],
+  "checkpoint_inventory": {
+    "required": 48,
+    "exact_available": 6,
+    "matches": [
+      {
+        "fold_id": 0,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "8385e925240c1e1cd6cc38da14ce77356806148d852d63851516d07e9ee894e0",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/stage1/best_model.pt"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "a36de5ed912168a0e7e51ca1f822c0767c61b0b438d0a9cdd1b006557e155dec",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/hierarchical/best_model.pt"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "4fd05ac3a2f1ad492d4fa3f6c7252a704a5836e5363bfc63a6af049b70e141bd",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/coarse/best_model.pt"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "5f6ec94883cbf0c46dda9c0b78e9f5e228e7dfcd39b31331a97932f7f14a7bc1",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/fine/best_model.pt"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "8bab4165347e2b851c051e5d7fa5c9f8b211cfce4fbb0d01de28dfeb9e5fc599",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/evidence/best_model.pt"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold0/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "5ce6acb585142232d9b7412b60b8b2db4b6bf7da9825fb049c5d61747e690d10",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/reliability/best_ab_model.pt"
+        ]
+      },
+      {
+        "fold_id": 1,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "46e24a4877375d0f59587be28cc88e13219f5b8013d1fde4e925d3b8a3b87b4d",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 1,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "8eb4e260fec4571abae817dfe24a887cfd2bc1bf70a3a642e2801a46f2cbdff1",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 1,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "cb4d69665768a6964dad9ef7e8fa13062c25643c5b40483fd6eacd391fa14d55",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 1,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "f1ec78d78fcc883f9b6c4ea797a29b15f9eab7991696edd56bde56bc1ad5656e",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 1,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "22e72cbf2e24817b1ca351bb56ca88b4d3ed524ad3e3e5e9eb8c75fbb4371d71",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 1,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold1/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "99bd5fc83a64267abcaea2cf84365fe4297ceaec52f0187f273442c8ba5abba7",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 2,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "f762aae149a10b9e24e6c3a4c0e218745045bd977d2808995e9901ae72192234",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 2,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "28fbcc13dc886669b40d5a9379988054cb61b9e8ae872526ee224b3f997d6d65",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 2,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "4e6b03985b1ba196fd5989de68a314137f434df596cbbfea7cd18c57716eadee",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 2,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "73412803acfa2241b463318ed3b27e9278df1d9777a237760863066292f56724",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 2,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "0ea86b0ca4c8f5a18db08950e3a8d1d8bd2086ce4b418ae06cd6dc1c185a0a34",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 2,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold2/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "d6903c287c7147a11dfe0b46f1089bf3b43f7a874e59fa35e875199578ee7bf1",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 3,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "843f6b2d90074a15fe88d6e4d590eadebdd66bdfbd29ba7e5a541a163ef7f168",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 3,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "16eb266112ec265dafe84c61bb4e026386024d60dd9a50060b09f8a3acca3452",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 3,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "fd459aa6b0546ef06769792127ba67062c8c2e8f8234820d3b425a0869b1e4ef",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 3,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "8148acbcbe2fb7585c1d9773089837ad0254e28563661bbd3f8a7db9ff231397",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 3,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "0dea33c66a051aa8b9719cd534508a3b858d2518c5764866461e0713ff07a1ba",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 3,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold3/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "58e4459566634faacf58d9d75bcb23062bd4724eade5d2e4011a5d73e534dc5d",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 4,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "68f8faab067d3316f721ded1688d4d0790b2258cf658fc8c76abf2a59abedbb1",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 4,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "6bb80f944131903e78b2e1c7fd6560cccf34d73a6ab0a1f5cf0434c1f55d8e89",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 4,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "0179335abc0807d326bae83964b03c18de4d99a8c60e8c16388a7ad7c7f5a172",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 4,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "aaa5ae2e4f025927bb985f8b2984dee467da9a7c88ee8d006256f34b8dd4b3a4",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 4,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "61f422604e561be37e861854d1feb5c4ffe2a256e23f2da5ce9bec8f34248f38",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 4,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold4/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "9311819b86dbacc2da7d4a97e77fb4298511b68410c2c7b707da45cce9900b58",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 5,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "a6ac40ff345c042a82e640a6bb52c2b54a05216da107a1a574357787936ccedb",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 5,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "2a3c0f423f8f1b661de50cb76bd35af37c539da67d33c00637d7eae4409654e1",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 5,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "1b91ac062923e351b84d47088e188d67b40231091d1b1e852da22f2241cd31f4",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 5,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "49f282b0abd628723ea6aef08943a7c23cdb5141fbdc53cc0082651458b835cf",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 5,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "13ec3a4e15909990807293dca141250c2f5d796be3db80454a1a76359d83810c",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 5,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold5/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "59a3515f6d84de37fc195d8355a04a6b79e65debdd752ec44d5e579a1818a9d4",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 6,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "26d05aec71068414feaa6158b01d11a17f0d1b2b39b32ea92cd44f662f919cf9",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 6,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "0774c328e5edbeda61c3484fcb3502dd5b005d26f5ae8caffdea8c5ee7b65443",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 6,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "01265d6a6706cd639688976f0ba95d77bf040fd50a7064cc12b37652824294cf",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 6,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "8da310c54629d00a022dd666807ee8cd7c795c46928b6179f4187f52e8b5ce68",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 6,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "cd3716af2f42233ccba0c91732c9ee0670ce25efb3c275bc3a8dac077ef658e0",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 6,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold6/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "b4fc3d9e2e126c1e3232ced0e262106084c786650fc6cadcaae3c1033684ec3d",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 7,
+        "stage": "stage1",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/stage1/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "59335a96c252f26bde47f8ba06e881a806a4e53c77748a9d42215c6fdd327942",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 7,
+        "stage": "hierarchical",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/hierarchical/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "8bc03b8ea42dee976ad7b77b5636236b1eeaca1ae31fdec8114f76b9bdfc390e",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 7,
+        "stage": "coarse",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/coarse/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "665238ec48ddc080ac86c8afe14c8808eb9344e895e60f41249e8f22552a4299",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 7,
+        "stage": "fine",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/fine/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "ead6be9f5c53f73426668d3c269796b6e2438a3caa170f16ac94c0b3c55cf615",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 7,
+        "stage": "evidence",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/evidence/best_model.pt",
+        "basename": "best_model.pt",
+        "expected_sha256": "0289799da651a657f827a186839ac0aa6c37e0723225daf72b66b71390cd9411",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      },
+      {
+        "fold_id": 7,
+        "stage": "reliability",
+        "artifact_kind": "checkpoint",
+        "original_path": "/home/zzk/gmner/outputs/null_release_oof/roberta128/fold7/reliability/best_ab_model.pt",
+        "basename": "best_ab_model.pt",
+        "expected_sha256": "fc410bab8c6928742d797d278fc4c7ea5bbb2abad7fd7644e81f1125406c683c",
+        "status": "MISSING",
+        "match_count": 0,
+        "matched_paths": []
+      }
+    ]
+  },
+  "fold_source_inventory": {
+    "required": 24,
+    "exact_available": 24,
+    "matches": [
+      {
+        "fold_id": 0,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold0.jsonl",
+        "basename": "train_fold0.jsonl",
+        "expected_sha256": "c4e9f9842c87a4487764f9b2e2a142b4251f06623f562b7fbffa78b88ec421ea",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold0.jsonl"
+        ]
+      },
+      {
+        "fold_id": 0,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold0.jsonl",
+        "basename": "heldout_fold0.jsonl",
+        "expected_sha256": "93851c535075ae440822715b84f661e89a0ed569b9d529a82175c686534fe6c5",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold0.jsonl"
+        ]
+      },
+      {
+        "fold_id": 1,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 1,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold1.jsonl",
+        "basename": "train_fold1.jsonl",
+        "expected_sha256": "a99bd7b6af76ee4bfc09bd5989eae08ee7361147f2a23cd60e34fce5cd3bcb7e",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold1.jsonl"
+        ]
+      },
+      {
+        "fold_id": 1,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold1.jsonl",
+        "basename": "heldout_fold1.jsonl",
+        "expected_sha256": "44cb3c3742f99bc48c88afc3fa6c49b48a30c2014d8873bfe7ad0625f005ea2d",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold1.jsonl"
+        ]
+      },
+      {
+        "fold_id": 2,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 2,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold2.jsonl",
+        "basename": "train_fold2.jsonl",
+        "expected_sha256": "28b11cb7b62d1aad734b6f6117489bc8113d7ad8d3a8a5ba148a40fb655e3f0e",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold2.jsonl"
+        ]
+      },
+      {
+        "fold_id": 2,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold2.jsonl",
+        "basename": "heldout_fold2.jsonl",
+        "expected_sha256": "0be10acd467bf4f9fa78e7637442bcdc5eae66baab93b43fda26deba1988efa5",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold2.jsonl"
+        ]
+      },
+      {
+        "fold_id": 3,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 3,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold3.jsonl",
+        "basename": "train_fold3.jsonl",
+        "expected_sha256": "606516493513790021ad4fa01daaaf0af2c8cb32d4486eb08a3897db6c149e34",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold3.jsonl"
+        ]
+      },
+      {
+        "fold_id": 3,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold3.jsonl",
+        "basename": "heldout_fold3.jsonl",
+        "expected_sha256": "6204ab2debd18083d16131dca1c127f3b12c2c04ebab3d6b45d76413454087f0",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold3.jsonl"
+        ]
+      },
+      {
+        "fold_id": 4,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 4,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold4.jsonl",
+        "basename": "train_fold4.jsonl",
+        "expected_sha256": "c06154b063b83dd61f6d505438f62dc89352f7b31c1138b142bdf95ba41dd04b",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold4.jsonl"
+        ]
+      },
+      {
+        "fold_id": 4,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold4.jsonl",
+        "basename": "heldout_fold4.jsonl",
+        "expected_sha256": "ba3c31b85e88b116bdc0ef67fa0e5ab6517e686da8a7ad7d0390517a15bab907",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold4.jsonl"
+        ]
+      },
+      {
+        "fold_id": 5,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 5,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold5.jsonl",
+        "basename": "train_fold5.jsonl",
+        "expected_sha256": "682b19921cd23d611f5417308e9c8eab3a2993edf5828eb2119329090266b5eb",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold5.jsonl"
+        ]
+      },
+      {
+        "fold_id": 5,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold5.jsonl",
+        "basename": "heldout_fold5.jsonl",
+        "expected_sha256": "09ef6e7d27ba41775b85a61abe6e712ffc78563e562be0dd691dd347668be981",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold5.jsonl"
+        ]
+      },
+      {
+        "fold_id": 6,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 6,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold6.jsonl",
+        "basename": "train_fold6.jsonl",
+        "expected_sha256": "31b5388512eb5996c8a6b8aa7e6352cdf4a30eb74f9a4215d908b63e62aa246f",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold6.jsonl"
+        ]
+      },
+      {
+        "fold_id": 6,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold6.jsonl",
+        "basename": "heldout_fold6.jsonl",
+        "expected_sha256": "c6bc5a082c4d7aeebbfc7edb8e36542e78676fed53d31fd7c87e69c2cfdb5769",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold6.jsonl"
+        ]
+      },
+      {
+        "fold_id": 7,
+        "artifact_kind": "fold_summary",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+        "basename": "fold_summary.json",
+        "expected_sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json"
+        ]
+      },
+      {
+        "fold_id": 7,
+        "artifact_kind": "train_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold7.jsonl",
+        "basename": "train_fold7.jsonl",
+        "expected_sha256": "806d31b893e1e147347b75cbbaef17e2a77eb4c97bc6a2151a6fc4901c8dac3c",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold7.jsonl"
+        ]
+      },
+      {
+        "fold_id": 7,
+        "artifact_kind": "heldout_source",
+        "original_path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold7.jsonl",
+        "basename": "heldout_fold7.jsonl",
+        "expected_sha256": "2e7de58710175c2ef5567c4d04fb87f33521e5e58b3ea47003de57081e529047",
+        "status": "EXACT_SHA256_AVAILABLE",
+        "match_count": 1,
+        "matched_paths": [
+          "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold7.jsonl"
+        ]
+      }
+    ]
+  },
+  "source_tree": {
+    "expected_sha256": "24a204edfee9353c1f1974d6436740a6952883390f3104a8e5d52b7d1d7f4b8a",
+    "commits_checked": 77,
+    "unique_blobs_checked": 273,
+    "matching_commits": [],
+    "exact_source_tree_available": false
+  },
+  "input_fingerprint_audit": {
+    "required_fields": [
+      "vinvl_feature_tree_sha256",
+      "text_tokenizer_tree_sha256",
+      "grounding_prior_bundle_sha256"
+    ],
+    "all_recorded": false,
+    "candidate_cache_output_hashes_recorded": true,
+    "siglip_manifest_hashes_recorded": true
+  },
+  "external_inventory": {
+    "kind": "p4_r0_a_external_storage_inventory",
+    "format_version": 1,
+    "observed_at": "2026-07-29",
+    "scope": "filesystem existence, byte size, and SHA256 only",
+    "folds_checked": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "access_contract": {
+      "payloads_deserialized": 0,
+      "training_records_parsed": 0,
+      "calibration_folds_opened": false,
+      "dev_accessed": false,
+      "test_accessed": false,
+      "oracle_labels_computed": false,
+      "model_executed": false
+    },
+    "locations": [
+      {
+        "name": "server4090",
+        "root": "/home/zzk/gmner",
+        "probe": "remote file tests plus sha256sum for fold source files",
+        "checkpoint_probe": {
+          "expected_paths_checked": 48,
+          "exact_files_present": 0,
+          "missing_paths": 48,
+          "missing_stages_by_fold": {
+            "0": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "1": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "2": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "3": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "4": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "5": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "6": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ],
+            "7": [
+              "stage1",
+              "hierarchical",
+              "coarse",
+              "fine",
+              "evidence",
+              "reliability"
+            ]
+          }
+        },
+        "available_artifacts": [
+          {
+            "artifact_kind": "fold_summary",
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/fold_summary.json",
+            "bytes": 1201450,
+            "sha256": "5ba871aa7667e49d936320e8f00344622b411a123309734410f6b4ac4b2bcf3c"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 0,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold0.jsonl",
+            "bytes": 2347768,
+            "sha256": "c4e9f9842c87a4487764f9b2e2a142b4251f06623f562b7fbffa78b88ec421ea"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 1,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold1.jsonl",
+            "bytes": 2345906,
+            "sha256": "a99bd7b6af76ee4bfc09bd5989eae08ee7361147f2a23cd60e34fce5cd3bcb7e"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 2,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold2.jsonl",
+            "bytes": 2347938,
+            "sha256": "28b11cb7b62d1aad734b6f6117489bc8113d7ad8d3a8a5ba148a40fb655e3f0e"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 3,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold3.jsonl",
+            "bytes": 2346369,
+            "sha256": "606516493513790021ad4fa01daaaf0af2c8cb32d4486eb08a3897db6c149e34"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 4,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold4.jsonl",
+            "bytes": 2348081,
+            "sha256": "c06154b063b83dd61f6d505438f62dc89352f7b31c1138b142bdf95ba41dd04b"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 5,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold5.jsonl",
+            "bytes": 2346135,
+            "sha256": "682b19921cd23d611f5417308e9c8eab3a2993edf5828eb2119329090266b5eb"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 6,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold6.jsonl",
+            "bytes": 2349428,
+            "sha256": "31b5388512eb5996c8a6b8aa7e6352cdf4a30eb74f9a4215d908b63e62aa246f"
+          },
+          {
+            "artifact_kind": "train_source",
+            "fold_id": 7,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/train_fold7.jsonl",
+            "bytes": 2350368,
+            "sha256": "806d31b893e1e147347b75cbbaef17e2a77eb4c97bc6a2151a6fc4901c8dac3c"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 0,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold0.jsonl",
+            "bytes": 260804,
+            "sha256": "93851c535075ae440822715b84f661e89a0ed569b9d529a82175c686534fe6c5"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 1,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold1.jsonl",
+            "bytes": 262666,
+            "sha256": "44cb3c3742f99bc48c88afc3fa6c49b48a30c2014d8873bfe7ad0625f005ea2d"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 2,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold2.jsonl",
+            "bytes": 260634,
+            "sha256": "0be10acd467bf4f9fa78e7637442bcdc5eae66baab93b43fda26deba1988efa5"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 3,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold3.jsonl",
+            "bytes": 262203,
+            "sha256": "6204ab2debd18083d16131dca1c127f3b12c2c04ebab3d6b45d76413454087f0"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 4,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold4.jsonl",
+            "bytes": 260491,
+            "sha256": "ba3c31b85e88b116bdc0ef67fa0e5ab6517e686da8a7ad7d0390517a15bab907"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 5,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold5.jsonl",
+            "bytes": 262437,
+            "sha256": "09ef6e7d27ba41775b85a61abe6e712ffc78563e562be0dd691dd347668be981"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 6,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold6.jsonl",
+            "bytes": 259144,
+            "sha256": "c6bc5a082c4d7aeebbfc7edb8e36542e78676fed53d31fd7c87e69c2cfdb5769"
+          },
+          {
+            "artifact_kind": "heldout_source",
+            "fold_id": 7,
+            "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/folds/heldout_fold7.jsonl",
+            "bytes": 258204,
+            "sha256": "2e7de58710175c2ef5567c4d04fb87f33521e5e58b3ea47003de57081e529047"
+          }
+        ],
+        "static_input_presence": [
+          {
+            "artifact_kind": "text_model_directory",
+            "path": "/home/zzk/gmner/roberta-base",
+            "exists": true,
+            "authoritative_archived_tree_sha256": null
+          },
+          {
+            "artifact_kind": "vinvl_feature_directory",
+            "path": "/home/zzk/gmner/GMNER-main/Twitter10000_v2.0/VinVL",
+            "exists": true,
+            "authoritative_archived_tree_sha256": null
+          },
+          {
+            "artifact_kind": "groundability_type_prior",
+            "path": "/home/zzk/gmner/knowledge/grounding/groundability_by_type.jsonl",
+            "exists": true,
+            "authoritative_archived_sha256": null
+          },
+          {
+            "artifact_kind": "groundability_mention_prior",
+            "path": "/home/zzk/gmner/knowledge/grounding/groundability_by_mention_type.jsonl",
+            "exists": true,
+            "authoritative_archived_sha256": null
+          },
+          {
+            "artifact_kind": "siglip2_model_directory",
+            "path": "/home/zzk/gmner/siglip2-base-patch16-224",
+            "exists": false,
+            "authoritative_archived_tree_sha256": null
+          }
+        ],
+        "siglip_heldout_manifests": {
+          "expected": 8,
+          "present": 0,
+          "missing_folds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
+      },
+      {
+        "name": "local_checkpoint_archive",
+        "root": "../GMNER_oof_checkpoint_archive",
+        "probe": "driver hashes only preregistered checkpoint basenames",
+        "available_artifacts": [],
+        "note": "Only fold 0 checkpoint payloads are present; exact matches are discovered and hashed by the audit driver."
+      }
+    ],
+    "local_discovery": {
+      "roots": [
+        "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive"
+      ],
+      "candidate_files_hashed": 6,
+      "locked_directories_skipped": [
+        "C:/Users/Administrator/Desktop/代码/GMNER_oof_checkpoint_archive/fold0/outputs/stage1/cache/graph_cache/dev"
+      ]
+    }
+  },
+  "gate": {
+    "fold_provenance_complete": true,
+    "all_supervised_checkpoints_exact": false,
+    "all_stage_configs_exact_and_seeded": true,
+    "all_fold_sources_exact": true,
+    "source_tree_exactly_recoverable": false,
+    "required_input_fingerprints_recorded": false,
+    "checkpoint_payloads_loaded_zero": true,
+    "candidate_payloads_loaded_zero": true,
+    "training_records_parsed_zero": true,
+    "calibration_folds_opened_false": true,
+    "dev_accessed_false": true,
+    "test_accessed_false": true,
+    "oracle_labels_computed_false": true
+  },
+  "gate_blockers": [
+    "all_supervised_checkpoints_exact",
+    "required_input_fingerprints_recorded",
+    "source_tree_exactly_recoverable"
+  ],
+  "gate_passed": false,
+  "checkpoint_replay_execution_authorized": false,
+  "r0_b_authorized": false,
+  "next_state": "STOP_WITHOUT_AUTHORIZING_R0_B",
+  "report_sha256": "fa89c8dd3213b2b8894938f489cbdbfa9622a0968d2382e1263725edbbeb8328"
+}
