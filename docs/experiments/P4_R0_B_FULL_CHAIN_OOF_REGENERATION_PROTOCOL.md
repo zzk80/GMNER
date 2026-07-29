@@ -237,7 +237,7 @@ R0-B result but are ineligible for existing P4 candidates.
 ## Resource Contract
 
 ```text
-minimum disk before each fold: 12 GiB
+minimum disk before each fold: 5 GiB
 minimum free GPU memory:       12000 MiB
 maximum active fold jobs:      1
 Stage1 SIGSEGV retries:        2

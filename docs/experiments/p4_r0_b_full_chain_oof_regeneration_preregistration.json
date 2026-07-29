@@ -106,7 +106,7 @@
     "on_fail": "ARCHIVE_REGENERATION_AND_KEEP_P4_BLOCKED"
   },
   "resources": {
-    "minimum_disk_gib": 12,
+    "minimum_disk_gib": 5,
     "minimum_gpu_free_mib": 12000,
     "maximum_parallel_folds": 1,
     "maximum_stage1_sigsegv_retries": 2
