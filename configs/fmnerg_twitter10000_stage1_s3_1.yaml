@@ -1,0 +1,50 @@
+base:
+  formal_config: configs/fmnerg_twitter10000_stage1.yaml
+  initialization_checkpoint: outputs/fmnerg_stage1_roberta128/best_model.pt
+  baseline_lock: docs/experiments/s3_stage1_baseline_lock.json
+
+model:
+  hidden_size: 768
+  boundary_dropout: 0.1
+  type_dropout: 0.1
+  num_boundary_tags: 3
+  num_types: 4
+
+optim:
+  batch_size: 4
+  learning_rate: 2.0e-5
+  new_module_learning_rate: 1.0e-4
+  high_level_learning_rate: 1.0e-5
+  backbone_learning_rate: 3.0e-6
+  bert_unfreeze_last_n_layers: 4
+  weight_decay: 0.01
+  num_epochs: 20
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+
+loss:
+  label_smoothing: 0.0
+  lambda_boundary: 1.0
+  lambda_type: 1.0
+  lambda_grounding: 1.0
+  lambda_alignment: 1.0
+  scaling_report: outputs/s3_stage1/scaling_probe_seed42.json
+  require_scaling_report: true
+
+probe:
+  steps: 100
+  audit_interval: 10
+  lambda_min: 0.05
+  lambda_max: 20.0
+  epsilon: 1.0e-12
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: outputs/s3_stage1/seed42
+  probe_output: outputs/s3_stage1/scaling_probe_seed42.json
+  early_stopping_patience: 3
+  log_every_steps: 20
+  num_workers: 0

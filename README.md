@@ -134,25 +134,28 @@ M3.3A rebuild are not run. The compact OOF caches, checkpoint, protocol, and
 summary are retained as a frozen ablation. Formal metrics remain unchanged
 and Test was not accessed.
 
-The next main experiment is a jointly trained hierarchical Stage1:
+The active experiment is the phased S3 hierarchical Stage1:
 
 ```text
 shared RoBERTa / graph / cross-modal representation
 ├── Boundary CRF
 ├── span-level coarse type head
-├── existing grounding head
-└── candidate utility auxiliary head
+├── legacy-equivalent vectorized grounding
+└── record-level alignment
 ```
 
-Because candidate utility is trained inside the same Stage1 forward/backward
-pass, the initial joint experiment uses all Train records and does not require
-OOF. OOF remains mandatory only for a separately trained selector after
-Stage1 is frozen. A downstream M3.3A rebuild is allowed only after the paired
-Stage1 and three-seed gates pass.
+P0 and the S3.0 forward/decode equivalence foundation are complete. S3.1 is
+implemented on an isolated branch, but its Train-only scaling probe and
+Seed42 method Gate remain pending. Utility is not part of S3.1; S3.2 remains
+conditional on the S3.1 result. The joint experiment uses all Train records
+and does not require OOF. OOF remains mandatory only for a separately trained
+selector after Stage1 is frozen. A downstream M3.3A rebuild is allowed only
+after the Stage1 and three-seed gates pass.
 
-The corrected evidence, OOF boundary, acceptance gates, and execution order
-are frozen in
-[`docs/INNOVATION_OPTIMIZATION_PROPOSALS.md`](docs/INNOVATION_OPTIMIZATION_PROPOSALS.md).
+The formal contract and current execution commands are recorded in
+[`docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md`](docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md)
+and
+[`docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md`](docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md).
 
 ## Repository Layout
 

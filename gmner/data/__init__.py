@@ -16,6 +16,14 @@ __all__ = [
     "Stage1CandidateSelectorCollator",
     "RecordLevelStage1Dataset",
     "RecordLevelStage1Collator",
+    "S3Initialization",
+    "build_s3_dataloader",
+    "build_s3_record_dataset",
+    "file_sha256",
+    "load_formal_stage1_teacher",
+    "load_locked_s3_initialization",
+    "load_s3_tokenizer",
+    "resolve_project_path",
     "encode_words_with_alignment",
     "infer_model_input_limit",
     "load_word_aligned_tokenizer",
@@ -97,6 +105,39 @@ def __getattr__(name):
         from .record_level_stage1_collator import RecordLevelStage1Collator
 
         return RecordLevelStage1Collator
+    if name in {
+        "S3Initialization",
+        "build_s3_dataloader",
+        "build_s3_record_dataset",
+        "file_sha256",
+        "load_formal_stage1_teacher",
+        "load_locked_s3_initialization",
+        "load_s3_tokenizer",
+        "resolve_project_path",
+    }:
+        from .s3_stage1_builder import (
+            S3Initialization,
+            build_s3_dataloader,
+            build_s3_record_dataset,
+            file_sha256,
+            load_formal_stage1_teacher,
+            load_locked_s3_initialization,
+            load_s3_tokenizer,
+            resolve_project_path,
+        )
+
+        return {
+            "S3Initialization": S3Initialization,
+            "build_s3_dataloader": build_s3_dataloader,
+            "build_s3_record_dataset": build_s3_record_dataset,
+            "file_sha256": file_sha256,
+            "load_formal_stage1_teacher": load_formal_stage1_teacher,
+            "load_locked_s3_initialization": (
+                load_locked_s3_initialization
+            ),
+            "load_s3_tokenizer": load_s3_tokenizer,
+            "resolve_project_path": resolve_project_path,
+        }[name]
     if name in {
         "encode_words_with_alignment",
         "infer_model_input_limit",
