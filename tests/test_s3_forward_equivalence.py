@@ -306,8 +306,9 @@ def test_archived_formal_s3_gate_matches_baseline_lock() -> None:
     report_path = root / gate["formal_report"]["path"]
     payload = report_path.read_bytes()
     report = json.loads(payload.decode("utf-8"))
+    canonical_payload = payload.replace(b"\r\n", b"\n")
 
-    assert hashlib.sha256(payload).hexdigest() == (
+    assert hashlib.sha256(canonical_payload).hexdigest() == (
         gate["formal_report"]["sha256"]
     )
     assert report["original_numerical_gate_passed"] is False
