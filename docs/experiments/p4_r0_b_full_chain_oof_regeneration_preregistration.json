@@ -7,7 +7,7 @@
   "experiment_id": "p4_r0b_20260729_seed42",
   "supersedes_prior_lock": {
     "path": "docs/experiments/p4_r0_full_chain_oof_r16_regeneration_preregistration.json",
-    "sha256": "5e0bb583ac0ceb83569a3a81e7746f0a9b05fa2c58b77b8c6d0078b992c925fa",
+    "sha256": "35f279e6893774596b9bc4e02ad020eb590df08f75a0bdb6faa036a93b457743",
     "scope": "authorization.r0_b_full_oof_retraining",
     "new_value": true,
     "reason": "Explicit separate authorization for a newly identified full OOF rebuild"
