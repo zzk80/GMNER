@@ -1,16 +1,17 @@
 # GMNER / FMNERG Stage1 Innovation Protocol
 
-**Version:** 2.0
+**Version:** 2.1
 
 **Updated:** 2026-07-29
 
-**Status:** Final planning baseline
+**Status:** Current formal roadmap
 
 **Test access:** Locked
 
 This document replaces the earlier speculative roadmap. It incorporates the
-completed D0 gradient audit, the strict D1 OOF selector result, and the final
-decision to prioritize a jointly trained Stage1 before rebuilding M3.3A.
+completed D0 gradient audit, the strict D1 OOF selector result, the S3.1
+joint-Stage1 no-go result, and the preregistered P4 Protected Joint Promotion
+audit.
 
 ---
 
@@ -233,13 +234,13 @@ justify task-adversarial learning. Gradient reversal may remove information
 needed by NER or grounding. If balancing is needed, use measured gradient
 normalization as a separately controlled ablation.
 
-### 5.3 Hierarchical boundary/type modeling remains justified
+### 5.3 Hierarchical boundary/type modeling was a justified test
 
-The flat typed-BIO CRF couples boundary and coarse type decisions. Separating
-an untyped boundary CRF from a span-level type head can improve boundary
-recall without requiring every boundary transition to carry a type label.
-
-This is the highest-priority architecture hypothesis.
+The flat typed-BIO CRF couples boundary and coarse type decisions. S3.1
+therefore tested an untyped Boundary CRF and span-level type head as a
+controlled alternative. The engineering implementation was valid, but its
+net Boundary/Type corrections were negligible and shared updates damaged
+grounding. It is no longer the active experiment.
 
 ### 5.4 Dynamic context requires a truncation audit
 
@@ -274,137 +275,132 @@ not experimentally established and are removed.
 
 ---
 
-## 6. Recommended Joint Stage1
+## 6. S3.1 Result And Scope
 
-### 6.1 Architecture
-
-The next candidate system is a single jointly trained Stage1:
+S3.1 tested this specific fully shared, statically weighted architecture:
 
 ```text
-RoBERTa
--> Text Graph Encoder
--> Cross-modal Aligner
--> shared fused token representation
-   ├── Boundary CRF (B / I / O)
-   ├── Span-level coarse type head
-   ├── Existing region / NULL grounding head
-   └── Candidate utility auxiliary head
+shared RoBERTa / graph / cross-modal representation
+├── Boundary CRF
+├── span-level coarse type head
+├── legacy-equivalent vectorized grounding
+└── record-level alignment
 ```
 
-The existing typed-BIO head remains a frozen Teacher or temporary auxiliary
-head during the first experiment.
+The corrected Seed42 run was engineering-valid. Relative to the frozen
+Stage1:
 
-### 6.2 Candidate utility role
+| Metric | Frozen Stage1 | S3.1 | Delta |
+| --- | ---: | ---: | ---: |
+| Span F1 | 0.870721 | 0.872002 | +0.001281 |
+| MNER F1 | 0.814740 | 0.815561 | +0.000821 |
+| EEG F1 | 0.645993 | 0.640193 | -0.005799 |
+| GMNER F1 | 0.607330 | 0.603507 | -0.003822 |
 
-The D1 result proves that candidate utility contains useful precision signal.
-The first joint experiment uses it as an auxiliary objective, not as an
-immediate hard replacement for formal decoding.
+Correct GMNER triples fell by 11 and formal-gold preservation was
+`0.952918`. Boundary corrected/damaged was `11/10`; Type was `14/14`.
+Later training also showed task-gradient scales on shared layers diverging by
+orders of magnitude, so the initialization-time static scaling did not
+maintain balance.
 
-Requirements:
+S3.1 is `NO_GO`. Seeds 41/43, S3.2 Utility, Teacher KD, downstream rebuild,
+and Test are not authorized.
 
-```text
-utility gradients reach shared Stage1 representations
-candidate indices are generated online or refreshed from the current model
-formal decoding remains available as a bypass
-new residual output is zero-initialized
-candidate loss is normalized separately from NER and grounding
-```
+This result rejects only:
 
-If a later hard selector is needed after Stage1 is frozen, it becomes a new
-standalone stacked module and requires new OOF features from the new Stage1.
-The old D1 checkpoint cannot be deployed unchanged because its representation
-and candidate distributions belong to the old Stage1.
+> Static-weight joint training of Boundary, Type, Grounding, and Alignment on
+> fully shared representations can improve text predictions while preserving
+> formal grounding.
 
-### 6.3 Loss
-
-The initial controlled objective is:
-
-```text
-L = L_boundary
-  + lambda_type * L_type
-  + lambda_ground * L_grounding
-  + lambda_align * L_alignment
-  + lambda_utility * L_candidate_utility
-  + lambda_kd * L_teacher_preservation
-```
-
-Do not add visual boundary loss, adversarial loss, dynamic context, and
-gradient balancing in the same run. Each additional mechanism needs an
-independent ablation.
-
-### 6.4 Training protocol
-
-Because this is one joint model:
-
-```text
-Train: all 7000 Train records
-Dev: unseen 1500 Dev records
-Test: locked
-OOF prerequisite: none
-```
-
-The first experiment is Seed42 only. Seeds 41/43 are authorized only after the
-registered Seed42 gate passes.
+It does not reject every Stage1 architecture change. A future Stage1 proposal
+must decouple text correction from grounding, for example by freezing
+grounding representations or logits and evaluating candidate corrections
+through frozen grounding replay.
 
 ---
 
-## 7. Acceptance Gates
+## 7. P4 Protected Joint Promotion
 
-### 7.1 Paired Stage1 gate
+### 7.1 Independent hypothesis
 
-Use the exact paired Stage1 evaluation produced by the same candidate model
-and evaluator. Minimum requirements:
+P4 is not a D1 continuation:
 
 ```text
-Span F1 delta                >= +0.005
-MNER F1 delta                >= +0.003
-Stage1 GMNER delta           >= +0.003
-EEG F1 delta                 >= -0.002
-GMNER correct triple count   must not decrease
-R16 candidate coverage delta >= -0.002
-Test accessed                = false
+D1 = Selective Rejection
+P4 = Protected Joint Promotion
 ```
 
-The correct-count requirement prevents another precision-only improvement
-that irreversibly removes useful gold spans.
+D1 demonstrated rejection/calibration behavior. It did not establish that
+non-formal candidates can be promoted as complete correct GMNER triples at
+high precision. P4.0 must establish that recovery signal independently.
 
-### 7.2 Three-seed gate
+### 7.2 Final-output protection
 
-Before rebuilding M3.3A:
+For each record, let `F_r` be the complete frozen M3.3A output and `F'_r` the
+P4 output:
 
 ```text
-Seeds                       = 41, 42, 43
-positive GMNER seeds        >= 2 / 3
-mean Stage1 GMNER delta     >= +0.003
-mean MNER delta             >= 0
-mean EEG delta              >= -0.002
-all runs Test-free
+F_r is a subset of F'_r
+F'_r = F_r union optional_one_promoted_triple
 ```
 
-### 7.3 Downstream rebuild gate
+Every formal prediction and its digest must remain exact. The promoted
+candidate cannot re-enter NMS, record decode, conflict resolution, or
+reranking. This guarantees content preservation, not automatic F1
+improvement.
 
-Only the frozen winning Stage1 configuration may rebuild:
+For baseline counts `C`, `P`, and `G`, the promotion break-even precision is:
 
 ```text
-new Stage1
--> new R16 formal candidates
--> new R36 expanded regions
--> retrained Hierarchical Record Verifier
--> retrained Coarse Region Selector
--> retrained Fine Grounding Adapter
--> retrained Evidence Visibility
+C / (P + G) = baseline_F1 / 2
 ```
 
-The first full-chain rebuild is Seed42 Dev only. It must satisfy:
+The Stage1 Dev `30.37%` value is an illustration only. P4 runs after complete
+Model-G decode and must recompute exact split-specific counts and GMNER. The
+registered deployment precision Gate is `60%`.
+
+### 7.3 P4.0 data isolation
+
+P4.0 is read-only and uses strict full-chain OOF Train features:
 
 ```text
-full-chain Dev GMNER >= 0.624316
-full-chain MNER delta >= 0
-full-chain EEG delta >= -0.002
+OOF folds 0-7 -> candidate source, feature, and score development
+OOF folds 8-9 -> one threshold/prefix calibration
+Dev           -> one frozen execution
+Test          -> locked
+```
+
+Candidate generation is gold-free. Gold is used only after materialization
+for oracle labels and exact metric recomputation. Dev cannot select sources,
+features, scores, thresholds, tie-breaks, or prefix lengths.
+
+### 7.4 P4.0 Gate
+
+All conditions are required:
+
+```text
+joint-positive OOF records >= 50
+max-one-per-record exact oracle GMNER delta >= +0.010
+
+OOF calibration prefix:
+actions >= 25
+promotion precision >= 60%
+exact recomputed GMNER delta >= +0.003
+
+formal output set preserved exactly
+candidate generation used no gold
 Test accessed = false
 ```
 
-Only then is a multi-seed full-chain confirmation justified.
+P4.0 must report Span, Span+Type, Joint, deduplicated, non-overlap, and
+max-one exact oracles; source-specific positive rates; PR/risk-coverage
+curves; exact GMNER for every prefix; and OOF/full-fit Dev unlabeled feature
+drift.
+
+The complete frozen contract is:
+[`experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
+
+P4.1 selector training is not authorized until P4.0 passes.
 
 ---
 
@@ -428,16 +424,17 @@ reported; neither may be treated as a secondary metric.
 ## 9. Execution Order
 
 ```text
-0. Freeze current M3.3A, F3, D0, and D1 artifacts
-1. Run read-only boundary-error and truncation audits
-2. Implement S3 Boundary CRF + span-level type head
-3. Add candidate utility as an auxiliary joint Stage1 objective
-4. Add Teacher preservation and gradient diagnostics
-5. Run Seed42 paired Stage1 gate
-6. If passed, run Seeds 41 and 43
-7. If the three-seed gate passes, rebuild the downstream chain once
-8. If Model-G becomes formal, separately rebuild and evaluate FMNERG
-9. Access Test only after architecture, weights, checkpoints, and decode are frozen
+0. Keep M3.3A, F3, D0, D1, and S3.1 artifacts frozen
+1. Validate full-chain OOF provenance available to P4
+2. Freeze the P4 candidate-source and feature manifest on OOF folds 0-7
+3. Materialize the cumulative oracle levels without using gold for generation
+4. Seal source, feature, score, deduplication, and tie-break definitions
+5. Open OOF folds 8-9 once for threshold/prefix calibration
+6. Recompute exact full GMNER for every calibrated prefix
+7. Apply the complete P4.0 Gate
+8. If passed, execute the sealed rule on Dev once
+9. Only then propose a separate P4.1 training protocol
+10. If P4.0 fails, close Selector and design a decoupled Stage1 correction
 ```
 
 No time-to-result or expected-gain claim is preregistered. Progress is
@@ -451,10 +448,14 @@ controlled only by the measured gates above.
 Formal Model-G: M3.3A, unchanged
 Formal Model-F: F3, unchanged
 D0: valid diagnostic, no adversarial training
-D1: positive learning signal, deployment no-go, parked
+D1: selective-rejection signal, deployment no-go, parked
+S3.0: forward/decode equivalence passed under amended numeric tolerance
+S3.1: engineering-valid, method no-go
 Old OOF caches: retained, not rerun
-Next main experiment: jointly trained hierarchical Stage1
-Initial joint Stage1 OOF requirement: none
-Downstream rebuild: gated
+Next main experiment: P4.0 Protected Joint Promotion audit
+P4 status: new hypothesis, preregistered, not run
+P4 Train features: strict full-chain OOF
+P4.1 selector: not authorized
+Downstream rebuild: not authorized
 Test: locked
 ```
