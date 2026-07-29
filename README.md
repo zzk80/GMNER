@@ -134,25 +134,31 @@ M3.3A rebuild are not run. The compact OOF caches, checkpoint, protocol, and
 summary are retained as a frozen ablation. Formal metrics remain unchanged
 and Test was not accessed.
 
-The next main experiment is a jointly trained hierarchical Stage1:
+The active experiment is the phased S3 hierarchical Stage1:
 
 ```text
 shared RoBERTa / graph / cross-modal representation
 ├── Boundary CRF
 ├── span-level coarse type head
-├── existing grounding head
-└── candidate utility auxiliary head
+├── legacy-equivalent vectorized grounding
+└── record-level alignment
 ```
 
-Because candidate utility is trained inside the same Stage1 forward/backward
-pass, the initial joint experiment uses all Train records and does not require
-OOF. OOF remains mandatory only for a separately trained selector after
-Stage1 is frozen. A downstream M3.3A rebuild is allowed only after the paired
-Stage1 and three-seed gates pass.
+P0 and the S3.0 forward/decode equivalence foundation are complete. The
+corrected S3.1 Seed42 run was engineering-valid but failed its method Gate.
+Relative to the frozen Stage1, Span/MNER changed by only
+`+0.00128/+0.00082`, while EEG/GMNER changed by
+`-0.00580/-0.00382`; correct GMNER triples fell by 11 and formal-gold
+preservation was `0.95292`. S3.1 is therefore `NO_GO`. Seeds 41/43, S3.2,
+and the downstream M3.3A rebuild are not run. Test was not accessed and the
+formal Model-G results remain unchanged.
 
-The corrected evidence, OOF boundary, acceptance gates, and execution order
-are frozen in
-[`docs/INNOVATION_OPTIMIZATION_PROPOSALS.md`](docs/INNOVATION_OPTIMIZATION_PROPOSALS.md).
+The formal contract and current execution commands are recorded in
+[`docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md`](docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md)
+and
+[`docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md`](docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md).
+The compact result is archived in
+[`docs/experiments/s3_1_seed42_dev_summary.json`](docs/experiments/s3_1_seed42_dev_summary.json).
 
 ## Repository Layout
 

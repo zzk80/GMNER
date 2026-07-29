@@ -1,8 +1,8 @@
 # S3 层次化联合 Stage1 最终实施协议
 
 **状态**：P0 已实现；S3.0 按批准的数值容差修订正式通过；S3.1
-已授权但尚未实现。S3.2 仍为有条件授权，S3.3/S3.4、后半链与 Test
-仍未授权。
+工程有效但 Seed42 方法 Gate 为 `NO_GO`。根据 6.8 的预注册规则，
+seeds 41/43、S3.2、S3.3/S3.4 和后半链均不运行，Test 保持锁定。
 
 ## 实现审计备注
 
@@ -1021,6 +1021,25 @@ NO_GO
 ```
 
 不运行 S3.2。
+
+### Seed42 正式结果
+
+修复优化器分组后，正式 run 按 Dev GMNER 选择 epoch 1：
+
+```text
+Span delta              = +0.0012807
+MNER delta              = +0.0008211
+EEG delta               = -0.0057992
+Stage1 GMNER delta      = -0.0038225
+correct span delta      = +1
+correct GMNER delta     = -11
+formal preservation    = 0.9529178
+R16 coverage delta     = 0
+Test accessed           = false
+```
+
+冻结基线及所有来源检查精确通过，因此该结果归类为方法 `NO_GO`，
+不是工程失败。按照本节规则，不运行 seeds 41/43 或 S3.2。
 
 ---
 

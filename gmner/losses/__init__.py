@@ -42,6 +42,10 @@ from .stage1_candidate_selector_loss import (
     stage1_candidate_selector_loss,
     stage1_candidate_selector_supervision,
 )
+from .s3_stage1_loss import (
+    S3LossWeights,
+    compute_s3_stage1_losses,
+)
 
 __all__ = [
     "alignment_objective",
@@ -69,5 +73,7 @@ __all__ = [
     "same_type_region_supervision",
     "stage1_candidate_selector_loss",
     "stage1_candidate_selector_supervision",
+    "S3LossWeights",
+    "compute_s3_stage1_losses",
     "weighted_masked_cross_entropy",
 ]

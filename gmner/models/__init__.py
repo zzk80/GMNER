@@ -21,6 +21,7 @@ __all__ = [
     "ConditionalSameTypeRegionResolver",
     "Stage1CandidateSelectorConfig",
     "Stage1CandidateSelector",
+    "HierarchicalJointStage1",
     "LegacyStage1RecordWrapper",
 ]
 
@@ -148,4 +149,8 @@ def __getattr__(name):
         from .stage1 import LegacyStage1RecordWrapper
 
         return LegacyStage1RecordWrapper
+    if name == "HierarchicalJointStage1":
+        from .stage1 import HierarchicalJointStage1
+
+        return HierarchicalJointStage1
     raise AttributeError(name)
