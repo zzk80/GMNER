@@ -1,0 +1,79 @@
+kind: fmnerg_subtype_f3_p1_protocol
+format_version: 1
+
+method:
+  name: f3_subtype_learning_rate_diagnostic
+  selection_source: dev
+  selection_metric: fmnerg_f1
+  formal_gmner_frozen: true
+  train_input: gold_span_gold_parent
+  dev_input: formal_predicted_span_predicted_parent
+  test_accessed: false
+
+baseline:
+  method: f2_full_encoder
+  source: docs/experiments/fmnerg_subtype_region_oracle_dev_summary.json
+  per_seed_fmnerg:
+    41: 0.5171578522406137
+    42: 0.5183689947517158
+    43: 0.5163504238998788
+  mean_fmnerg: 0.5172924236307361
+
+screen:
+  seed: 42
+  minimum_paired_delta: 0.002
+  one_triple_tolerance: 0.000404
+  conservative_order:
+    - lr1_head_half
+    - lr3_upper_half
+    - lr5_lower_half
+    - lr2_head_double
+    - lr4_upper_double
+    - lr6_lower_double
+  advance_exactly_one_winner: true
+
+final_gate:
+  seeds: [41, 42, 43]
+  minimum_mean_paired_delta: 0.003
+  require_every_paired_delta_positive: true
+  maximum_paired_delta_population_std: 0.002
+  expected_dev_gmner_f1: 0.6213161081953977
+  expected_dev_gmner_tolerance: 0.0000005
+  stop_model_selection_on_pass: true
+
+candidates:
+  - id: lr1_head_half
+    config: sidecars/fmnerg_subtype/configs/f3_p1_lr1_head_half.yaml
+    changed_group: subtype_head
+    multiplier: 0.5
+  - id: lr2_head_double
+    config: sidecars/fmnerg_subtype/configs/f3_p1_lr2_head_double.yaml
+    changed_group: subtype_head
+    multiplier: 2.0
+  - id: lr3_upper_half
+    config: sidecars/fmnerg_subtype/configs/f3_p1_lr3_upper_half.yaml
+    changed_group: backbone_upper
+    multiplier: 0.5
+  - id: lr4_upper_double
+    config: sidecars/fmnerg_subtype/configs/f3_p1_lr4_upper_double.yaml
+    changed_group: backbone_upper
+    multiplier: 2.0
+  - id: lr5_lower_half
+    config: sidecars/fmnerg_subtype/configs/f3_p1_lr5_lower_half.yaml
+    changed_group: backbone_lower
+    multiplier: 0.5
+  - id: lr6_lower_double
+    config: sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml
+    changed_group: backbone_lower
+    multiplier: 2.0
+
+next_stage:
+  on_pass: freeze_f3_and_stop_model_selection
+  on_no_go: f3_p2_multi_granularity_pooling
+
+test_contract:
+  enabled_during_p1: false
+  prior_test_results_known: true
+  f2_test_fmnerg_mean: 0.501437908496732
+  future_f3_requires_separate_atomic_pre_access_seal: true
+  repository_test_access_count_before_f3: 1

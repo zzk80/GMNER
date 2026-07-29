@@ -1,0 +1,42 @@
+taxonomy: sidecars/fmnerg_subtype/taxonomy_twitter10000.json
+
+data:
+  train_source: GMNER-main/Twitter10000_v2.0/txt_fine/train.txt
+  dev_source: GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt
+  dev_formal_predictions: knowledge/fmnerg_subtype_sidecar/roberta128/dev_formal_predictions.json
+
+initialization:
+  stage1_config: configs/fmnerg_twitter10000_stage1.yaml
+  stage1_checkpoint: outputs/fmnerg_stage1_roberta128/best_model.pt
+
+model:
+  input_size: 2304
+  hidden_size: 768
+  dropout: 0.1
+  head_architecture: shared_hard
+  parent_hidden_size: 192
+  encoder_scope: all
+  unfreeze_last_n_layers: 4
+  upper_layer_count: 4
+  gradient_checkpointing: false
+
+optim:
+  batch_size: 8
+  eval_batch_size: 16
+  gradient_accumulation_steps: 1
+  head_learning_rate: 0.0002
+  backbone_upper_learning_rate: 0.000005
+  backbone_lower_learning_rate: 0.000001
+  weight_decay: 0.01
+  num_epochs: 15
+  warmup_ratio: 0.1
+  early_stop_patience: 3
+  gradient_clip_norm: 1.0
+
+runtime:
+  seed: 42
+  device: cuda
+  mixed_precision: true
+  output_dir: outputs/fmnerg_subtype_f3_p1/lr2_head_double/seed42
+  expected_dev_gmner_f1: 0.6213161081953977
+  expected_dev_gmner_tolerance: 0.0000005

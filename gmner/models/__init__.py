@@ -17,6 +17,10 @@ __all__ = [
     "LayeredActionVerifierConfig",
     "LayeredActionVerifier",
     "NullReleaseVerifier",
+    "SameTypeRegionResolverConfig",
+    "ConditionalSameTypeRegionResolver",
+    "Stage1CandidateSelectorConfig",
+    "Stage1CandidateSelector",
 ]
 
 
@@ -109,4 +113,34 @@ def __getattr__(name):
         from .null_release_verifier import NullReleaseVerifier
 
         return NullReleaseVerifier
+    if name in {
+        "SameTypeRegionResolverConfig",
+        "ConditionalSameTypeRegionResolver",
+    }:
+        from .same_type_region_resolver import (
+            ConditionalSameTypeRegionResolver,
+            SameTypeRegionResolverConfig,
+        )
+
+        return {
+            "SameTypeRegionResolverConfig": (
+                SameTypeRegionResolverConfig
+            ),
+            "ConditionalSameTypeRegionResolver": (
+                ConditionalSameTypeRegionResolver
+            ),
+        }[name]
+    if name in {
+        "Stage1CandidateSelectorConfig",
+        "Stage1CandidateSelector",
+    }:
+        from .stage1_candidate_selector import (
+            Stage1CandidateSelector,
+            Stage1CandidateSelectorConfig,
+        )
+
+        return {
+            "Stage1CandidateSelectorConfig": Stage1CandidateSelectorConfig,
+            "Stage1CandidateSelector": Stage1CandidateSelector,
+        }[name]
     raise AttributeError(name)

@@ -9,6 +9,8 @@ __all__ = [
     "evaluate_evidence_visibility",
     "evaluate_siglip2_region_reliability",
     "evaluate_layered_action_verifier",
+    "evaluate_same_type_region_resolver",
+    "evaluate_stage1_candidate_selector",
 ]
 
 
@@ -57,4 +59,16 @@ def __getattr__(name):
         )
 
         return evaluate_layered_action_verifier
+    if name == "evaluate_same_type_region_resolver":
+        from .same_type_region_resolver_evaluator import (
+            evaluate_same_type_region_resolver,
+        )
+
+        return evaluate_same_type_region_resolver
+    if name == "evaluate_stage1_candidate_selector":
+        from .stage1_candidate_selector_evaluator import (
+            evaluate_stage1_candidate_selector,
+        )
+
+        return evaluate_stage1_candidate_selector
     raise AttributeError(name)

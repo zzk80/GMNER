@@ -1,5 +1,0 @@
-# Install this only in the offline cache environment after requirements.txt.
-# 4.49.0 misroutes the FixRes checkpoint to the legacy SiglipTokenizer.
-# 4.50.3 correctly loads its Gemma tokenizer through AutoProcessor.
-transformers==4.50.3
-safetensors>=0.4.3,<1.0

@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "kind": "fmnerg_subtype_f3_p1_final_summary",
+    "format_version": 1,
+    "protocol_path": "/home/zzk/gmner/sidecars/fmnerg_subtype/f3_p1_protocol.yaml",
+    "protocol_sha256": "d10c6bcf8ae58fe5647117599b7c230c4e86b7510d0c690ecff644bde1948d24",
+    "screen_summary": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/screen_seed42.json",
+    "screen_summary_sha256": "06e03347d0c6d25f64178ad683af1f594ffdf2377251c3cb459f40f5cdb2d7a1",
+    "selection_source": "dev",
+    "selection_metric": "fmnerg_f1",
+    "formal_gmner_frozen": true,
+    "test_accessed": false
+  },
+  "winner_id": "lr6_lower_double",
+  "winner_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml",
+  "runs": [
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed41/train_summary.json",
+      "seed": 41,
+      "fmnerg_f1": 0.5228098506257569,
+      "fine_mner_f1": 0.6838918046023414,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 14,
+      "config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912",
+      "candidate_id": "lr6_lower_double",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml",
+      "candidate_config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed42/train_summary.json",
+      "seed": 42,
+      "fmnerg_f1": 0.5211949939442875,
+      "fine_mner_f1": 0.6806620912394025,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 11,
+      "config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912",
+      "candidate_id": "lr6_lower_double",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml",
+      "candidate_config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912"
+    },
+    {
+      "path": "/home/zzk/gmner/outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed43/train_summary.json",
+      "seed": 43,
+      "fmnerg_f1": 0.5175615664109809,
+      "fine_mner_f1": 0.6766249495357286,
+      "gmner_f1": 0.6213161081953977,
+      "gmner_identity_exact": true,
+      "formal_stage1_mutated": false,
+      "test_accessed": false,
+      "best_epoch": 15,
+      "config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912",
+      "candidate_id": "lr6_lower_double",
+      "candidate_config": "/home/zzk/gmner/sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml",
+      "candidate_config_sha256": "cdcbe007d9d8e7d13a12e0cce178f28e3a6a66b8825c99f5fc1054979fec4912"
+    }
+  ],
+  "gate": {
+    "winner_id": "lr6_lower_double",
+    "seeds": [
+      41,
+      42,
+      43
+    ],
+    "fmnerg_by_seed": {
+      "41": 0.5228098506257569,
+      "42": 0.5211949939442875,
+      "43": 0.5175615664109809
+    },
+    "baseline_fmnerg_by_seed": {
+      "41": 0.5171578522406137,
+      "42": 0.5183689947517158,
+      "43": 0.5163504238998788
+    },
+    "paired_deltas": {
+      "41": 0.0056519983851431865,
+      "42": 0.0028259991925716488,
+      "43": 0.0012111425111021035
+    },
+    "mean_fmnerg": 0.5205221369936751,
+    "mean_paired_delta": 0.0032297133629389796,
+    "paired_delta_population_std": 0.0018353090697060326,
+    "run_contract": {
+      "41": {
+        "gmner_f1": 0.6213161081953977,
+        "gmner_identity_exact": true,
+        "formal_stage1_mutated": false,
+        "test_accessed": false,
+        "passed": true
+      },
+      "42": {
+        "gmner_f1": 0.6213161081953977,
+        "gmner_identity_exact": true,
+        "formal_stage1_mutated": false,
+        "test_accessed": false,
+        "passed": true
+      },
+      "43": {
+        "gmner_f1": 0.6213161081953977,
+        "gmner_identity_exact": true,
+        "formal_stage1_mutated": false,
+        "test_accessed": false,
+        "passed": true
+      }
+    },
+    "checks": {
+      "mean_delta_at_least_minimum": true,
+      "every_paired_delta_positive": true,
+      "paired_delta_population_std_within_limit": true,
+      "gmner_identity_exact": true
+    },
+    "passed": true,
+    "decision": "freeze_f3_and_stop_model_selection"
+  },
+  "passed": true,
+  "decision": "freeze_f3_and_stop_model_selection"
+}

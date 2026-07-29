@@ -1,69 +1,40 @@
 # GMNER / FMNERG
 
-本仓库当前只以 **M3.3A** 作为正式主线。历史实验、失败分支和严格 OOF
-基础设施仍可复现，但不属于正式推理链。
-
-## Current Status
+This repository contains the two frozen formal systems used for Twitter10000:
 
 ```text
-Current formal method: M3.3A
-Formal Dev GMNER:      0.621316
-Formal Test MNER:      0.81843
-Formal Test Fine MNER: 0.66144 +/- 0.00037
-Formal Test EEG:       0.65216
-Formal Test GMNER:     0.61529
-Formal Test FMNERG:    0.50144 +/- 0.00133
+Model-G: M3.3A -> GMNER
+Model-F: F3 subtype encoder on frozen M3.3A predictions -> FMNERG
 ```
 
-- Dev/Test 结果已经冻结。
-- M3.6 NULL Release 没有访问 Test，也没有进入正式链路。
-- GMNER 与 FMNERG 都是主任务；51 类 subtype 由独立 sidecar 评估。
-- FMNERG 使用 Dev 选定的全量解冻 RoBERTa 副本，Test 固定报告三个预定
-  seed 的 mean/std，不按 Test 选择 seed。
-
-## Formal Architecture
-
-```text
-RoBERTa Stage1
-  -> R16 formal span/type candidates
-  -> R36 expanded region candidates
-  -> Hierarchical Record Verifier
-  -> Base Top-8 + Learned Top-8
-  -> Fine Grounding Adapter
-  -> Evidence Visibility
-  -> Record-level Decode
-```
-
-边界约束：
-
-- R16 决定正式 span 和 coarse type。
-- R36 只扩展区域候选，不覆盖正式 span/type。
-- 后续 grounding 模块不改变 MNER。
-- FMNERG subtype sidecar 不修改 GMNER 主链的 coarse type。
+Historical no-go branches are summarized in
+[`docs/EXPERIMENT_RESULTS_TABLE.md`](docs/EXPERIMENT_RESULTS_TABLE.md) and are
+not part of the runnable primary surface.
 
 ## Formal Results
 
 | Split | Span F1 | MNER F1 | Fine MNER F1 | EEG F1 | GMNER F1 | FMNERG F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| OOF Train | 0.870900 | 0.811690 | - | 0.651135 | 0.610849 | - |
-| Dev | - | 0.816714 | 0.67488 +/- 0.00243 | 0.660880 | 0.621316 | 0.51729 +/- 0.00083 |
-| Test | - | 0.81843 | 0.66144 +/- 0.00037 | 0.65216 | 0.61529 | 0.50144 +/- 0.00133 |
+| Dev | 0.87283 | 0.816714 | 0.68039 +/- 0.00297 | 0.660880 | 0.621316 | 0.52052 +/- 0.00219 |
+| Test | 0.86980 | 0.818431 | 0.66510 +/- 0.00160 | 0.652157 | 0.615294 | 0.50431 +/- 0.00111 |
 
-OOF Train 是 10 个 heldout fold、7000 条记录的严格 micro-average，不是
-fold ensemble，也不会改变正式 Dev/Test 结果。其 fold GMNER 为
-`0.610869 +/- 0.010907`，并满足：
+The F3 values are means and standard deviations over the preregistered seeds
+41, 42, and 43. Test was not used for checkpoint or threshold selection.
+
+## Model-G: M3.3A
 
 ```text
-10 folds
-700 records per fold
-7000 unique records
-no overlap / no missing records
-test_accessed=false
+RoBERTa Stage1
+-> R16 formal candidates
+-> R36 expanded regions
+-> Hierarchical Record Verifier
+-> Coarse Region Selector
+-> Fine Grounding Adapter
+-> Evidence Visibility
+-> record-level decode
 ```
 
-## Repository Layout
-
-正式配置：
+Formal configuration:
 
 ```text
 configs/fmnerg_twitter10000_stage1.yaml
@@ -73,44 +44,24 @@ configs/fmnerg_twitter10000_fine_grounding_adapter.yaml
 configs/fmnerg_twitter10000_evidence_visibility.yaml
 ```
 
-正式入口位于 `scripts/`；模型、数据和评估实现位于 `gmner/`。
+Formal checkpoints:
 
-其他目录：
-
-- `sidecars/fmnerg_subtype/`：独立 51 类 FMNERG subtype 评估链；包含冻结
-  F0 以及“RoBERTa 最后 4 层 / 全量解冻”的隔离副本消融，详见
-  [Subtype Sidecar](sidecars/fmnerg_subtype/README.md)。
-- `docs/HIERARCHICAL_RECORD_VERIFIER.md`：M2 到 M3.3A 的方法细节。
-- `docs/EXPERIMENT_SUMMARY.md`：历史实验和负结果。
-- `docs/OOF_NULL_RELEASE.md`：严格 OOF 契约及 M3.6A-r2 no-go 结论。
-- `docs/experiments/`：不属于正式推理链的诊断实验。
-
-## Reproduction
-
-训练 Stage1：
-
-```bash
-PYTHONPATH=. python scripts/train.py \
-  --config configs/fmnerg_twitter10000_stage1.yaml
+```text
+outputs/fmnerg_stage1_roberta128/best_model.pt
+outputs/fmnerg_roberta128_hierarchical_record_verifier/best_model.pt
+outputs/fmnerg_roberta128_coarse_selector/best_model.pt
+outputs/fmnerg_roberta128_fine_grounding_adapter/best_model.pt
+outputs/fmnerg_roberta128_evidence_visibility/best_model.pt
 ```
 
-训练后续正式模块：
+Candidate caches:
 
-```bash
-PYTHONPATH=. python scripts/train_hierarchical_record_verifier.py \
-  --config configs/fmnerg_twitter10000_hierarchical_record_verifier.yaml
-
-PYTHONPATH=. python scripts/train_coarse_region_selector.py \
-  --config configs/fmnerg_twitter10000_coarse_selector.yaml
-
-PYTHONPATH=. python scripts/train_fine_grounding_adapter.py \
-  --config configs/fmnerg_twitter10000_fine_grounding_adapter.yaml
-
-PYTHONPATH=. python scripts/train_evidence_visibility.py \
-  --config configs/fmnerg_twitter10000_evidence_visibility.yaml
+```text
+knowledge/record_candidates/roberta128/fmnerg_{train,dev,test}_hierarchical.pt
+knowledge/record_candidates/roberta128/fmnerg_{train,dev,test}_hierarchical_r36.pt
 ```
 
-正式 Dev 评估：
+Evaluate the frozen Model-G endpoint:
 
 ```bash
 PYTHONPATH=. python scripts/evaluate_evidence_visibility.py \
@@ -119,35 +70,122 @@ PYTHONPATH=. python scripts/evaluate_evidence_visibility.py \
   --split dev
 ```
 
-聚合已经物化的严格 OOF 特征：
+The method and ablation details are in
+[`docs/HIERARCHICAL_RECORD_VERIFIER.md`](docs/HIERARCHICAL_RECORD_VERIFIER.md).
 
-```bash
-PYTHONPATH=. python scripts/aggregate_m33a_oof_metrics.py \
-  --feature-root knowledge/null_release_oof/roberta128 \
-  --source-file GMNER-main/Twitter10000_v2.0/txt_fine/train.txt \
-  --output outputs/fmnerg_roberta128_m33a_oof_train/metrics.json
+## Model-F: F3
+
+F3 adds a conditional 51-class subtype encoder to frozen Model-G predictions.
+It cannot change span, coarse type, region, NULL, ordering, EEG, or GMNER.
+
+```text
+frozen M3.3A entity
+-> start/end/mean RoBERTa span representation
+-> parent-masked 51-class subtype encoder
+-> Fine MNER / FMNERG
 ```
 
-完整候选缓存构建、阶段输入输出和一次性 Test 规范见
-[`docs/HIERARCHICAL_RECORD_VERIFIER.md`](docs/HIERARCHICAL_RECORD_VERIFIER.md)。
+Winner configuration:
 
-## Archived Experiments
+```text
+sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml
+```
 
-- **M3.6A-r1**：非 OOF Dev 达到 `0.623738`，不能作为正式提升。
-- **M3.6A-r2**：严格 10-fold full-chain OOF 下，最优 checkpoint 为
-  epoch-0 KEEP，无可部署收益，状态为 **archived no-go**。
-- **M3.4A SigLIP2 Reliability**：冻结旁路诊断，未达到正式接入门槛。
-- Prototype、external knowledge、flat verifier 和旧 action controller 均不属于
-  当前正式方法。
+Formal checkpoints:
 
-历史完成点保存在 Git tag `m3.6a-r2-oof-complete`。
+```text
+outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed41/best_model.pt
+outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed42/best_model.pt
+outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed43/best_model.pt
+```
+
+Formal protocol and commands are documented in
+[`sidecars/fmnerg_subtype/README.md`](sidecars/fmnerg_subtype/README.md).
+
+## Stage1 Research Status
+
+D0 found no significant comparable-scale gradient conflict in Stage1. Its
+main finding was a gradient-scale imbalance, so task-adversarial training is
+not authorized by the audit.
+
+D1 evaluated a standalone span candidate selector with the required strict
+10-fold OOF Train features:
+
+```text
+10 fold-specific Stage1 models
+-> unseen 700-record candidate cache per fold
+-> compact and seal each fold
+-> merge exactly 7000 Train records
+-> paired full-fit Dev cache
+-> distribution audit
+```
+
+Protocol:
+[`docs/experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md`](docs/experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md).
+
+D1 Phase 1 completed with a `VALID_AUDIT`: 7000 strict OOF Train records and
+1500 paired full-fit Dev records share the same v2 candidate contract. The
+preregistered Seed42 selector then reached Dev Span/MNER/EEG/Stage1-GMNER
+deltas of `+0.00430/+0.00570/+0.00166/+0.00256`, but formal-gold preservation
+fell to `0.98381`. The selector has a positive learning signal, but it reduced
+the number of correct Stage1 spans and triples while improving precision. Its
+formal deployment status is therefore `NO_GO`; Seeds 41/43 and the downstream
+M3.3A rebuild are not run. The compact OOF caches, checkpoint, protocol, and
+summary are retained as a frozen ablation. Formal metrics remain unchanged
+and Test was not accessed.
+
+The next main experiment is a jointly trained hierarchical Stage1:
+
+```text
+shared RoBERTa / graph / cross-modal representation
+├── Boundary CRF
+├── span-level coarse type head
+├── existing grounding head
+└── candidate utility auxiliary head
+```
+
+Because candidate utility is trained inside the same Stage1 forward/backward
+pass, the initial joint experiment uses all Train records and does not require
+OOF. OOF remains mandatory only for a separately trained selector after
+Stage1 is frozen. A downstream M3.3A rebuild is allowed only after the paired
+Stage1 and three-seed gates pass.
+
+The corrected evidence, OOF boundary, acceptance gates, and execution order
+are frozen in
+[`docs/INNOVATION_OPTIMIZATION_PROPOSALS.md`](docs/INNOVATION_OPTIMIZATION_PROPOSALS.md).
+
+## Repository Layout
+
+```text
+gmner/       core models, data contracts, losses, and evaluators
+scripts/     primary training, evaluation, and cache builders
+configs/     formal Model-G configs
+sidecars/    formal F3 subtype implementation
+tools/       F3 and D1 orchestration
+tests/       tests for the retained formal and active paths
+docs/        final results, protocols, and method documentation
+```
+
+## Environment
+
+```bash
+conda activate gmner
+pip install -r requirements.txt
+export PYTHONPATH=.
+```
+
+Local model paths expected by the formal configuration:
+
+```text
+roberta-base/
+clip-vit-base-patch32/
+```
 
 ## Validation
 
 ```bash
-python -m pytest
-ruff check .
-python -m compileall gmner scripts sidecars tools
+PYTHONPATH=. python -m pytest -q
 ```
 
-正式结果复现期间不得使用 Test 选择 checkpoint、阈值或超参数。
+Formal result selection rules are recorded in
+[`docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md`](docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md).

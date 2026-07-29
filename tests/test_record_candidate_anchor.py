@@ -35,6 +35,18 @@ def test_stage1_entities_are_restored_from_formal_anchor() -> None:
     ]
 
 
+def test_stage1_entities_preserve_formal_subtype() -> None:
+    record = _anchor_record()
+    record["metadata"]["stage1_predictions"][0]["subtype_id"] = 17
+
+    entities = stage1_entities_from_anchor(
+        record,
+        ["before", "New", "York", "after"],
+    )
+
+    assert entities[0]["subtype_id"] == 17
+
+
 def test_formal_anchor_requires_same_stage1_and_candidate_contract(
     tmp_path,
 ) -> None:
@@ -102,3 +114,42 @@ def test_formal_anchor_rejects_non_region_candidate_differences(
         assert "differ only in max_regions" in str(error)
     else:
         raise AssertionError("Candidate-contract drift must reject the anchor.")
+
+
+def test_formal_anchor_rejects_taxonomy_drift(tmp_path) -> None:
+    path = tmp_path / "formal.pt"
+    formal_spec = {
+        "max_regions": 16,
+        "label_schema": "fine_hierarchical",
+        "taxonomy_sha256": "taxonomy-a",
+    }
+    torch.save(
+        {
+            "metadata": {
+                "stage1_checkpoint_sha256": "stage1",
+                "data_source_sha256": "source",
+                "label_schema": "fine_hierarchical",
+                "taxonomy_sha256": "taxonomy-a",
+                "candidate_config": formal_spec,
+            },
+            "records": [_anchor_record()],
+        },
+        path,
+    )
+
+    try:
+        load_formal_anchor_cache(
+            path,
+            stage1_checkpoint_sha256="stage1",
+            data_source_sha256="source",
+            expanded_candidate_spec={
+                **formal_spec,
+                "max_regions": 36,
+            },
+            expected_label_schema="fine_hierarchical",
+            expected_taxonomy_sha256="taxonomy-b",
+        )
+    except ValueError as error:
+        assert "another subtype taxonomy" in str(error)
+    else:
+        raise AssertionError("Taxonomy drift must reject the formal anchor.")

@@ -27,6 +27,10 @@ from gmner.data import (
 )
 from gmner.data.graph_builders import GraphBuilderConfig
 from gmner.engine import GMNERTrainer, evaluate_model
+from gmner.fmnerg.taxonomy import (
+    SubtypeTaxonomy,
+    bind_config_taxonomy_fingerprint,
+)
 from gmner.models import GMNERModel
 from gmner.utils.io import ensure_dir, maybe_convert_conll
 from gmner.utils.logging import create_logger
@@ -167,6 +171,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-train-samples", type=int, default=None, help="Use only the first N train samples for debugging.")
     parser.add_argument("--num-labels", type=int, default=None, help="Label number for NER task.")
     parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Optional runtime seed override.",
+    )
+    parser.add_argument(
+        "--lambda-fine-subtype",
+        type=float,
+        default=None,
+        help="Optional Stage1-F subtype-loss weight override.",
+    )
+    parser.add_argument(
         "--skip-test-evaluation",
         action="store_true",
         help="Skip final test evaluation. Useful for out-of-fold checkpoint generation.",
@@ -223,6 +239,14 @@ def apply_overrides(config: GMNERConfig, args: argparse.Namespace) -> GMNERConfi
     if args.reranker_alpha is not None:
         config.model.grounding_reranker_fusion_mode = "fixed"
         config.model.grounding_reranker_weight = args.reranker_alpha
+    if args.seed is not None:
+        config.runtime.seed = int(args.seed)
+    if args.lambda_fine_subtype is not None:
+        if args.lambda_fine_subtype < 0:
+            raise ValueError("--lambda-fine-subtype must be non-negative.")
+        config.loss.lambda_fine_subtype = float(
+            args.lambda_fine_subtype
+        )
     return config
 
 
@@ -236,6 +260,15 @@ def build_datasets(
     num_labels_override: int | None = None,
     build_test: bool = True,
 ) -> Tuple:
+    subtype_taxonomy = None
+    if bool(getattr(config.model, "use_fine_subtype_head", False)):
+        subtype_taxonomy = SubtypeTaxonomy.from_file(
+            resolve_path(config.data.subtype_taxonomy, project_root)
+        )
+        bind_config_taxonomy_fingerprint(
+            config.data,
+            subtype_taxonomy,
+        )
     train_path = maybe_convert_conll(resolve_path(config.data.train_file, project_root), output_dir)
     dev_path = maybe_convert_conll(resolve_path(config.data.dev_file, project_root), output_dir)
     test_path = None
@@ -281,6 +314,8 @@ def build_datasets(
         groundability_type_priors=str(groundability_type_priors) if groundability_type_priors else None,
         groundability_mention_priors=str(groundability_mention_priors) if groundability_mention_priors else None,
         region_min_score=config.data.region_min_score,
+        subtype_taxonomy=subtype_taxonomy,
+        require_all_subtypes=subtype_taxonomy is not None,
     )
     dev_dataset = MMNERJsonDataset(
         jsonl_path=str(dev_path),
@@ -299,6 +334,7 @@ def build_datasets(
         groundability_type_priors=str(groundability_type_priors) if groundability_type_priors else None,
         groundability_mention_priors=str(groundability_mention_priors) if groundability_mention_priors else None,
         region_min_score=config.data.region_min_score,
+        subtype_taxonomy=subtype_taxonomy,
     )
     test_dataset = None
     if test_path is not None:
@@ -319,6 +355,7 @@ def build_datasets(
             groundability_type_priors=str(groundability_type_priors) if groundability_type_priors else None,
             groundability_mention_priors=str(groundability_mention_priors) if groundability_mention_priors else None,
             region_min_score=config.data.region_min_score,
+            subtype_taxonomy=subtype_taxonomy,
         )
 
     num_labels = num_labels_override if num_labels_override is not None else 9
@@ -331,6 +368,21 @@ if __name__ == "__main__":
 
     config = load_config(args.config)
     config = apply_overrides(config, args)
+    if bool(getattr(config.model, "use_fine_subtype_head", False)):
+        if str(getattr(config.data, "label_schema", "")) != "fine_hierarchical":
+            raise ValueError(
+                "Stage1-F requires data.label_schema=fine_hierarchical."
+            )
+        if not str(getattr(config.data, "subtype_taxonomy", "")).strip():
+            raise ValueError(
+                "Stage1-F requires data.subtype_taxonomy."
+            )
+        config.data.subtype_taxonomy = str(
+            resolve_path(config.data.subtype_taxonomy, project_root)
+        )
+        taxonomy = SubtypeTaxonomy.from_file(config.data.subtype_taxonomy)
+        bind_config_taxonomy_fingerprint(config.data, taxonomy)
+        config.model.num_subtypes = taxonomy.num_subtypes
     if config.data.semantic_prototype_path:
         config.data.semantic_prototype_path = str(
             resolve_path(config.data.semantic_prototype_path, project_root)
@@ -419,6 +471,14 @@ if __name__ == "__main__":
         config.model.num_subtypes = train_subtype_count
     if config.model.use_subtype_auxiliary:
         logger.info("Subtype auxiliary labels: %d", config.model.num_subtypes)
+    if config.model.use_fine_subtype_head:
+        taxonomy = SubtypeTaxonomy.from_file(config.data.subtype_taxonomy)
+        config.model.num_subtypes = taxonomy.num_subtypes
+        logger.info(
+            "Formal subtype taxonomy: labels=%d sha256=%s",
+            taxonomy.num_subtypes,
+            taxonomy.source_sha256,
+        )
 
     collator = GMNERCollator(tokenizer=tokenizer)
 

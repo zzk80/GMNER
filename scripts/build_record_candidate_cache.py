@@ -40,6 +40,20 @@ from gmner.data.formal_candidate_anchor import (
 )
 from gmner.data.record_candidate_dataset import CACHE_FORMAT_VERSION
 from gmner.engine.utils import move_batch_to_device
+from gmner.fmnerg.candidate_contract import (
+    FINE_CANDIDATE_SCHEMA,
+    FINE_CANDIDATE_SCHEMA_VERSION,
+    validate_fine_candidate_record,
+)
+from gmner.fmnerg.metrics import (
+    end_to_end_fine_metrics,
+    fine_entities_from_bio_tags,
+)
+from gmner.fmnerg.taxonomy import (
+    SubtypeTaxonomy,
+    bind_config_taxonomy_fingerprint,
+    validate_taxonomy_fingerprint,
+)
 from gmner.knowledge.region_compatibility import compatibility_score
 from gmner.models import GMNERModel
 from gmner.utils.candidate_decoding import (
@@ -113,6 +127,14 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument("--device", default=None)
+    parser.add_argument(
+        "--allow-test",
+        action="store_true",
+        help=(
+            "Required to build a fine_hierarchical Test cache after the "
+            "architecture and protocol are frozen."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -282,6 +304,35 @@ def build(args: argparse.Namespace) -> dict:
             "--oof-fold-id requires --split train and an explicit --input-file."
         )
     config = load_config(args.config)
+    label_schema = str(
+        getattr(config.data, "label_schema", "coarse")
+    )
+    fine_schema = label_schema == FINE_CANDIDATE_SCHEMA
+    if fine_schema and args.split == "test" and not args.allow_test:
+        raise ValueError(
+            "Fine-hierarchical Test cache access requires --allow-test."
+        )
+    taxonomy = None
+    if fine_schema:
+        if not bool(
+            getattr(config.model, "use_fine_subtype_head", False)
+        ):
+            raise ValueError(
+                "fine_hierarchical cache requires the formal subtype head."
+            )
+        taxonomy_path = resolve_path(
+            config.data.subtype_taxonomy,
+            root,
+        )
+        taxonomy = SubtypeTaxonomy.from_file(taxonomy_path)
+        config.data.subtype_taxonomy = str(taxonomy_path)
+        bind_config_taxonomy_fingerprint(config.data, taxonomy)
+        config.model.num_subtypes = taxonomy.num_subtypes
+    elif bool(getattr(config.model, "use_fine_subtype_head", False)):
+        raise ValueError(
+            "The formal subtype head requires "
+            "data.label_schema=fine_hierarchical."
+        )
     if args.max_regions is not None:
         if int(args.max_regions) <= 0:
             raise ValueError("--max-regions must be a positive integer.")
@@ -334,6 +385,7 @@ def build(args: argparse.Namespace) -> dict:
         grounding_iou_threshold=config.data.grounding_iou_threshold,
         add_null_region=config.data.add_null_region,
         region_min_score=config.data.region_min_score,
+        subtype_taxonomy=taxonomy,
     )
     selected_dataset = dataset
     if args.max_records is not None:
@@ -348,7 +400,16 @@ def build(args: argparse.Namespace) -> dict:
 
     model = GMNERModel(config=config, num_labels=len(DEFAULT_LABEL2ID))
     checkpoint = torch.load(checkpoint_path, map_location="cpu")
-    model.load_state_dict(checkpoint["model_state_dict"], strict=False)
+    if taxonomy is not None:
+        validate_taxonomy_fingerprint(
+            dict(checkpoint.get("model_metadata") or {}),
+            taxonomy,
+            artifact_name="Stage1-F checkpoint",
+        )
+    model.load_state_dict(
+        checkpoint["model_state_dict"],
+        strict=taxonomy is not None,
+    )
     model.to(device).eval()
 
     id2label = {value: key for key, value in DEFAULT_LABEL2ID.items()}
@@ -381,6 +442,15 @@ def build(args: argparse.Namespace) -> dict:
         "preserve_stage1_type": True,
         "grounding_iou_threshold": float(config.data.grounding_iou_threshold),
         "max_regions": int(config.data.max_regions),
+        **(
+            {
+                "label_schema": label_schema,
+                "fine_schema_version": FINE_CANDIDATE_SCHEMA_VERSION,
+                "taxonomy_sha256": taxonomy.source_sha256,
+            }
+            if taxonomy is not None
+            else {}
+        ),
     }
     stage1_checkpoint_sha256 = sha256_file(checkpoint_path)
     data_source_sha256 = sha256_file(source_path)
@@ -393,13 +463,22 @@ def build(args: argparse.Namespace) -> dict:
             stage1_checkpoint_sha256=stage1_checkpoint_sha256,
             data_source_sha256=data_source_sha256,
             expanded_candidate_spec=candidate_spec,
+            expected_label_schema=(
+                FINE_CANDIDATE_SCHEMA if taxonomy is not None else None
+            ),
+            expected_taxonomy_sha256=(
+                taxonomy.source_sha256 if taxonomy is not None else None
+            ),
         )
     records: list[dict] = []
     source_counts = Counter()
     gold_count = span_covered = type_covered = region_covered = triple_covered = 0
+    visible_gold_count = visible_region_covered = 0
+    visible_joint_span_region_covered = 0
     stage1_gold_lost = 0
     bypass_predicted = bypass_gold = 0
     bypass_correct = Counter()
+    fine_bypass_correct = Counter()
 
     for batch in tqdm(loader, desc=f"Caching {args.split} records"):
         batch = move_batch_to_device(batch, device)
@@ -442,10 +521,36 @@ def build(args: argparse.Namespace) -> dict:
                     tokens,
                 )
             gold_entities_raw = extract_entities_from_word_labels(word_gold, tokens, id2label)
+            gold_fine_by_span: dict[tuple[int, int], dict] = {}
+            if taxonomy is not None:
+                fine_tags = metadata.get("fine_ner_tags")
+                if not isinstance(fine_tags, list):
+                    raise ValueError(
+                        "fine_hierarchical cache requires fine_ner_tags in "
+                        f"record {metadata.get('record_id')}."
+                    )
+                gold_fine_entities = fine_entities_from_bio_tags(
+                    tokens=tokens,
+                    coarse_tags=word_gold,
+                    fine_tags=fine_tags,
+                    taxonomy=taxonomy,
+                    coarse_id2label=id2label,
+                )
+                gold_fine_by_span = {
+                    tuple(map(int, item["span"])): item
+                    for item in gold_fine_entities
+                }
             stage1_spans = {(int(item["start"]), int(item["end"])) for item in pred_entities}
             stage1_types_by_span = {
                 (int(item["start"]), int(item["end"])): ENTITY_TYPE2ID[str(item["type"])]
                 for item in pred_entities
+            }
+            stage1_subtypes_by_span = {
+                (int(item["start"]), int(item["end"])): int(
+                    item["subtype_id"]
+                )
+                for item in pred_entities
+                if item.get("subtype_id") is not None
             }
 
             valid_subwords = batch["attention_mask"][index].bool() & labels[index].ne(IGNORE_INDEX)
@@ -513,6 +618,7 @@ def build(args: argparse.Namespace) -> dict:
             region_scores = []
             compatibilities = []
             source_ids = []
+            candidate_masks: list[torch.Tensor] = []
             for candidate in candidates:
                 mask = span_mask_from_words(
                     candidate.start,
@@ -520,6 +626,7 @@ def build(args: argparse.Namespace) -> dict:
                     word_ids,
                     batch["attention_mask"][index],
                 ).unsqueeze(0)
+                candidate_masks.append(mask[0])
                 token_states = outputs["pre_prototype_fused_tokens"][index]
                 feature = (token_states * mask[0].unsqueeze(-1)).sum(dim=0) / mask.sum().clamp_min(1.0)
                 span_features.append(feature)
@@ -621,6 +728,58 @@ def build(args: argparse.Namespace) -> dict:
                 base_region_scores[row] = fixed_scores
                 base_region_indices[row] = int(fixed_scores.argmax().item())
 
+            subtype_raw_logits = torch.empty(
+                span_count,
+                taxonomy.num_subtypes if taxonomy is not None else 0,
+                dtype=torch.float32,
+                device=device,
+            )
+            fixed_subtype_ids = torch.full(
+                (span_count,),
+                IGNORE_INDEX,
+                dtype=torch.long,
+                device=device,
+            )
+            subtype_confidence = torch.zeros(
+                span_count,
+                dtype=torch.float32,
+                device=device,
+            )
+            subtype_margin = torch.zeros_like(subtype_confidence)
+            subtype_entropy = torch.zeros_like(subtype_confidence)
+            if taxonomy is not None and span_count:
+                subtype_text_states = outputs["base_text_nodes"][
+                    index : index + 1
+                ].expand(span_count, -1, -1)
+                subtype_outputs = model.score_fine_subtypes(
+                    token_states=subtype_text_states,
+                    target_mask=torch.stack(candidate_masks).to(device),
+                    parent_ids=fixed_type_ids,
+                )
+                subtype_raw_logits = subtype_outputs[
+                    "raw_logits"
+                ].float()
+                fixed_subtype_ids = subtype_outputs[
+                    "predicted_subtype_ids"
+                ]
+                subtype_confidence = subtype_outputs["confidence"].float()
+                subtype_margin = subtype_outputs["margin"].float()
+                subtype_entropy = subtype_outputs["entropy"].float()
+                for row, candidate in enumerate(candidates):
+                    anchored_subtype = stage1_subtypes_by_span.get(
+                        candidate.boundary
+                    )
+                    if (
+                        anchored_subtype is not None
+                        and anchored_subtype
+                        != int(fixed_subtype_ids[row].item())
+                    ):
+                        raise ValueError(
+                            "Expanded cache changed the formal R16 subtype "
+                            f"for record {metadata.get('record_id')} span "
+                            f"{candidate.boundary}."
+                        )
+
             gold_span_mask = torch.zeros(span_count, dtype=torch.bool, device=device)
             gold_type_mask = torch.zeros(span_count, top_m, dtype=torch.bool, device=device)
             gold_region_mask = torch.zeros(span_count, num_regions, dtype=torch.bool, device=device)
@@ -631,10 +790,22 @@ def build(args: argparse.Namespace) -> dict:
                 span_count, num_regions, dtype=torch.float32, device=device
             )
             visibility_targets = torch.full((span_count,), -1.0, device=device)
+            gold_subtype_ids = torch.full(
+                (span_count,),
+                IGNORE_INDEX,
+                dtype=torch.long,
+                device=device,
+            )
             gold_entities: list[dict] = []
             gt_boxes_by_name = metadata.get("gt_boxes_by_name") or {}
             for entity in gold_entities_raw:
                 boundary = (int(entity["start"]), int(entity["end"]))
+                fine_entity = gold_fine_by_span.get(boundary)
+                if taxonomy is not None and fine_entity is None:
+                    raise ValueError(
+                        "Coarse and fine gold spans differ in record "
+                        f"{metadata.get('record_id')}: {boundary}."
+                    )
                 region_positive, region_iou, visible = positive_regions(
                     entity,
                     gt_boxes_by_name,
@@ -648,12 +819,26 @@ def build(args: argparse.Namespace) -> dict:
                     {
                         "span": list(boundary),
                         "type_id": int(type_id),
+                        **(
+                            {
+                                "subtype": str(fine_entity["subtype"]),
+                                "subtype_id": int(
+                                    fine_entity["subtype_id"]
+                                ),
+                            }
+                            if fine_entity is not None
+                            else {}
+                        ),
                         "text": str(entity["text"]),
                         "visible": bool(visible),
                         "region_positive_indices": torch.nonzero(region_positive, as_tuple=False).squeeze(-1).tolist(),
                     }
                 )
                 gold_count += 1
+                visible_gold_count += int(visible)
+                visible_region_covered += int(
+                    visible and region_positive.any().item()
+                )
                 if boundary not in candidate_index:
                     continue
                 span_covered += 1
@@ -664,8 +849,15 @@ def build(args: argparse.Namespace) -> dict:
                 gold_type_mask[row] = type_hits
                 gold_region_mask[row] = region_positive
                 region_iou_targets[row] = region_iou
+                if fine_entity is not None:
+                    gold_subtype_ids[row] = int(
+                        fine_entity["subtype_id"]
+                    )
                 type_covered += int(type_hits.any().item())
                 region_covered += int(region_positive.any().item())
+                visible_joint_span_region_covered += int(
+                    visible and region_positive.any().item()
+                )
                 if type_hits.any() and region_positive.any():
                     positive_triples[row] = type_hits[:, None] & region_positive[None, :]
                     triple_covered += 1
@@ -678,6 +870,15 @@ def build(args: argparse.Namespace) -> dict:
                     {
                         "span": list(boundary),
                         "type_id": int(fixed_type_ids[row].item()),
+                        **(
+                            {
+                                "subtype_id": int(
+                                    fixed_subtype_ids[row].item()
+                                )
+                            }
+                            if taxonomy is not None
+                            else {}
+                        ),
                         "region_index": int(base_region_indices[row].item()),
                     }
                 )
@@ -686,6 +887,21 @@ def build(args: argparse.Namespace) -> dict:
             bypass_predicted += len(stage1_predictions)
             bypass_gold += len(gold_entities)
             bypass_correct.update(matches)
+            if taxonomy is not None:
+                fine_metrics = end_to_end_fine_metrics(
+                    [
+                        {
+                            "predictions": stage1_predictions,
+                            "gold_entities": gold_entities,
+                        }
+                    ]
+                )
+                fine_bypass_correct["fine_mner"] += int(
+                    fine_metrics["fine_mner_correct"]
+                )
+                fine_bypass_correct["fmnerg"] += int(
+                    fine_metrics["fmnerg_correct"]
+                )
 
             geometry = normalized_geometry(region_boxes, batch["image_sizes"][index])
             record = {
@@ -709,6 +925,31 @@ def build(args: argparse.Namespace) -> dict:
                 "region_base_scores": region_scores_tensor.detach().cpu().float(),
                 "type_region_compatibility": compatibility_values.detach().cpu().float(),
                 "fixed_type_ids": fixed_type_ids.detach().cpu(),
+                **(
+                    {
+                        "fixed_parent_ids": fixed_type_ids.detach().cpu(),
+                        "subtype_raw_logits": (
+                            subtype_raw_logits.detach().cpu().float()
+                        ),
+                        "fixed_subtype_ids": (
+                            fixed_subtype_ids.detach().cpu()
+                        ),
+                        "subtype_confidence": (
+                            subtype_confidence.detach().cpu().float()
+                        ),
+                        "subtype_margin": (
+                            subtype_margin.detach().cpu().float()
+                        ),
+                        "subtype_entropy": (
+                            subtype_entropy.detach().cpu().float()
+                        ),
+                        "gold_subtype_ids": (
+                            gold_subtype_ids.detach().cpu()
+                        ),
+                    }
+                    if taxonomy is not None
+                    else {}
+                ),
                 "base_region_indices": base_region_indices.detach().cpu(),
                 "base_region_scores": base_region_scores.detach().cpu().float(),
                 "region_mask": region_mask.detach().cpu(),
@@ -732,6 +973,8 @@ def build(args: argparse.Namespace) -> dict:
                     "null_region_index": int(null_index),
                 },
             }
+            if taxonomy is not None:
+                validate_fine_candidate_record(record, taxonomy)
             records.append(record)
 
     if (
@@ -748,6 +991,17 @@ def build(args: argparse.Namespace) -> dict:
         name: f1(int(bypass_correct[name]), bypass_predicted, bypass_gold)
         for name in ("span", "mner", "eeg", "gmner")
     }
+    if taxonomy is not None:
+        bypass_metrics.update(
+            {
+                name: f1(
+                    int(fine_bypass_correct[name]),
+                    bypass_predicted,
+                    bypass_gold,
+                )
+                for name in ("fine_mner", "fmnerg")
+            }
+        )
     summary = {
         "split": args.split,
         "records": len(records),
@@ -757,6 +1011,18 @@ def build(args: argparse.Namespace) -> dict:
         "span_coverage": span_covered / max(gold_count, 1),
         "typed_span_coverage": type_covered / max(gold_count, 1),
         "region_coverage": region_covered / max(gold_count, 1),
+        "visible_region_oracle_recall": (
+            visible_region_covered / max(visible_gold_count, 1)
+        ),
+        "visible_gold_entities": visible_gold_count,
+        "visible_region_covered": visible_region_covered,
+        "visible_joint_span_region_coverage": (
+            visible_joint_span_region_covered
+            / max(visible_gold_count, 1)
+        ),
+        "visible_joint_span_region_covered": (
+            visible_joint_span_region_covered
+        ),
         "triple_coverage": triple_covered / max(gold_count, 1),
         "stage1_gold_lost_by_final_candidates": stage1_gold_lost,
         "stage1_bypass": bypass_metrics,
@@ -775,6 +1041,15 @@ def build(args: argparse.Namespace) -> dict:
         "hidden_size": int(config.model.hidden_size),
         "num_types": 4,
         "summary": summary,
+        **(
+            {
+                "label_schema": FINE_CANDIDATE_SCHEMA,
+                "fine_schema_version": FINE_CANDIDATE_SCHEMA_VERSION,
+                **taxonomy.fingerprint_metadata(),
+            }
+            if taxonomy is not None
+            else {}
+        ),
     }
     if formal_anchor_provenance is not None:
         cache_metadata["formal_anchor_cache"] = formal_anchor_provenance

@@ -1,0 +1,1424 @@
+{
+  "metadata": {
+    "kind": "fmnerg_subtype_region_evidence_oracle",
+    "format_version": 1,
+    "split": "dev",
+    "scope": "formal GMNER-correct but F2 subtype-wrong predictions",
+    "interpretation": "A deterministic Train-prototype probe of visual subtype separability; not deployable accuracy and not a trained model",
+    "candidate_semantics": "Only official gold-positive real R36 regions count as clean visual evidence; Fine Top-K controls whether such evidence is reachable without using a non-gold region",
+    "seeds": [
+      41,
+      42,
+      43
+    ],
+    "top_k": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "training_performed": false,
+    "gradient_updates": 0,
+    "formal_stage1_mutated": false,
+    "formal_region_mutated": false,
+    "test_accessed": false
+  },
+  "decision": {
+    "status": "no_go",
+    "freeze": "F2 remains the formal FMNERG solution",
+    "terminate": [
+      "C1",
+      "J0",
+      "J1",
+      "J2",
+      "Top-K subtype-conditioned region attention"
+    ],
+    "evidence": [
+      "Mean subtype errors given GMNER-correct: 257.67",
+      "Mean gold-visible subtype errors: 103.00",
+      "Mean gold-NULL subtype errors: 154.67",
+      "Top-4 adds 5.33 pairwise and 4.67 sibling recoveries over formal region",
+      "Top-4, Top-8, Top-16, and full R36 have the same support ceiling",
+      "Full-R36 sibling-top1 support covers only 22.33% of visible subtype errors"
+    ]
+  },
+  "artifacts": {
+    "joint_config": {
+      "path": "/home/zzk/gmner/sidecars/fmnerg_joint/configs/j0_visual_fusion.yaml",
+      "sha256": "02568c03c2fcb19659f758e5bab7a38204c0d3ae4ebeaab8a672f98bba8b7ffe"
+    },
+    "evidence_config": {
+      "path": "/home/zzk/gmner/configs/fmnerg_twitter10000_evidence_visibility.yaml",
+      "sha256": "bc90e550547bca42fac9c02f00e3e9b0af915b787bb318718ae307829cd22eea"
+    },
+    "taxonomy": {
+      "path": "/home/zzk/gmner/sidecars/fmnerg_subtype/taxonomy_twitter10000.json",
+      "sha256": "84d6bae4298d383aea989b7a559c4d5d68d465733fcdfe1b3da288380e622f40"
+    },
+    "dev_source": {
+      "path": "/home/zzk/gmner/GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt",
+      "sha256": "3ff31ebca3c858926ec6c98694820fda39c0f9718645174c00069ee5bcffab69"
+    },
+    "formal_predictions": {
+      "path": "/home/zzk/gmner/knowledge/fmnerg_subtype_sidecar/roberta128/dev_formal_predictions.json",
+      "sha256": "f1373962e07546419a699df303e7bc31bf1ccf22c4ef8f915e318764d6879fdd",
+      "coarse_prediction_sha256": "9d9f556231951a2655109c4d5e58f61aba7bd63b00c3dfbf7855e939238808df",
+      "coarse_metrics": {
+        "span_precision": 0.8634185303514377,
+        "span_recall": 0.8824489795918368,
+        "span_f1": 0.8728300363342755,
+        "span_correct": 2162.0,
+        "coarse_mner_precision": 0.8079073482428115,
+        "coarse_mner_recall": 0.8257142857142857,
+        "coarse_mner_f1": 0.8167137666532096,
+        "coarse_mner_correct": 2023.0,
+        "eeg_precision": 0.6537539936102237,
+        "eeg_recall": 0.6681632653061225,
+        "eeg_f1": 0.6608800968914009,
+        "eeg_correct": 1637.0,
+        "gmner_precision": 0.6146166134185304,
+        "gmner_recall": 0.6281632653061224,
+        "gmner_f1": 0.6213161081953977,
+        "gmner_correct": 1539.0,
+        "entity_precision": 0.8079073482428115,
+        "entity_recall": 0.8257142857142857,
+        "entity_f1": 0.8167137666532096,
+        "triple_precision": 0.6146166134185304,
+        "triple_recall": 0.6281632653061224,
+        "triple_f1": 0.6213161081953977,
+        "gmner_score": 0.6213161081953977,
+        "predicted": 2504.0,
+        "gold": 2450.0
+      }
+    },
+    "prototype_bank": {
+      "method": "IoU-weighted mean of normalized Train gold-positive R36 features, followed by one normalized centroid per subtype",
+      "source_sha256": "b067446640d71ffad116e67c359f095f99c9d5ca2d0f2a1bc103909ebc8505e9",
+      "gold_entities": 11779.0,
+      "span_missing": 1.0,
+      "span_coverage": 0.9999151031496731,
+      "visible_entities": 4212.0,
+      "no_real_positive": 7566.0,
+      "prototype_subtypes_available": 49.0,
+      "prototype_subtypes_missing": [
+        "continent",
+        "ordinance"
+      ]
+    },
+    "fine_adapter": {
+      "expanded_cache_sha256": "25ba4162bf3be5fb81188b1276a3bf765f1e8c98019fab8eb046f02ec42ce567",
+      "fine_config_sha256": "b22032458267b9bb2d0562fcb5b3f11fa13129be38e64864cb687e51be0e2ef1",
+      "fine_checkpoint_sha256": "f76cca733ba3bbccf5ccbbdca43dcfe9b56ca91d3ad9c1a7631092ab5dfa2439",
+      "fine_checkpoint_epoch": 1,
+      "candidate_budget": 16.0
+    },
+    "f2": {
+      "encoder_config_sha256": "c396ea6f6d2ff85632e3ebb01c510875c86300b441d7f70f0c945c1b68b81ff5",
+      "formal_coarse_prediction_sha256": "9d9f556231951a2655109c4d5e58f61aba7bd63b00c3dfbf7855e939238808df",
+      "checkpoints": {
+        "41": {
+          "path": "/home/zzk/gmner/outputs/fmnerg_roberta128_subtype_encoder_ablation/all_seed41/best_model.pt",
+          "sha256": "327276c327d83f503f2f6a98e897d0766c6a3513d34d0ba715f7ae3a26a60b5c",
+          "epoch": 10,
+          "metrics": {
+            "subtype_accuracy_on_gold_spans": 0.7812244897959184,
+            "subtype_micro_f1_on_gold_spans": 0.7812244897959184,
+            "subtype_macro_f1_on_gold_spans": 0.6803469693465424,
+            "gold_span_examples": 2450.0,
+            "subtype_loc_macro_f1_on_gold_spans": 0.7057198418076542,
+            "subtype_per_macro_f1_on_gold_spans": 0.6132452095639997,
+            "subtype_org_macro_f1_on_gold_spans": 0.7802828303886403,
+            "subtype_other_macro_f1_on_gold_spans": 0.6564565381512392,
+            "span_precision": 0.8634185303514377,
+            "span_recall": 0.8824489795918368,
+            "span_f1": 0.8728300363342755,
+            "span_correct": 2162.0,
+            "coarse_mner_precision": 0.8079073482428115,
+            "coarse_mner_recall": 0.8257142857142857,
+            "coarse_mner_f1": 0.8167137666532096,
+            "coarse_mner_correct": 2023.0,
+            "eeg_precision": 0.6537539936102237,
+            "eeg_recall": 0.6681632653061225,
+            "eeg_f1": 0.6608800968914009,
+            "eeg_correct": 1637.0,
+            "gmner_precision": 0.6146166134185304,
+            "gmner_recall": 0.6281632653061224,
+            "gmner_f1": 0.6213161081953977,
+            "gmner_correct": 1539.0,
+            "entity_precision": 0.8079073482428115,
+            "entity_recall": 0.8257142857142857,
+            "entity_f1": 0.8167137666532096,
+            "triple_precision": 0.6146166134185304,
+            "triple_recall": 0.6281632653061224,
+            "triple_f1": 0.6213161081953977,
+            "gmner_score": 0.6213161081953977,
+            "predicted": 2504.0,
+            "gold": 2450.0,
+            "fine_mner_precision": 0.6665335463258786,
+            "fine_mner_recall": 0.6812244897959183,
+            "fine_mner_f1": 0.673798950343157,
+            "fine_mner_correct": 1669.0,
+            "fmnerg_precision": 0.5115814696485623,
+            "fmnerg_recall": 0.5228571428571429,
+            "fmnerg_f1": 0.5171578522406137,
+            "fmnerg_correct": 1281.0,
+            "fmnerg_score": 0.5171578522406137,
+            "subtype_accuracy_on_correct_predicted_spans": 0.7719703977798335,
+            "parent_conditioned_subtype_accuracy": 0.8250123578843302,
+            "exact_predicted_span_count": 2162.0,
+            "parent_conditioned_span_count": 2023.0,
+            "hierarchy_consistency_rate": 1.0,
+            "predicted_parent_subtype_accuracy_on_exact_predicted_spans": 0.7719703977798335,
+            "gold_parent_subtype_accuracy_on_exact_predicted_spans": 0.8085106382978723,
+            "coarse_wrong_exact_predicted_span_count": 139.0,
+            "coarse_wrong_gold_parent_subtype_correct": 79.0,
+            "coarse_wrong_gold_parent_subtype_recovery_rate": 0.5683453237410072,
+            "train_loss": 0.2650659667702063
+          },
+          "test_accessed": false
+        },
+        "42": {
+          "path": "/home/zzk/gmner/outputs/fmnerg_roberta128_subtype_encoder_ablation/all_seed42/best_model.pt",
+          "sha256": "e0f4abeb730e09d11883f73f79a02ca8aa9bb6494ec9db286ce85b87aa4eb9c7",
+          "epoch": 11,
+          "metrics": {
+            "subtype_accuracy_on_gold_spans": 0.7893877551020408,
+            "subtype_micro_f1_on_gold_spans": 0.7893877551020408,
+            "subtype_macro_f1_on_gold_spans": 0.6906112029615366,
+            "gold_span_examples": 2450.0,
+            "subtype_loc_macro_f1_on_gold_spans": 0.7222838435002437,
+            "subtype_per_macro_f1_on_gold_spans": 0.6094092913972218,
+            "subtype_org_macro_f1_on_gold_spans": 0.7950030639018291,
+            "subtype_other_macro_f1_on_gold_spans": 0.6708057438443248,
+            "span_precision": 0.8634185303514377,
+            "span_recall": 0.8824489795918368,
+            "span_f1": 0.8728300363342755,
+            "span_correct": 2162.0,
+            "coarse_mner_precision": 0.8079073482428115,
+            "coarse_mner_recall": 0.8257142857142857,
+            "coarse_mner_f1": 0.8167137666532096,
+            "coarse_mner_correct": 2023.0,
+            "eeg_precision": 0.6537539936102237,
+            "eeg_recall": 0.6681632653061225,
+            "eeg_f1": 0.6608800968914009,
+            "eeg_correct": 1637.0,
+            "gmner_precision": 0.6146166134185304,
+            "gmner_recall": 0.6281632653061224,
+            "gmner_f1": 0.6213161081953977,
+            "gmner_correct": 1539.0,
+            "entity_precision": 0.8079073482428115,
+            "entity_recall": 0.8257142857142857,
+            "entity_f1": 0.8167137666532096,
+            "triple_precision": 0.6146166134185304,
+            "triple_recall": 0.6281632653061224,
+            "triple_f1": 0.6213161081953977,
+            "gmner_score": 0.6213161081953977,
+            "predicted": 2504.0,
+            "gold": 2450.0,
+            "fine_mner_precision": 0.670926517571885,
+            "fine_mner_recall": 0.6857142857142857,
+            "fine_mner_f1": 0.6782398062171983,
+            "fine_mner_correct": 1680.0,
+            "fmnerg_precision": 0.512779552715655,
+            "fmnerg_recall": 0.5240816326530612,
+            "fmnerg_f1": 0.5183689947517158,
+            "fmnerg_correct": 1284.0,
+            "fmnerg_score": 0.5183689947517158,
+            "subtype_accuracy_on_correct_predicted_spans": 0.7770582793709528,
+            "parent_conditioned_subtype_accuracy": 0.8304498269896193,
+            "exact_predicted_span_count": 2162.0,
+            "parent_conditioned_span_count": 2023.0,
+            "hierarchy_consistency_rate": 1.0,
+            "predicted_parent_subtype_accuracy_on_exact_predicted_spans": 0.7770582793709528,
+            "gold_parent_subtype_accuracy_on_exact_predicted_spans": 0.8149861239592969,
+            "coarse_wrong_exact_predicted_span_count": 139.0,
+            "coarse_wrong_gold_parent_subtype_correct": 82.0,
+            "coarse_wrong_gold_parent_subtype_recovery_rate": 0.5899280575539568,
+            "train_loss": 0.236469675190712
+          },
+          "test_accessed": false
+        },
+        "43": {
+          "path": "/home/zzk/gmner/outputs/fmnerg_roberta128_subtype_encoder_ablation/all_seed43/best_model.pt",
+          "sha256": "05e48ee9853280109f64acf00f967edc3ee4faef1b88c8e85734717a0e8d49c7",
+          "epoch": 14,
+          "metrics": {
+            "subtype_accuracy_on_gold_spans": 0.7808163265306123,
+            "subtype_micro_f1_on_gold_spans": 0.7808163265306123,
+            "subtype_macro_f1_on_gold_spans": 0.6775632279899929,
+            "gold_span_examples": 2450.0,
+            "subtype_loc_macro_f1_on_gold_spans": 0.7096616927216525,
+            "subtype_per_macro_f1_on_gold_spans": 0.6003926480838261,
+            "subtype_org_macro_f1_on_gold_spans": 0.781879586741128,
+            "subtype_other_macro_f1_on_gold_spans": 0.6544438655912026,
+            "span_precision": 0.8634185303514377,
+            "span_recall": 0.8824489795918368,
+            "span_f1": 0.8728300363342755,
+            "span_correct": 2162.0,
+            "coarse_mner_precision": 0.8079073482428115,
+            "coarse_mner_recall": 0.8257142857142857,
+            "coarse_mner_f1": 0.8167137666532096,
+            "coarse_mner_correct": 2023.0,
+            "eeg_precision": 0.6537539936102237,
+            "eeg_recall": 0.6681632653061225,
+            "eeg_f1": 0.6608800968914009,
+            "eeg_correct": 1637.0,
+            "gmner_precision": 0.6146166134185304,
+            "gmner_recall": 0.6281632653061224,
+            "gmner_f1": 0.6213161081953977,
+            "gmner_correct": 1539.0,
+            "entity_precision": 0.8079073482428115,
+            "entity_recall": 0.8257142857142857,
+            "entity_f1": 0.8167137666532096,
+            "triple_precision": 0.6146166134185304,
+            "triple_recall": 0.6281632653061224,
+            "triple_f1": 0.6213161081953977,
+            "gmner_score": 0.6213161081953977,
+            "predicted": 2504.0,
+            "gold": 2450.0,
+            "fine_mner_precision": 0.6653354632587859,
+            "fine_mner_recall": 0.68,
+            "fine_mner_f1": 0.672587807832055,
+            "fine_mner_correct": 1666.0,
+            "fmnerg_precision": 0.5107827476038339,
+            "fmnerg_recall": 0.5220408163265307,
+            "fmnerg_f1": 0.5163504238998788,
+            "fmnerg_correct": 1279.0,
+            "fmnerg_score": 0.5163504238998788,
+            "subtype_accuracy_on_correct_predicted_spans": 0.7705827937095282,
+            "parent_conditioned_subtype_accuracy": 0.8235294117647058,
+            "exact_predicted_span_count": 2162.0,
+            "parent_conditioned_span_count": 2023.0,
+            "hierarchy_consistency_rate": 1.0,
+            "predicted_parent_subtype_accuracy_on_exact_predicted_spans": 0.7705827937095282,
+            "gold_parent_subtype_accuracy_on_exact_predicted_spans": 0.8075855689176689,
+            "coarse_wrong_exact_predicted_span_count": 139.0,
+            "coarse_wrong_gold_parent_subtype_correct": 80.0,
+            "coarse_wrong_gold_parent_subtype_recovery_rate": 0.5755395683453237,
+            "train_loss": 0.16766074390359104
+          },
+          "test_accessed": false
+        }
+      }
+    }
+  },
+  "aggregate": {
+    "seed_count": 3.0,
+    "subtype_wrong_given_gmner_correct": {
+      "mean": 257.6666666666667,
+      "std": 2.0548046676563256,
+      "min": 255.0,
+      "max": 260.0
+    },
+    "visible_subtype_errors": {
+      "mean": 103.0,
+      "std": 0.816496580927726,
+      "min": 102.0,
+      "max": 104.0
+    },
+    "null_subtype_errors": {
+      "mean": 154.66666666666666,
+      "std": 1.699673171197595,
+      "min": 153.0,
+      "max": 157.0
+    },
+    "formal_pairwise_support_rate": {
+      "mean": 0.5920810818726295,
+      "std": 0.023638892894012,
+      "min": 0.5588235294117647,
+      "max": 0.6116504854368932
+    },
+    "formal_sibling_top1_rate": {
+      "mean": 0.17790993669063346,
+      "std": 0.015603415600308345,
+      "min": 0.1568627450980392,
+      "max": 0.1941747572815534
+    },
+    "fine_top_k": {
+      "1": {
+        "pairwise_support_rate": {
+          "mean": 0.5920810818726295,
+          "std": 0.023638892894012,
+          "min": 0.5588235294117647,
+          "max": 0.6116504854368932
+        },
+        "sibling_top1_rate": {
+          "mean": 0.17790993669063346,
+          "std": 0.015603415600308345,
+          "min": 0.1568627450980392,
+          "max": 0.1941747572815534
+        },
+        "incremental_pairwise_recovery_over_formal": {
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "incremental_sibling_recovery_over_formal": {
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "2": {
+        "pairwise_support_rate": {
+          "mean": 0.6180046078675433,
+          "std": 0.015119394099684068,
+          "min": 0.5980392156862745,
+          "max": 0.6346153846153846
+        },
+        "sibling_top1_rate": {
+          "mean": 0.18761928470666334,
+          "std": 0.015551183339394758,
+          "min": 0.16666666666666666,
+          "max": 0.20388349514563106
+        },
+        "incremental_pairwise_recovery_over_formal": {
+          "mean": 2.6666666666666665,
+          "std": 1.247219128924647,
+          "min": 1.0,
+          "max": 4.0
+        },
+        "incremental_sibling_recovery_over_formal": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      },
+      "4": {
+        "pairwise_support_rate": {
+          "mean": 0.6438646780594239,
+          "std": 0.0192806893337469,
+          "min": 0.6176470588235294,
+          "max": 0.6634615384615384
+        },
+        "sibling_top1_rate": {
+          "mean": 0.22325154856565477,
+          "std": 0.015111247810875823,
+          "min": 0.20588235294117646,
+          "max": 0.24271844660194175
+        },
+        "incremental_pairwise_recovery_over_formal": {
+          "mean": 5.333333333333333,
+          "std": 0.9428090415820634,
+          "min": 4.0,
+          "max": 6.0
+        },
+        "incremental_sibling_recovery_over_formal": {
+          "mean": 4.666666666666667,
+          "std": 0.4714045207910317,
+          "min": 4.0,
+          "max": 5.0
+        }
+      },
+      "8": {
+        "pairwise_support_rate": {
+          "mean": 0.6438646780594239,
+          "std": 0.0192806893337469,
+          "min": 0.6176470588235294,
+          "max": 0.6634615384615384
+        },
+        "sibling_top1_rate": {
+          "mean": 0.22325154856565477,
+          "std": 0.015111247810875823,
+          "min": 0.20588235294117646,
+          "max": 0.24271844660194175
+        },
+        "incremental_pairwise_recovery_over_formal": {
+          "mean": 5.333333333333333,
+          "std": 0.9428090415820634,
+          "min": 4.0,
+          "max": 6.0
+        },
+        "incremental_sibling_recovery_over_formal": {
+          "mean": 4.666666666666667,
+          "std": 0.4714045207910317,
+          "min": 4.0,
+          "max": 5.0
+        }
+      },
+      "16": {
+        "pairwise_support_rate": {
+          "mean": 0.6438646780594239,
+          "std": 0.0192806893337469,
+          "min": 0.6176470588235294,
+          "max": 0.6634615384615384
+        },
+        "sibling_top1_rate": {
+          "mean": 0.22325154856565477,
+          "std": 0.015111247810875823,
+          "min": 0.20588235294117646,
+          "max": 0.24271844660194175
+        },
+        "incremental_pairwise_recovery_over_formal": {
+          "mean": 5.333333333333333,
+          "std": 0.9428090415820634,
+          "min": 4.0,
+          "max": 6.0
+        },
+        "incremental_sibling_recovery_over_formal": {
+          "mean": 4.666666666666667,
+          "std": 0.4714045207910317,
+          "min": 4.0,
+          "max": 5.0
+        }
+      }
+    },
+    "full_r36_positive_oracle": {
+      "pairwise_support_rate": {
+        "mean": 0.6438646780594239,
+        "std": 0.0192806893337469,
+        "min": 0.6176470588235294,
+        "max": 0.6634615384615384
+      },
+      "sibling_top1_rate": {
+        "mean": 0.22325154856565477,
+        "std": 0.015111247810875823,
+        "min": 0.20588235294117646,
+        "max": 0.24271844660194175
+      },
+      "incremental_pairwise_recovery_over_formal": {
+        "mean": 5.333333333333333,
+        "std": 0.9428090415820634,
+        "min": 4.0,
+        "max": 6.0
+      },
+      "incremental_sibling_recovery_over_formal": {
+        "mean": 4.666666666666667,
+        "std": 0.4714045207910317,
+        "min": 4.0,
+        "max": 5.0
+      }
+    },
+    "error_entity_union": 311.0,
+    "error_entity_intersection": 204.0,
+    "visible_error_entity_union": 124.0,
+    "visible_error_entity_intersection": 80.0
+  },
+  "per_seed": [
+    {
+      "seed": 41,
+      "summary": {
+        "formal_predictions": 2504.0,
+        "gmner_correct_predictions": 1539.0,
+        "subtype_wrong_given_gmner_correct": 258.0,
+        "visible_subtype_errors": 104.0,
+        "null_subtype_errors": 154.0,
+        "visible_error_rate": 0.40310077519379844,
+        "errors_by_parent": {
+          "PER": 149,
+          "LOC": 54,
+          "OTHER": 26,
+          "ORG": 29
+        },
+        "top_confusions": {
+          "actor->musician": 10,
+          "musician->actor": 8,
+          "artist->actor": 7,
+          "athlete->musician": 5,
+          "actor->athlete": 5,
+          "musician->artist": 5,
+          "person_other->athlete": 5,
+          "brand_name_products->product_other": 4,
+          "park->location_other": 4,
+          "person_other->intellectual": 4,
+          "city->park": 4,
+          "park->city": 4,
+          "sports_team->educational_institution": 4,
+          "educational_institution->sports_team": 4,
+          "music->film_and_television_works": 4,
+          "musician->athlete": 3,
+          "coach->athlete": 3,
+          "character->musician": 3,
+          "journalist->politician": 3,
+          "athlete->person_other": 3,
+          "businessman->athlete": 3,
+          "person_other->artist": 3,
+          "location_other->building_other": 3,
+          "artist->businessman": 3,
+          "social_organization->government_agency": 3
+        },
+        "formal_region_probe": {
+          "entities": 104.0,
+          "pairwise_scorable": 104.0,
+          "pairwise_support_count": 63.0,
+          "pairwise_support_rate_among_scorable": 0.6057692307692307,
+          "pairwise_support_rate_among_visible_errors": 0.6057692307692307,
+          "sibling_scorable": 104.0,
+          "sibling_top1_count": 19.0,
+          "sibling_top1_rate_among_scorable": 0.18269230769230768,
+          "sibling_top1_rate_among_visible_errors": 0.18269230769230768,
+          "pairwise_margin": {
+            "count": 104.0,
+            "mean": 0.04460261959152726,
+            "std": 0.15255518782054012,
+            "median": 0.023059338331222534,
+            "min": -0.5251374579966068,
+            "max": 0.5578348636627197
+          },
+          "sibling_margin": {
+            "count": 104.0,
+            "mean": -0.07075369017771803,
+            "std": 0.11367701488217596,
+            "median": -0.04910522699356079,
+            "min": -0.589664027094841,
+            "max": 0.17786288261413574
+          }
+        },
+        "fine_top_k_positive_oracle": {
+          "1": {
+            "entities": 104.0,
+            "pairwise_scorable": 104.0,
+            "pairwise_support_count": 63.0,
+            "pairwise_support_rate_among_scorable": 0.6057692307692307,
+            "pairwise_support_rate_among_visible_errors": 0.6057692307692307,
+            "sibling_scorable": 104.0,
+            "sibling_top1_count": 19.0,
+            "sibling_top1_rate_among_scorable": 0.18269230769230768,
+            "sibling_top1_rate_among_visible_errors": 0.18269230769230768,
+            "pairwise_margin": {
+              "count": 104.0,
+              "mean": 0.04460261959152726,
+              "std": 0.15255518782054012,
+              "median": 0.023059338331222534,
+              "min": -0.5251374579966068,
+              "max": 0.5578348636627197
+            },
+            "sibling_margin": {
+              "count": 104.0,
+              "mean": -0.07075369017771803,
+              "std": 0.11367701488217596,
+              "median": -0.04910522699356079,
+              "min": -0.589664027094841,
+              "max": 0.17786288261413574
+            },
+            "gold_positive_candidates": {
+              "count": 104.0,
+              "mean": 1.0,
+              "std": 0.0,
+              "median": 1.0,
+              "min": 1.0,
+              "max": 1.0
+            },
+            "incremental_pairwise_recovery_over_formal": 0.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.0,
+            "incremental_sibling_recovery_over_formal": 0.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.0
+          },
+          "2": {
+            "entities": 104.0,
+            "pairwise_scorable": 104.0,
+            "pairwise_support_count": 66.0,
+            "pairwise_support_rate_among_scorable": 0.6346153846153846,
+            "pairwise_support_rate_among_visible_errors": 0.6346153846153846,
+            "sibling_scorable": 104.0,
+            "sibling_top1_count": 20.0,
+            "sibling_top1_rate_among_scorable": 0.19230769230769232,
+            "sibling_top1_rate_among_visible_errors": 0.19230769230769232,
+            "pairwise_margin": {
+              "count": 104.0,
+              "mean": 0.049937641355567254,
+              "std": 0.15119582135318982,
+              "median": 0.02743685245513916,
+              "min": -0.5251374579966068,
+              "max": 0.5578348636627197
+            },
+            "sibling_margin": {
+              "count": 104.0,
+              "mean": -0.0636564757173451,
+              "std": 0.11349538081114409,
+              "median": -0.0386413037776947,
+              "min": -0.589664027094841,
+              "max": 0.17786288261413574
+            },
+            "gold_positive_candidates": {
+              "count": 104.0,
+              "mean": 1.6153846153846154,
+              "std": 0.4865042554105199,
+              "median": 2.0,
+              "min": 1.0,
+              "max": 2.0
+            },
+            "incremental_pairwise_recovery_over_formal": 3.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.028846153846153848,
+            "incremental_sibling_recovery_over_formal": 1.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.009615384615384616
+          },
+          "4": {
+            "entities": 104.0,
+            "pairwise_scorable": 104.0,
+            "pairwise_support_count": 69.0,
+            "pairwise_support_rate_among_scorable": 0.6634615384615384,
+            "pairwise_support_rate_among_visible_errors": 0.6634615384615384,
+            "sibling_scorable": 104.0,
+            "sibling_top1_count": 23.0,
+            "sibling_top1_rate_among_scorable": 0.22115384615384615,
+            "sibling_top1_rate_among_visible_errors": 0.22115384615384615,
+            "pairwise_margin": {
+              "count": 104.0,
+              "mean": 0.058779534668876574,
+              "std": 0.14522973225337554,
+              "median": 0.03394967317581177,
+              "min": -0.4470314234495163,
+              "max": 0.5578348636627197
+            },
+            "sibling_margin": {
+              "count": 104.0,
+              "mean": -0.05470601096749306,
+              "std": 0.11097929460404699,
+              "median": -0.03618943691253662,
+              "min": -0.589664027094841,
+              "max": 0.19592487812042236
+            },
+            "gold_positive_candidates": {
+              "count": 104.0,
+              "mean": 2.3653846153846154,
+              "std": 1.000554579948351,
+              "median": 2.0,
+              "min": 1.0,
+              "max": 4.0
+            },
+            "incremental_pairwise_recovery_over_formal": 6.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.057692307692307696,
+            "incremental_sibling_recovery_over_formal": 4.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.038461538461538464
+          },
+          "8": {
+            "entities": 104.0,
+            "pairwise_scorable": 104.0,
+            "pairwise_support_count": 69.0,
+            "pairwise_support_rate_among_scorable": 0.6634615384615384,
+            "pairwise_support_rate_among_visible_errors": 0.6634615384615384,
+            "sibling_scorable": 104.0,
+            "sibling_top1_count": 23.0,
+            "sibling_top1_rate_among_scorable": 0.22115384615384615,
+            "sibling_top1_rate_among_visible_errors": 0.22115384615384615,
+            "pairwise_margin": {
+              "count": 104.0,
+              "mean": 0.059977388922841504,
+              "std": 0.14452448842120902,
+              "median": 0.03574122488498688,
+              "min": -0.43258647061884403,
+              "max": 0.5578348636627197
+            },
+            "sibling_margin": {
+              "count": 104.0,
+              "mean": -0.05399031014754795,
+              "std": 0.11016191583161596,
+              "median": -0.03618943691253662,
+              "min": -0.589664027094841,
+              "max": 0.19592487812042236
+            },
+            "gold_positive_candidates": {
+              "count": 104.0,
+              "mean": 2.6923076923076925,
+              "std": 1.2865945141290562,
+              "median": 2.5,
+              "min": 1.0,
+              "max": 6.0
+            },
+            "incremental_pairwise_recovery_over_formal": 6.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.057692307692307696,
+            "incremental_sibling_recovery_over_formal": 4.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.038461538461538464
+          },
+          "16": {
+            "entities": 104.0,
+            "pairwise_scorable": 104.0,
+            "pairwise_support_count": 69.0,
+            "pairwise_support_rate_among_scorable": 0.6634615384615384,
+            "pairwise_support_rate_among_visible_errors": 0.6634615384615384,
+            "sibling_scorable": 104.0,
+            "sibling_top1_count": 23.0,
+            "sibling_top1_rate_among_scorable": 0.22115384615384615,
+            "sibling_top1_rate_among_visible_errors": 0.22115384615384615,
+            "pairwise_margin": {
+              "count": 104.0,
+              "mean": 0.059977388922841504,
+              "std": 0.14452448842120902,
+              "median": 0.03574122488498688,
+              "min": -0.43258647061884403,
+              "max": 0.5578348636627197
+            },
+            "sibling_margin": {
+              "count": 104.0,
+              "mean": -0.05399031014754795,
+              "std": 0.11016191583161596,
+              "median": -0.03618943691253662,
+              "min": -0.589664027094841,
+              "max": 0.19592487812042236
+            },
+            "gold_positive_candidates": {
+              "count": 104.0,
+              "mean": 2.7211538461538463,
+              "std": 1.2968655316186761,
+              "median": 3.0,
+              "min": 1.0,
+              "max": 6.0
+            },
+            "incremental_pairwise_recovery_over_formal": 6.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.057692307692307696,
+            "incremental_sibling_recovery_over_formal": 4.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.038461538461538464
+          }
+        },
+        "full_r36_positive_oracle": {
+          "entities": 104.0,
+          "pairwise_scorable": 104.0,
+          "pairwise_support_count": 69.0,
+          "pairwise_support_rate_among_scorable": 0.6634615384615384,
+          "pairwise_support_rate_among_visible_errors": 0.6634615384615384,
+          "sibling_scorable": 104.0,
+          "sibling_top1_count": 23.0,
+          "sibling_top1_rate_among_scorable": 0.22115384615384615,
+          "sibling_top1_rate_among_visible_errors": 0.22115384615384615,
+          "pairwise_margin": {
+            "count": 104.0,
+            "mean": 0.059977388922841504,
+            "std": 0.14452448842120902,
+            "median": 0.03574122488498688,
+            "min": -0.43258647061884403,
+            "max": 0.5578348636627197
+          },
+          "sibling_margin": {
+            "count": 104.0,
+            "mean": -0.05399031014754795,
+            "std": 0.11016191583161596,
+            "median": -0.03618943691253662,
+            "min": -0.589664027094841,
+            "max": 0.19592487812042236
+          },
+          "gold_positive_candidates": {
+            "count": 104.0,
+            "mean": 2.7211538461538463,
+            "std": 1.2968655316186761,
+            "median": 3.0,
+            "min": 1.0,
+            "max": 6.0
+          },
+          "incremental_pairwise_recovery_over_formal": 6.0,
+          "incremental_pairwise_recovery_rate_over_visible_errors": 0.057692307692307696,
+          "incremental_sibling_recovery_over_formal": 4.0,
+          "incremental_sibling_recovery_rate_over_visible_errors": 0.038461538461538464
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "summary": {
+        "formal_predictions": 2504.0,
+        "gmner_correct_predictions": 1539.0,
+        "subtype_wrong_given_gmner_correct": 255.0,
+        "visible_subtype_errors": 102.0,
+        "null_subtype_errors": 153.0,
+        "visible_error_rate": 0.4,
+        "errors_by_parent": {
+          "PER": 151,
+          "LOC": 47,
+          "OTHER": 27,
+          "ORG": 30
+        },
+        "top_confusions": {
+          "actor->musician": 9,
+          "musician->artist": 7,
+          "artist->actor": 7,
+          "musician->actor": 6,
+          "educational_institution->sports_team": 6,
+          "athlete->musician": 5,
+          "author->politician": 5,
+          "city->location_other": 5,
+          "actor->athlete": 5,
+          "brand_name_products->product_other": 5,
+          "character->musician": 4,
+          "athlete->actor": 4,
+          "actor->artist": 4,
+          "person_other->intellectual": 4,
+          "businessman->politician": 4,
+          "city->park": 4,
+          "sports_team->educational_institution": 4,
+          "musician->athlete": 3,
+          "businessman->athlete": 3,
+          "location_other->park": 3,
+          "athlete->person_other": 3,
+          "athlete->coach": 3,
+          "location_other->building_other": 3,
+          "artist->businessman": 3,
+          "character->politician": 3
+        },
+        "formal_region_probe": {
+          "entities": 102.0,
+          "pairwise_scorable": 102.0,
+          "pairwise_support_count": 57.0,
+          "pairwise_support_rate_among_scorable": 0.5588235294117647,
+          "pairwise_support_rate_among_visible_errors": 0.5588235294117647,
+          "sibling_scorable": 102.0,
+          "sibling_top1_count": 16.0,
+          "sibling_top1_rate_among_scorable": 0.1568627450980392,
+          "sibling_top1_rate_among_visible_errors": 0.1568627450980392,
+          "pairwise_margin": {
+            "count": 102.0,
+            "mean": 0.03462889640792912,
+            "std": 0.15599440630658185,
+            "median": 0.02301672101020813,
+            "min": -0.589664027094841,
+            "max": 0.46601396799087524
+          },
+          "sibling_margin": {
+            "count": 102.0,
+            "mean": -0.07324206248364028,
+            "std": 0.11181721244716511,
+            "median": -0.05291026830673218,
+            "min": -0.589664027094841,
+            "max": 0.17786288261413574
+          }
+        },
+        "fine_top_k_positive_oracle": {
+          "1": {
+            "entities": 102.0,
+            "pairwise_scorable": 102.0,
+            "pairwise_support_count": 57.0,
+            "pairwise_support_rate_among_scorable": 0.5588235294117647,
+            "pairwise_support_rate_among_visible_errors": 0.5588235294117647,
+            "sibling_scorable": 102.0,
+            "sibling_top1_count": 16.0,
+            "sibling_top1_rate_among_scorable": 0.1568627450980392,
+            "sibling_top1_rate_among_visible_errors": 0.1568627450980392,
+            "pairwise_margin": {
+              "count": 102.0,
+              "mean": 0.03462889640792912,
+              "std": 0.15599440630658185,
+              "median": 0.02301672101020813,
+              "min": -0.589664027094841,
+              "max": 0.46601396799087524
+            },
+            "sibling_margin": {
+              "count": 102.0,
+              "mean": -0.07324206248364028,
+              "std": 0.11181721244716511,
+              "median": -0.05291026830673218,
+              "min": -0.589664027094841,
+              "max": 0.17786288261413574
+            },
+            "gold_positive_candidates": {
+              "count": 102.0,
+              "mean": 1.0,
+              "std": 0.0,
+              "median": 1.0,
+              "min": 1.0,
+              "max": 1.0
+            },
+            "incremental_pairwise_recovery_over_formal": 0.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.0,
+            "incremental_sibling_recovery_over_formal": 0.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.0
+          },
+          "2": {
+            "entities": 102.0,
+            "pairwise_scorable": 102.0,
+            "pairwise_support_count": 61.0,
+            "pairwise_support_rate_among_scorable": 0.5980392156862745,
+            "pairwise_support_rate_among_visible_errors": 0.5980392156862745,
+            "sibling_scorable": 102.0,
+            "sibling_top1_count": 17.0,
+            "sibling_top1_rate_among_scorable": 0.16666666666666666,
+            "sibling_top1_rate_among_visible_errors": 0.16666666666666666,
+            "pairwise_margin": {
+              "count": 102.0,
+              "mean": 0.039605268332011556,
+              "std": 0.15539618828080362,
+              "median": 0.02570706605911255,
+              "min": -0.589664027094841,
+              "max": 0.46601396799087524
+            },
+            "sibling_margin": {
+              "count": 102.0,
+              "mean": -0.06646012036385489,
+              "std": 0.11164190744301956,
+              "median": -0.0449410080909729,
+              "min": -0.589664027094841,
+              "max": 0.17786288261413574
+            },
+            "gold_positive_candidates": {
+              "count": 102.0,
+              "mean": 1.5980392156862746,
+              "std": 0.4902941078450975,
+              "median": 2.0,
+              "min": 1.0,
+              "max": 2.0
+            },
+            "incremental_pairwise_recovery_over_formal": 4.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.0392156862745098,
+            "incremental_sibling_recovery_over_formal": 1.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.00980392156862745
+          },
+          "4": {
+            "entities": 102.0,
+            "pairwise_scorable": 102.0,
+            "pairwise_support_count": 63.0,
+            "pairwise_support_rate_among_scorable": 0.6176470588235294,
+            "pairwise_support_rate_among_visible_errors": 0.6176470588235294,
+            "sibling_scorable": 102.0,
+            "sibling_top1_count": 21.0,
+            "sibling_top1_rate_among_scorable": 0.20588235294117646,
+            "sibling_top1_rate_among_visible_errors": 0.20588235294117646,
+            "pairwise_margin": {
+              "count": 102.0,
+              "mean": 0.048573127363388445,
+              "std": 0.15374814043183044,
+              "median": 0.028662368655204773,
+              "min": -0.589664027094841,
+              "max": 0.4767823815345764
+            },
+            "sibling_margin": {
+              "count": 102.0,
+              "mean": -0.058101256688435875,
+              "std": 0.10856447602879109,
+              "median": -0.03771930932998657,
+              "min": -0.589664027094841,
+              "max": 0.18400335311889648
+            },
+            "gold_positive_candidates": {
+              "count": 102.0,
+              "mean": 2.323529411764706,
+              "std": 1.0113257141570862,
+              "median": 2.0,
+              "min": 1.0,
+              "max": 4.0
+            },
+            "incremental_pairwise_recovery_over_formal": 6.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.058823529411764705,
+            "incremental_sibling_recovery_over_formal": 5.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.049019607843137254
+          },
+          "8": {
+            "entities": 102.0,
+            "pairwise_scorable": 102.0,
+            "pairwise_support_count": 63.0,
+            "pairwise_support_rate_among_scorable": 0.6176470588235294,
+            "pairwise_support_rate_among_visible_errors": 0.6176470588235294,
+            "sibling_scorable": 102.0,
+            "sibling_top1_count": 21.0,
+            "sibling_top1_rate_among_scorable": 0.20588235294117646,
+            "sibling_top1_rate_among_visible_errors": 0.20588235294117646,
+            "pairwise_margin": {
+              "count": 102.0,
+              "mean": 0.04949083880466573,
+              "std": 0.15345982268356823,
+              "median": 0.032859742641448975,
+              "min": -0.589664027094841,
+              "max": 0.4767823815345764
+            },
+            "sibling_margin": {
+              "count": 102.0,
+              "mean": -0.05764845504845474,
+              "std": 0.10778716964068372,
+              "median": -0.03771930932998657,
+              "min": -0.589664027094841,
+              "max": 0.18400335311889648
+            },
+            "gold_positive_candidates": {
+              "count": 102.0,
+              "mean": 2.656862745098039,
+              "std": 1.3098053892207346,
+              "median": 2.5,
+              "min": 1.0,
+              "max": 6.0
+            },
+            "incremental_pairwise_recovery_over_formal": 6.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.058823529411764705,
+            "incremental_sibling_recovery_over_formal": 5.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.049019607843137254
+          },
+          "16": {
+            "entities": 102.0,
+            "pairwise_scorable": 102.0,
+            "pairwise_support_count": 63.0,
+            "pairwise_support_rate_among_scorable": 0.6176470588235294,
+            "pairwise_support_rate_among_visible_errors": 0.6176470588235294,
+            "sibling_scorable": 102.0,
+            "sibling_top1_count": 21.0,
+            "sibling_top1_rate_among_scorable": 0.20588235294117646,
+            "sibling_top1_rate_among_visible_errors": 0.20588235294117646,
+            "pairwise_margin": {
+              "count": 102.0,
+              "mean": 0.04949083880466573,
+              "std": 0.15345982268356823,
+              "median": 0.032859742641448975,
+              "min": -0.589664027094841,
+              "max": 0.4767823815345764
+            },
+            "sibling_margin": {
+              "count": 102.0,
+              "mean": -0.05764845504845474,
+              "std": 0.10778716964068372,
+              "median": -0.03771930932998657,
+              "min": -0.589664027094841,
+              "max": 0.18400335311889648
+            },
+            "gold_positive_candidates": {
+              "count": 102.0,
+              "mean": 2.676470588235294,
+              "std": 1.322221576058178,
+              "median": 3.0,
+              "min": 1.0,
+              "max": 6.0
+            },
+            "incremental_pairwise_recovery_over_formal": 6.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.058823529411764705,
+            "incremental_sibling_recovery_over_formal": 5.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.049019607843137254
+          }
+        },
+        "full_r36_positive_oracle": {
+          "entities": 102.0,
+          "pairwise_scorable": 102.0,
+          "pairwise_support_count": 63.0,
+          "pairwise_support_rate_among_scorable": 0.6176470588235294,
+          "pairwise_support_rate_among_visible_errors": 0.6176470588235294,
+          "sibling_scorable": 102.0,
+          "sibling_top1_count": 21.0,
+          "sibling_top1_rate_among_scorable": 0.20588235294117646,
+          "sibling_top1_rate_among_visible_errors": 0.20588235294117646,
+          "pairwise_margin": {
+            "count": 102.0,
+            "mean": 0.04949083880466573,
+            "std": 0.15345982268356823,
+            "median": 0.032859742641448975,
+            "min": -0.589664027094841,
+            "max": 0.4767823815345764
+          },
+          "sibling_margin": {
+            "count": 102.0,
+            "mean": -0.05764845504845474,
+            "std": 0.10778716964068372,
+            "median": -0.03771930932998657,
+            "min": -0.589664027094841,
+            "max": 0.18400335311889648
+          },
+          "gold_positive_candidates": {
+            "count": 102.0,
+            "mean": 2.676470588235294,
+            "std": 1.322221576058178,
+            "median": 3.0,
+            "min": 1.0,
+            "max": 6.0
+          },
+          "incremental_pairwise_recovery_over_formal": 6.0,
+          "incremental_pairwise_recovery_rate_over_visible_errors": 0.058823529411764705,
+          "incremental_sibling_recovery_over_formal": 5.0,
+          "incremental_sibling_recovery_rate_over_visible_errors": 0.049019607843137254
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "summary": {
+        "formal_predictions": 2504.0,
+        "gmner_correct_predictions": 1539.0,
+        "subtype_wrong_given_gmner_correct": 260.0,
+        "visible_subtype_errors": 103.0,
+        "null_subtype_errors": 157.0,
+        "visible_error_rate": 0.39615384615384613,
+        "errors_by_parent": {
+          "PER": 149,
+          "LOC": 51,
+          "OTHER": 30,
+          "ORG": 30
+        },
+        "top_confusions": {
+          "actor->musician": 10,
+          "musician->actor": 7,
+          "actor->athlete": 6,
+          "artist->actor": 6,
+          "educational_institution->sports_team": 6,
+          "actor->artist": 5,
+          "athlete->musician": 5,
+          "person_other->intellectual": 5,
+          "musician->artist": 5,
+          "musician->athlete": 4,
+          "coach->athlete": 4,
+          "brand_name_products->product_other": 4,
+          "athlete->coach": 4,
+          "author->politician": 4,
+          "film_and_television_works->music": 4,
+          "sports_team->educational_institution": 4,
+          "city->state": 3,
+          "character->musician": 3,
+          "location_other->park": 3,
+          "city->location_other": 3,
+          "athlete->person_other": 3,
+          "city->park": 3,
+          "businessman->politician": 3,
+          "entertainment_place->city": 3,
+          "actor->person_other": 3
+        },
+        "formal_region_probe": {
+          "entities": 103.0,
+          "pairwise_scorable": 103.0,
+          "pairwise_support_count": 63.0,
+          "pairwise_support_rate_among_scorable": 0.6116504854368932,
+          "pairwise_support_rate_among_visible_errors": 0.6116504854368932,
+          "sibling_scorable": 103.0,
+          "sibling_top1_count": 20.0,
+          "sibling_top1_rate_among_scorable": 0.1941747572815534,
+          "sibling_top1_rate_among_visible_errors": 0.1941747572815534,
+          "pairwise_margin": {
+            "count": 103.0,
+            "mean": 0.042080662457399,
+            "std": 0.16487944397663723,
+            "median": 0.02366536855697632,
+            "min": -0.589664027094841,
+            "max": 0.5174068808555603
+          },
+          "sibling_margin": {
+            "count": 103.0,
+            "mean": -0.06970270025064644,
+            "std": 0.11701004198961536,
+            "median": -0.048393189907073975,
+            "min": -0.589664027094841,
+            "max": 0.17786288261413574
+          }
+        },
+        "fine_top_k_positive_oracle": {
+          "1": {
+            "entities": 103.0,
+            "pairwise_scorable": 103.0,
+            "pairwise_support_count": 63.0,
+            "pairwise_support_rate_among_scorable": 0.6116504854368932,
+            "pairwise_support_rate_among_visible_errors": 0.6116504854368932,
+            "sibling_scorable": 103.0,
+            "sibling_top1_count": 20.0,
+            "sibling_top1_rate_among_scorable": 0.1941747572815534,
+            "sibling_top1_rate_among_visible_errors": 0.1941747572815534,
+            "pairwise_margin": {
+              "count": 103.0,
+              "mean": 0.042080662457399,
+              "std": 0.16487944397663723,
+              "median": 0.02366536855697632,
+              "min": -0.589664027094841,
+              "max": 0.5174068808555603
+            },
+            "sibling_margin": {
+              "count": 103.0,
+              "mean": -0.06970270025064644,
+              "std": 0.11701004198961536,
+              "median": -0.048393189907073975,
+              "min": -0.589664027094841,
+              "max": 0.17786288261413574
+            },
+            "gold_positive_candidates": {
+              "count": 103.0,
+              "mean": 1.0,
+              "std": 0.0,
+              "median": 1.0,
+              "min": 1.0,
+              "max": 1.0
+            },
+            "incremental_pairwise_recovery_over_formal": 0.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.0,
+            "incremental_sibling_recovery_over_formal": 0.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.0
+          },
+          "2": {
+            "entities": 103.0,
+            "pairwise_scorable": 103.0,
+            "pairwise_support_count": 64.0,
+            "pairwise_support_rate_among_scorable": 0.6213592233009708,
+            "pairwise_support_rate_among_visible_errors": 0.6213592233009708,
+            "sibling_scorable": 103.0,
+            "sibling_top1_count": 21.0,
+            "sibling_top1_rate_among_scorable": 0.20388349514563106,
+            "sibling_top1_rate_among_visible_errors": 0.20388349514563106,
+            "pairwise_margin": {
+              "count": 103.0,
+              "mean": 0.04772056129227564,
+              "std": 0.16289817897527922,
+              "median": 0.02733457088470459,
+              "min": -0.589664027094841,
+              "max": 0.5174068808555603
+            },
+            "sibling_margin": {
+              "count": 103.0,
+              "mean": -0.06285948403975339,
+              "std": 0.11666645119648858,
+              "median": -0.03884083032608032,
+              "min": -0.589664027094841,
+              "max": 0.17786288261413574
+            },
+            "gold_positive_candidates": {
+              "count": 103.0,
+              "mean": 1.6213592233009708,
+              "std": 0.4850483882251183,
+              "median": 2.0,
+              "min": 1.0,
+              "max": 2.0
+            },
+            "incremental_pairwise_recovery_over_formal": 1.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.009708737864077669,
+            "incremental_sibling_recovery_over_formal": 1.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.009708737864077669
+          },
+          "4": {
+            "entities": 103.0,
+            "pairwise_scorable": 103.0,
+            "pairwise_support_count": 67.0,
+            "pairwise_support_rate_among_scorable": 0.6504854368932039,
+            "pairwise_support_rate_among_visible_errors": 0.6504854368932039,
+            "sibling_scorable": 103.0,
+            "sibling_top1_count": 25.0,
+            "sibling_top1_rate_among_scorable": 0.24271844660194175,
+            "sibling_top1_rate_among_visible_errors": 0.24271844660194175,
+            "pairwise_margin": {
+              "count": 103.0,
+              "mean": 0.05606625106149507,
+              "std": 0.158617958653974,
+              "median": 0.029335707426071167,
+              "min": -0.589664027094841,
+              "max": 0.5174068808555603
+            },
+            "sibling_margin": {
+              "count": 103.0,
+              "mean": -0.05424491062905024,
+              "std": 0.11454404849237743,
+              "median": -0.03771930932998657,
+              "min": -0.589664027094841,
+              "max": 0.19592487812042236
+            },
+            "gold_positive_candidates": {
+              "count": 103.0,
+              "mean": 2.3398058252427183,
+              "std": 1.0101753962694806,
+              "median": 2.0,
+              "min": 1.0,
+              "max": 4.0
+            },
+            "incremental_pairwise_recovery_over_formal": 4.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.038834951456310676,
+            "incremental_sibling_recovery_over_formal": 5.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.04854368932038835
+          },
+          "8": {
+            "entities": 103.0,
+            "pairwise_scorable": 103.0,
+            "pairwise_support_count": 67.0,
+            "pairwise_support_rate_among_scorable": 0.6504854368932039,
+            "pairwise_support_rate_among_visible_errors": 0.6504854368932039,
+            "sibling_scorable": 103.0,
+            "sibling_top1_count": 25.0,
+            "sibling_top1_rate_among_scorable": 0.24271844660194175,
+            "sibling_top1_rate_among_visible_errors": 0.24271844660194175,
+            "pairwise_margin": {
+              "count": 103.0,
+              "mean": 0.057167848246624166,
+              "std": 0.15809745939113284,
+              "median": 0.03609851002693176,
+              "min": -0.589664027094841,
+              "max": 0.5174068808555603
+            },
+            "sibling_margin": {
+              "count": 103.0,
+              "mean": -0.053522261257455184,
+              "std": 0.11374162189323576,
+              "median": -0.03771930932998657,
+              "min": -0.589664027094841,
+              "max": 0.19592487812042236
+            },
+            "gold_positive_candidates": {
+              "count": 103.0,
+              "mean": 2.6893203883495147,
+              "std": 1.30740331253334,
+              "median": 3.0,
+              "min": 1.0,
+              "max": 6.0
+            },
+            "incremental_pairwise_recovery_over_formal": 4.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.038834951456310676,
+            "incremental_sibling_recovery_over_formal": 5.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.04854368932038835
+          },
+          "16": {
+            "entities": 103.0,
+            "pairwise_scorable": 103.0,
+            "pairwise_support_count": 67.0,
+            "pairwise_support_rate_among_scorable": 0.6504854368932039,
+            "pairwise_support_rate_among_visible_errors": 0.6504854368932039,
+            "sibling_scorable": 103.0,
+            "sibling_top1_count": 25.0,
+            "sibling_top1_rate_among_scorable": 0.24271844660194175,
+            "sibling_top1_rate_among_visible_errors": 0.24271844660194175,
+            "pairwise_margin": {
+              "count": 103.0,
+              "mean": 0.057167848246624166,
+              "std": 0.15809745939113284,
+              "median": 0.03609851002693176,
+              "min": -0.589664027094841,
+              "max": 0.5174068808555603
+            },
+            "sibling_margin": {
+              "count": 103.0,
+              "mean": -0.053522261257455184,
+              "std": 0.11374162189323576,
+              "median": -0.03771930932998657,
+              "min": -0.589664027094841,
+              "max": 0.19592487812042236
+            },
+            "gold_positive_candidates": {
+              "count": 103.0,
+              "mean": 2.7184466019417477,
+              "std": 1.317672821539693,
+              "median": 3.0,
+              "min": 1.0,
+              "max": 6.0
+            },
+            "incremental_pairwise_recovery_over_formal": 4.0,
+            "incremental_pairwise_recovery_rate_over_visible_errors": 0.038834951456310676,
+            "incremental_sibling_recovery_over_formal": 5.0,
+            "incremental_sibling_recovery_rate_over_visible_errors": 0.04854368932038835
+          }
+        },
+        "full_r36_positive_oracle": {
+          "entities": 103.0,
+          "pairwise_scorable": 103.0,
+          "pairwise_support_count": 67.0,
+          "pairwise_support_rate_among_scorable": 0.6504854368932039,
+          "pairwise_support_rate_among_visible_errors": 0.6504854368932039,
+          "sibling_scorable": 103.0,
+          "sibling_top1_count": 25.0,
+          "sibling_top1_rate_among_scorable": 0.24271844660194175,
+          "sibling_top1_rate_among_visible_errors": 0.24271844660194175,
+          "pairwise_margin": {
+            "count": 103.0,
+            "mean": 0.057167848246624166,
+            "std": 0.15809745939113284,
+            "median": 0.03609851002693176,
+            "min": -0.589664027094841,
+            "max": 0.5174068808555603
+          },
+          "sibling_margin": {
+            "count": 103.0,
+            "mean": -0.053522261257455184,
+            "std": 0.11374162189323576,
+            "median": -0.03771930932998657,
+            "min": -0.589664027094841,
+            "max": 0.19592487812042236
+          },
+          "gold_positive_candidates": {
+            "count": 103.0,
+            "mean": 2.7184466019417477,
+            "std": 1.317672821539693,
+            "median": 3.0,
+            "min": 1.0,
+            "max": 6.0
+          },
+          "incremental_pairwise_recovery_over_formal": 4.0,
+          "incremental_pairwise_recovery_rate_over_visible_errors": 0.038834951456310676,
+          "incremental_sibling_recovery_over_formal": 5.0,
+          "incremental_sibling_recovery_rate_over_visible_errors": 0.04854368932038835
+        }
+      }
+    }
+  ]
+}

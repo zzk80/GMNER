@@ -1,6 +1,5 @@
-"""Hierarchical fine-grained subtype sidecar for Twitter-FMNERG."""
+"""Formal F3 fine-grained subtype encoder for Twitter-FMNERG."""
 
-from .model import HierarchicalSubtypeSidecar
 from .taxonomy import SubtypeTaxonomy
 
-__all__ = ["HierarchicalSubtypeSidecar", "SubtypeTaxonomy"]
+__all__ = ["SubtypeTaxonomy"]

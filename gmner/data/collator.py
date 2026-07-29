@@ -201,6 +201,7 @@ class GMNERCollator:
                     "target_entity_type": feature.get("target_entity_type"),
                     "base_predicted_type": feature.get("base_predicted_type"),
                     "target_subtype": feature.get("target_subtype"),
+                    "fine_ner_tags": feature.get("fine_ner_tags"),
                     "grounding_null_prior": feature.get("grounding_null_prior"),
                     "region_object_labels": feature.get("region_object_labels"),
                     "region_object_attributes": feature.get("region_object_attributes"),

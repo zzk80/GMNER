@@ -1,0 +1,150 @@
+{
+  "format_version": 1,
+  "kind": "stage1_gradient_conflict_audit_summary",
+  "status": "VALID_AUDIT",
+  "source_report_created_at_utc": "2026-07-28T04:40:50.776219+00:00",
+  "source_report": "outputs/stage1_gradient_conflicts/train_probe_seed42.json",
+  "source_report_sha256": "d99762cc4cd29e8eae02906a0bfbce4e2ae64f12e77d29a69170fc97dafd85e0",
+  "provenance": {
+    "code_commit": "c3f92b906c95c969bbc9c481541bcd5c314a2b20",
+    "git_worktree_dirty": true,
+    "diagnostic_script_sha256": "f3757acb4dc41d9e6bd22607d68e97534e4b5db2a3cdb71843c1d19dd7d3fe84",
+    "diagnostic_module_sha256": "a6936441b817e96f1646ffa3a30be33666170c1b382baab54c919d47631dc57d",
+    "config_sha256": "6b6c1ed8cc3cfe453ae67f0483568ca82b667726839edb8bd6d5dd65f9c91171",
+    "checkpoint_sha256": "efc617f09e5a7cda818560a4640d606623a2f386cf4035f3b90c3fc620a4d29d",
+    "train_source_sha256": "b067446640d71ffad116e67c359f095f99c9d5ca2d0f2a1bc103909ebc8505e9"
+  },
+  "protocol": {
+    "split": "train_probe",
+    "seed": 42,
+    "selected_records": 128,
+    "materialized_samples": 231,
+    "processed_batches": 58,
+    "batch_size": 4,
+    "layers": [0, 5, 11],
+    "task_weights": {
+      "ner": 1.0,
+      "grounding": 1.0,
+      "alignment": 0.1
+    },
+    "amp": false,
+    "parameter_updates": 0,
+    "dev_accessed": false,
+    "test_accessed": false
+  },
+  "gate": {
+    "negative_ratio_gt": 0.3,
+    "strong_negative_cosine_lt": -0.3,
+    "strong_negative_ratio_gt": 0.1,
+    "median_norm_ratio_lte": 3.0,
+    "status": "no_significant_conflict",
+    "has_significant_conflict": false,
+    "recommend_d2": false
+  },
+  "sites": [
+    {
+      "layer": 0,
+      "pair": "ner_vs_grounding",
+      "valid_batches": 56,
+      "mean_cosine": 0.006378,
+      "median_cosine": 0.008072,
+      "negative_ratio": 0.4643,
+      "strong_negative_ratio": 0.0357,
+      "median_norm_ratio": 12982.810,
+      "significant_conflict": false
+    },
+    {
+      "layer": 0,
+      "pair": "ner_vs_alignment",
+      "valid_batches": 58,
+      "mean_cosine": -0.021232,
+      "median_cosine": 0.005083,
+      "negative_ratio": 0.4828,
+      "strong_negative_ratio": 0.0517,
+      "median_norm_ratio": 31.369,
+      "significant_conflict": false
+    },
+    {
+      "layer": 0,
+      "pair": "grounding_vs_alignment",
+      "valid_batches": 56,
+      "mean_cosine": 0.000201,
+      "median_cosine": 0.005647,
+      "negative_ratio": 0.4464,
+      "strong_negative_ratio": 0.0357,
+      "median_norm_ratio": 5084.454,
+      "significant_conflict": false
+    },
+    {
+      "layer": 5,
+      "pair": "ner_vs_grounding",
+      "valid_batches": 56,
+      "mean_cosine": -0.012112,
+      "median_cosine": -0.007738,
+      "negative_ratio": 0.5536,
+      "strong_negative_ratio": 0.0000,
+      "median_norm_ratio": 11751.483,
+      "significant_conflict": false
+    },
+    {
+      "layer": 5,
+      "pair": "ner_vs_alignment",
+      "valid_batches": 58,
+      "mean_cosine": -0.053194,
+      "median_cosine": -0.059168,
+      "negative_ratio": 0.6379,
+      "strong_negative_ratio": 0.0690,
+      "median_norm_ratio": 32.578,
+      "significant_conflict": false
+    },
+    {
+      "layer": 5,
+      "pair": "grounding_vs_alignment",
+      "valid_batches": 56,
+      "mean_cosine": -0.010249,
+      "median_cosine": -0.016190,
+      "negative_ratio": 0.6071,
+      "strong_negative_ratio": 0.0000,
+      "median_norm_ratio": 4279.898,
+      "significant_conflict": false
+    },
+    {
+      "layer": 11,
+      "pair": "ner_vs_grounding",
+      "valid_batches": 56,
+      "mean_cosine": -0.004068,
+      "median_cosine": 0.001619,
+      "negative_ratio": 0.4464,
+      "strong_negative_ratio": 0.0000,
+      "median_norm_ratio": 16992.759,
+      "significant_conflict": false
+    },
+    {
+      "layer": 11,
+      "pair": "ner_vs_alignment",
+      "valid_batches": 58,
+      "mean_cosine": -0.020230,
+      "median_cosine": -0.032542,
+      "negative_ratio": 0.5862,
+      "strong_negative_ratio": 0.0000,
+      "median_norm_ratio": 21.255,
+      "significant_conflict": false
+    },
+    {
+      "layer": 11,
+      "pair": "grounding_vs_alignment",
+      "valid_batches": 56,
+      "mean_cosine": 0.003419,
+      "median_cosine": 0.000773,
+      "negative_ratio": 0.5000,
+      "strong_negative_ratio": 0.0000,
+      "median_norm_ratio": 3840.375,
+      "significant_conflict": false
+    }
+  ],
+  "decision": {
+    "d0_complete": true,
+    "run_d2": false,
+    "next_stage": "D1 strict OOF candidate selector"
+  }
+}

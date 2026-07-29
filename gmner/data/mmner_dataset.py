@@ -19,6 +19,7 @@ from transformers import PreTrainedTokenizerBase
 from gmner.constants import DEFAULT_LABEL2ID, ENTITY_TYPE2ID, IGNORE_INDEX, normalize_entity_type, strip_bio_prefix
 from gmner.data.graph_builders import TextGraphBuilder
 from gmner.data.tokenization import encode_words_with_alignment
+from gmner.fmnerg.taxonomy import SubtypeTaxonomy
 from gmner.utils.io import read_jsonl
 
 
@@ -45,6 +46,8 @@ class MMNERJsonDataset(Dataset):
         groundability_type_priors: Optional[str] = None,
         groundability_mention_priors: Optional[str] = None,
         region_min_score: float = 0.0,
+        subtype_taxonomy: Optional[SubtypeTaxonomy] = None,
+        require_all_subtypes: bool = False,
     ) -> None:
         self.jsonl_path = Path(jsonl_path)
         self.image_dir = Path(image_dir)
@@ -54,7 +57,16 @@ class MMNERJsonDataset(Dataset):
         self.label2id = label2id or DEFAULT_LABEL2ID
         self.id2label = {value: key for key, value in self.label2id.items()}
         self.records = read_jsonl(self.jsonl_path)
-        self.subtype_label2id = self._build_subtype_label2id(self.records)
+        self.subtype_taxonomy = subtype_taxonomy
+        observed_subtypes = self._observed_subtypes(self.records)
+        if subtype_taxonomy is not None:
+            subtype_taxonomy.validate_labels(
+                observed_subtypes,
+                require_all=require_all_subtypes,
+            )
+            self.subtype_label2id = dict(subtype_taxonomy.label2id)
+        else:
+            self.subtype_label2id = self._build_subtype_label2id(self.records)
         self.grounding_enabled = grounding_enabled
         self.expand_entities_for_grounding = expand_entities_for_grounding
         self.image_feature_dir = Path(image_feature_dir) if image_feature_dir else None
@@ -93,6 +105,19 @@ class MMNERJsonDataset(Dataset):
             else:
                 converted.append(self.label2id.get(str(tag), IGNORE_INDEX))
         return converted
+
+    @staticmethod
+    def _observed_subtypes(records: List[dict]) -> set[str]:
+        labels: set[str] = set()
+        for record in records:
+            fine_tags = record.get("fine_ner_tags")
+            if not isinstance(fine_tags, list):
+                continue
+            for tag in fine_tags:
+                subtype = strip_bio_prefix(str(tag))
+                if subtype != "O":
+                    labels.add(subtype)
+        return labels
 
     @staticmethod
     def _build_subtype_label2id(records: List[dict]) -> Dict[str, int]:
@@ -527,6 +552,7 @@ class MMNERJsonDataset(Dataset):
                 "image_id": Path(record["image"]).stem,
                 "ner_loss_weight": 1.0,
                 "num_entities_in_record": 1,
+                "fine_ner_tags": fine_tags,
             }
 
             if not self.grounding_enabled:
@@ -638,8 +664,25 @@ class MMNERJsonDataset(Dataset):
                 sample["target_end"] = end
                 sample["target_entity_type"] = entity_type
                 sample["target_subtype"] = entity_subtype
-                sample["target_subtype_id"] = self.subtype_label2id.get(entity_subtype, IGNORE_INDEX)
-                sample["target_type_id"] = ENTITY_TYPE2ID.get(entity_type, ENTITY_TYPE2ID["O"])
+                target_type_id = ENTITY_TYPE2ID.get(
+                    entity_type,
+                    ENTITY_TYPE2ID["O"],
+                )
+                if self.subtype_taxonomy is not None:
+                    target_subtype_id = self.subtype_taxonomy.subtype_id(
+                        entity_subtype
+                    )
+                    self.subtype_taxonomy.validate_parent(
+                        target_subtype_id,
+                        target_type_id,
+                    )
+                else:
+                    target_subtype_id = self.subtype_label2id.get(
+                        entity_subtype,
+                        IGNORE_INDEX,
+                    )
+                sample["target_subtype_id"] = target_subtype_id
+                sample["target_type_id"] = target_type_id
                 sample["base_predicted_type"] = base_predicted_type
                 sample["base_predicted_type_id"] = (
                     ENTITY_TYPE2ID.get(base_predicted_type, IGNORE_INDEX)

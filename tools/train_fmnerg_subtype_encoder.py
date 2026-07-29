@@ -388,6 +388,9 @@ def main() -> None:
         "metadata": {
             "kind": "fmnerg_subtype_encoder_training_summary",
             "format_version": 1,
+            "seed": seed,
+            "config_path": str(config_path),
+            "config_sha256": sha256_file(config_path),
             "best_epoch": best_epoch,
             "best_checkpoint": str(checkpoint_path),
             "selection_metric": "fmnerg_f1",
