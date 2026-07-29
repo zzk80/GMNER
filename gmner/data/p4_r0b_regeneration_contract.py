@@ -14,6 +14,7 @@ import torch
 from gmner.data.full_chain_oof_contract import source_tree_sha256
 from gmner.data.null_release_oof_cache import (
     sha256_file,
+    stable_id_digest,
     validate_fold_oof_payload,
 )
 
@@ -26,6 +27,24 @@ P4_R0B_ARTIFACT_IDENTITY = "REGENERATED_FULL_CHAIN_OOF_R16"
 P4_R0B_EXECUTION_FOLDS = tuple(range(8))
 P4_R0B_FOLD_REPORT_KIND = "p4_r0_b_fold_semantic_consistency_report"
 P4_R0B_AGGREGATE_REPORT_KIND = "p4_r0_b_regeneration_aggregate_report"
+P4_R0B_M33A_CACHE_KIND = "p4_r0_b_m33a_formal_oof"
+P4_R0B_M33A_CACHE_VERSION = 1
+P4_R0B_M33A_REQUIRED_STAGES = (
+    "stage1",
+    "candidate_caches",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+    "formal_materialize",
+)
+P4_R0B_M33A_SUPERVISED_STAGES = (
+    "stage1",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+)
 
 SEMANTIC_TENSOR_PATHS = (
     "base_is_null",
@@ -47,10 +66,23 @@ SEMANTIC_TENSOR_PATHS = (
 
 CONTINUOUS_DIAGNOSTIC_PATHS = (
     "fine_outputs.final_region_logits",
-    "fine_outputs.base_log_prior",
-    "fine_outputs.coarse_log_prior",
-    "evidence_outputs.evidence_scalar_features",
-    "reliability_outputs.reliability_probability",
+)
+
+M33A_FINE_KEYS = (
+    "candidate_mask",
+    "final_region_logits",
+    "fine_top4_indices",
+    "fine_top4_valid_mask",
+    "promoted_candidate_mask",
+    "fixed_type_ids",
+)
+M33A_EXPANDED_KEYS = (
+    "span_mask",
+    "span_source_ids",
+    "type_candidates",
+    "region_mask",
+    "region_is_null",
+    "region_detector_scores",
 )
 
 
@@ -115,6 +147,18 @@ def validate_r0b_preregistration(payload: dict) -> None:
         raise ValueError("P4-R0-B seed must remain 42.")
     if source.get("checkpoint_reuse") is not False:
         raise PermissionError("P4-R0-B cannot reuse an old checkpoint.")
+    chain = dict(payload.get("chain_contract") or {})
+    if (
+        chain.get("identity") != "M3.3A_FORMAL_BEST_CHAIN"
+        or chain.get("siglip2") is not False
+        or chain.get("fusion_reliability") is not False
+        or chain.get("null_release") is not False
+    ):
+        raise PermissionError("P4-R0-B must use only the formal M3.3A chain.")
+    if tuple(payload.get("required_stages") or ()) != (
+        P4_R0B_M33A_REQUIRED_STAGES
+    ):
+        raise PermissionError("P4-R0-B required stages changed.")
     storage = dict(payload.get("storage_contract") or {})
     paths = {
         str(storage.get("work_root", "")),
@@ -252,6 +296,7 @@ def build_regeneration_fold_manifest(
         ),
         "regeneration_fold_id": None,
         "execution_folds": list(P4_R0B_EXECUTION_FOLDS),
+        "chain_contract": copy.deepcopy(authorization["chain_contract"]),
         "authorization_path": str(authorization_file),
         "upstream_validation_dev_access": True,
         "p4_dev_access": False,
@@ -269,6 +314,150 @@ def build_regeneration_fold_manifest(
         }
     )
     return output
+
+
+def _compact_tensor(
+    value: torch.Tensor,
+    *,
+    preserve_float32: bool = False,
+) -> torch.Tensor:
+    tensor = value.detach().cpu().contiguous()
+    if tensor.is_floating_point() and not preserve_float32:
+        tensor = tensor.to(torch.float16)
+    return tensor
+
+
+def pack_m33a_formal_batch(
+    context: dict,
+    *,
+    fold_id: int,
+) -> dict:
+    expanded = dict(context["expanded"])
+    fine = dict(context["fine_outputs"])
+    hierarchy = dict(context["hierarchy_outputs"])
+    missing_fine = [key for key in M33A_FINE_KEYS if key not in fine]
+    missing_expanded = [key for key in M33A_EXPANDED_KEYS if key not in expanded]
+    if missing_fine or missing_expanded:
+        raise ValueError(
+            "Cannot pack M3.3A formal state: "
+            f"fine={missing_fine}, expanded={missing_expanded}."
+        )
+    if "fixed_type_ids" not in hierarchy:
+        raise ValueError("M3.3A hierarchy output lacks fixed_type_ids.")
+    record_ids = [
+        str(item.get("record_id", ""))
+        for item in expanded["metadata"]
+    ]
+    if any(not value for value in record_ids):
+        raise ValueError("M3.3A formal state contains an empty record id.")
+    return {
+        "fold_id": int(fold_id),
+        "record_ids": record_ids,
+        "fine_outputs": {
+            key: _compact_tensor(
+                fine[key],
+                preserve_float32=key == "final_region_logits",
+            )
+            for key in M33A_FINE_KEYS
+        },
+        "hierarchy_outputs": {
+            "fixed_type_ids": _compact_tensor(hierarchy["fixed_type_ids"])
+        },
+        "expanded": {
+            key: _compact_tensor(expanded[key])
+            for key in M33A_EXPANDED_KEYS
+        },
+        "current_visible": _compact_tensor(context["current_visible"]),
+        "base_is_null": _compact_tensor(context["base_is_null"]),
+        "deployment_span_mask": _compact_tensor(
+            context["deployment_span_mask"]
+        ),
+    }
+
+
+def validate_m33a_formal_oof_payload(
+    payload: dict,
+    *,
+    expected_fold_id: int,
+    expected_record_ids: list[str],
+) -> dict:
+    metadata = dict(payload.get("metadata") or {})
+    if metadata.get("kind") != P4_R0B_M33A_CACHE_KIND:
+        raise ValueError("Not a P4-R0-B M3.3A formal-state cache.")
+    if int(metadata.get("format_version", -1)) != P4_R0B_M33A_CACHE_VERSION:
+        raise ValueError("Unsupported P4-R0-B M3.3A cache version.")
+    if int(metadata.get("fold_id", -1)) != int(expected_fold_id):
+        raise ValueError("M3.3A formal-state cache has another fold id.")
+    if int(metadata.get("num_folds", -1)) != 10:
+        raise ValueError("M3.3A formal-state cache must retain the 10-fold split.")
+    for excluded in (
+        "siglip2_included",
+        "reliability_included",
+        "null_release_included",
+    ):
+        if metadata.get(excluded) is not False:
+            raise ValueError(f"M3.3A formal-state cache must set {excluded}=false.")
+    batches = list(payload.get("batches") or [])
+    record_ids = []
+    for batch_index, batch in enumerate(batches):
+        required = (
+            "fold_id",
+            "record_ids",
+            "fine_outputs",
+            "hierarchy_outputs",
+            "expanded",
+            "current_visible",
+            "base_is_null",
+            "deployment_span_mask",
+        )
+        missing = [key for key in required if key not in batch]
+        if missing:
+            raise ValueError(
+                f"M3.3A batch {batch_index} is missing fields: {missing}."
+            )
+        if int(batch["fold_id"]) != int(expected_fold_id):
+            raise ValueError("M3.3A batch carries another fold id.")
+        batch_ids = [str(value) for value in batch["record_ids"]]
+        batch_size = int(batch["expanded"]["span_mask"].size(0))
+        if len(batch_ids) != batch_size:
+            raise ValueError("M3.3A batch record-id count is inconsistent.")
+        record_ids.extend(batch_ids)
+        fine = dict(batch["fine_outputs"])
+        expanded = dict(batch["expanded"])
+        if any(key not in fine for key in M33A_FINE_KEYS):
+            raise ValueError("M3.3A batch lacks a required Fine field.")
+        if any(key not in expanded for key in M33A_EXPANDED_KEYS):
+            raise ValueError("M3.3A batch lacks a required expanded field.")
+        top4_indices = fine["fine_top4_indices"].long()
+        top4_valid = fine["fine_top4_valid_mask"].bool()
+        candidate_mask = fine["candidate_mask"].bool()
+        if top4_indices.shape != top4_valid.shape or top4_indices.size(-1) != 4:
+            raise ValueError("M3.3A fixed Top-4 shape is invalid.")
+        if top4_indices.shape[:-1] != candidate_mask.shape[:-1]:
+            raise ValueError("M3.3A fixed Top-4 does not align with spans.")
+        safe = top4_indices.clamp(0, max(candidate_mask.size(-1) - 1, 0))
+        if not torch.all(candidate_mask.gather(-1, safe) | ~top4_valid):
+            raise ValueError("M3.3A fixed Top-4 leaves its Fine candidate mask.")
+        one_hot = torch.nn.functional.one_hot(
+            safe,
+            num_classes=candidate_mask.size(-1),
+        ).bool()
+        if (one_hot & top4_valid.unsqueeze(-1)).sum(dim=-2).gt(1).any():
+            raise ValueError("M3.3A fixed Top-4 contains duplicate actions.")
+    expected_ids = [str(value) for value in expected_record_ids]
+    if record_ids != expected_ids:
+        raise ValueError("M3.3A formal-state record order differs.")
+    if len(record_ids) != len(set(record_ids)):
+        raise ValueError("M3.3A formal-state cache has duplicate record ids.")
+    if int(metadata.get("records", -1)) != len(record_ids):
+        raise ValueError("M3.3A formal-state record count differs.")
+    if metadata.get("record_ids_sha256") != stable_id_digest(record_ids):
+        raise ValueError("M3.3A formal-state record digest differs.")
+    return {
+        "metadata": metadata,
+        "batches": batches,
+        "records": len(record_ids),
+    }
 
 
 def _nested(mapping: dict, path: str) -> torch.Tensor:
@@ -318,11 +507,10 @@ def compare_compact_semantics(
         expected_record_ids=expected_ids,
         require_reliability=True,
     )
-    validate_fold_oof_payload(
+    validate_m33a_formal_oof_payload(
         regenerated,
         expected_fold_id=fold_id,
         expected_record_ids=expected_ids,
-        require_reliability=True,
     )
     validate_regeneration_metadata(
         dict(regenerated["metadata"]),

@@ -24,13 +24,15 @@ Hierarchical Verifier
 Coarse Selector
 Fine Adapter
 Evidence Visibility
-SigLIP2 caches
-Fusion Reliability
-heldout full-chain feature materialization
+minimal heldout M3.3A formal-state materialization
 ```
 
 This is a new experiment. No regenerated file may be described as recovered,
 restored, byte-identical, or identical to a deleted artifact.
+
+This is the formal M3.3A best chain. SigLIP2, Fusion Reliability, NULL
+Release, Utility, and action-controller branches are excluded and must not be
+downloaded, trained, cached, or materialized by R0-B.
 
 ## Fixed Training Contract
 
@@ -68,9 +70,9 @@ Test remains locked.
 
 ## Official Dev Exception
 
-The existing full-chain training implementation requires the official Dev split
-for upstream checkpoint selection. R0-B explicitly authorizes this one fixed
-use so that the rebuilt chain follows the original training design:
+The existing M3.3A training implementation requires the official Dev split for
+upstream checkpoint selection. R0-B explicitly authorizes this one fixed use
+so that the rebuilt chain follows the original training design:
 
 ```text
 official Dev labels:
@@ -134,7 +136,6 @@ current source-tree SHA256 recorded
 RoBERTa model tree SHA256 recorded
 VinVL feature tree SHA256 recorded
 grounding-prior bundle SHA256 recorded
-SigLIP2 model tree SHA256 recorded
 official Dev source SHA256 fixed
 new work/output roots do not alias old roots
 Test paths absent from generated configs
@@ -148,21 +149,20 @@ Each fold permanently retains:
 
 ```text
 regenerated_heldout_r16.pt
-heldout_features.pt
+m33a_formal_state.pt
 pipeline_manifest.json
-fold_proof.json
 fold configs
 regeneration_semantic_report.json
 regeneration_archive_manifest.json
 small metrics and logs
 ```
 
-Large train/Dev candidates, R36 caches, SigLIP2 shards, checkpoints, optimizer
-state, tokenizer copies, and graph caches may be deleted only after:
+Large train/Dev candidates, R36 caches, checkpoints, optimizer state,
+tokenizer copies, and graph caches may be deleted only after:
 
 ```text
 pipeline sealed
-heldout feature cache validated
+heldout M3.3A formal-state cache validated
 regenerated R16 copied and hash-verified
 semantic comparison completed
 archive manifest written
@@ -171,8 +171,10 @@ retained artifacts independently reloaded
 
 ## Semantic Consistency Gate
 
-The regenerated fold is compared with the retained old compact full-chain OOF
-cache. This is a semantic Gate, not a byte-identity claim.
+The regenerated minimal M3.3A state is compared only with the shared fields in
+the retained old compact full-chain OOF cache. The old cache is a read-only
+reference, never a training input. Reliability-only fields are neither rebuilt
+nor gated. This is a semantic Gate, not a byte-identity claim.
 
 The following must be exact for every heldout record:
 

@@ -99,6 +99,15 @@ def main() -> None:
             raise ValueError(f"Fold {fold_id} is not cleaned and sealed.")
         if archive.get("post_cleanup_reload_passed") is not True:
             raise ValueError(f"Fold {fold_id} failed post-cleanup reload.")
+        for excluded in (
+            "siglip2_included",
+            "reliability_included",
+            "null_release_included",
+        ):
+            if report.get(excluded) is not False:
+                raise ValueError(
+                    f"Fold {fold_id} unexpectedly includes {excluded}."
+                )
         for artifact in archive["retained_artifacts"].values():
             path = Path(str(artifact["path"]))
             if not path.is_file() or sha256_file(path) != artifact["sha256"]:
@@ -171,6 +180,9 @@ def main() -> None:
         ),
         "formal_sidecar_generated": False,
         "attached_to_p4": False,
+        "siglip2_included": False,
+        "reliability_included": False,
+        "null_release_included": False,
         "folds_8_9_accessed": False,
         "p4_dev_accessed": False,
         "oracle_run": False,

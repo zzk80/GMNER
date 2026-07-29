@@ -14,6 +14,8 @@ from gmner.data.null_release_oof_cache import (
 )
 from gmner.data.p4_r0b_regeneration_contract import (
     P4_R0B_ARTIFACT_IDENTITY,
+    P4_R0B_M33A_CACHE_KIND,
+    P4_R0B_M33A_CACHE_VERSION,
     canonical_formal_triple_digest,
     compare_compact_semantics,
     regeneration_metadata,
@@ -83,15 +85,22 @@ def _batch() -> dict:
 
 def _payload(*, regenerated: bool) -> dict:
     metadata = {
-        "format_version": NULL_RELEASE_OOF_FORMAT_VERSION,
-        "kind": NULL_RELEASE_OOF_KIND,
+        "format_version": (
+            P4_R0B_M33A_CACHE_VERSION
+            if regenerated
+            else NULL_RELEASE_OOF_FORMAT_VERSION
+        ),
+        "kind": (
+            P4_R0B_M33A_CACHE_KIND
+            if regenerated
+            else NULL_RELEASE_OOF_KIND
+        ),
         "full_chain_oof": True,
         "fold_id": 0,
         "num_folds": 10,
         "records": 1,
         "record_ids_sha256": stable_id_digest(["record-0"]),
         "heldout_record_ids": ["record-0"],
-        "includes_reliability": True,
     }
     if regenerated:
         metadata.update(
@@ -101,7 +110,20 @@ def _payload(*, regenerated: bool) -> dict:
                 experiment_id=EXPERIMENT_ID,
             )
         )
-    return {"metadata": metadata, "batches": [_batch()]}
+        metadata.update(
+            {
+                "siglip2_included": False,
+                "reliability_included": False,
+                "null_release_included": False,
+            }
+        )
+    else:
+        metadata["includes_reliability"] = True
+    batch = _batch()
+    if regenerated:
+        batch.pop("evidence_outputs")
+        batch.pop("reliability_outputs")
+    return {"metadata": metadata, "batches": [batch]}
 
 
 def test_repository_preregistration_keeps_all_downstream_scopes_locked() -> None:
@@ -118,6 +140,9 @@ def test_repository_preregistration_keeps_all_downstream_scopes_locked() -> None
     assert payload["authorization"]["p4_oracle"] is False
     assert payload["authorization"]["p4_1"] is False
     assert payload["authorization"]["test_access"] is False
+    assert payload["chain_contract"]["siglip2"] is False
+    assert payload["chain_contract"]["fusion_reliability"] is False
+    assert payload["chain_contract"]["null_release"] is False
 
 
 def test_regeneration_identity_rejects_locked_fold() -> None:

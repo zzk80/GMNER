@@ -48,6 +48,20 @@
     "checkpoint_reuse": false,
     "old_compact_cache_as_training_input": false
   },
+  "chain_contract": {
+    "identity": "M3.3A_FORMAL_BEST_CHAIN",
+    "stages": [
+      "stage1",
+      "r16_r36_candidates",
+      "hierarchical_verifier",
+      "coarse_selector",
+      "fine_grounding_adapter",
+      "evidence_visibility"
+    ],
+    "siglip2": false,
+    "fusion_reliability": false,
+    "null_release": false
+  },
   "storage_contract": {
     "work_root": "knowledge/p4_r0b_full_chain_oof/roberta128",
     "output_root": "outputs/p4_r0b_full_chain_oof/roberta128",
@@ -62,16 +76,13 @@
     "coarse",
     "fine",
     "evidence",
-    "siglip2_caches",
-    "reliability",
-    "materialize"
+    "formal_materialize"
   ],
   "preflight_gate": {
     "source_tree_fingerprint": true,
     "roberta_tree_fingerprint": true,
     "vinvl_tree_fingerprint": true,
     "grounding_prior_bundle_fingerprint": true,
-    "siglip2_tree_fingerprint": true,
     "fold_source_hashes_exact": true,
     "official_dev_hash_recorded": true,
     "heldout_exclusion": true,

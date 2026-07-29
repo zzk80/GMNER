@@ -144,30 +144,6 @@ def main() -> None:
     )
     dataset, collator = _paired_dataset(reliability_config, root, "train")
     base = _base_paired(dataset)
-    regeneration_keys = (
-        "artifact_identity",
-        "regeneration_authorization_sha256",
-        "regeneration_fold_id",
-        "regeneration_experiment_id",
-    )
-    formal_regeneration = {
-        key: base.formal.metadata.get(key) for key in regeneration_keys
-    }
-    expanded_regeneration = {
-        key: base.expanded.metadata.get(key) for key in regeneration_keys
-    }
-    has_regeneration_identity = any(
-        value is not None for value in formal_regeneration.values()
-    ) or any(value is not None for value in expanded_regeneration.values())
-    if has_regeneration_identity:
-        if any(value is None for value in formal_regeneration.values()):
-            raise ValueError(
-                "Formal candidate cache has incomplete regeneration identity."
-            )
-        if formal_regeneration != expanded_regeneration:
-            raise ValueError(
-                "Formal and expanded candidate-cache regeneration identities differ."
-            )
     formal_fold = int(base.formal.metadata.get("oof_fold_id", -1))
     expanded_fold = int(base.expanded.metadata.get("oof_fold_id", -1))
     if not bool(base.formal.metadata.get("oof_heldout")) or not bool(
@@ -253,7 +229,8 @@ def main() -> None:
 
     output = resolve(args.output, root)
     output.parent.mkdir(parents=True, exist_ok=True)
-    payload_metadata = {
+    payload = {
+        "metadata": {
             "format_version": NULL_RELEASE_OOF_FORMAT_VERSION,
             "kind": NULL_RELEASE_OOF_KIND,
             "full_chain_oof": True,
@@ -270,11 +247,7 @@ def main() -> None:
             "artifact_sha256": {
                 name: sha256_file(path) for name, path in artifacts.items()
             },
-    }
-    if has_regeneration_identity:
-        payload_metadata.update(formal_regeneration)
-    payload = {
-        "metadata": payload_metadata,
+        },
         "batches": batches,
     }
     validate_fold_oof_payload(

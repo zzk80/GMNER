@@ -39,10 +39,6 @@ def parse_args() -> argparse.Namespace:
         default="configs/fmnerg_twitter10000_stage1.yaml",
     )
     parser.add_argument(
-        "--siglip2-model",
-        default="/home/zzk/gmner/siglip2-base-patch16-224",
-    )
-    parser.add_argument(
         "--output-fold-summary",
         default=(
             "knowledge/p4_r0b_full_chain_oof/roberta128/"
@@ -113,7 +109,6 @@ def main() -> None:
     model = dict(stage1_config["model"])
     roberta_path = resolve(model["text_model_name"], root)
     vinvl_path = resolve(data["image_feature_dir"], root)
-    siglip2_path = resolve(args.siglip2_model, root)
     dev_path = resolve(data["dev_file"], root)
     prior_paths = [
         resolve(data["groundability_type_priors"], root),
@@ -122,7 +117,6 @@ def main() -> None:
     input_fingerprints = {
         "roberta": tree_sha256(roberta_path),
         "vinvl": tree_sha256(vinvl_path),
-        "siglip2": tree_sha256(siglip2_path),
         "grounding_priors": file_bundle_sha256(prior_paths),
         "official_dev": {
             "path": str(dev_path),
@@ -142,6 +136,7 @@ def main() -> None:
         root / "gmner" / "data" / "p4_r0b_regeneration_contract.py",
         root / "scripts" / "prepare_p4_r0b_regeneration.py",
         root / "scripts" / "run_null_release_full_chain_oof_fold.py",
+        root / "scripts" / "build_p4_r0b_m33a_formal_oof.py",
         root / "scripts" / "seal_p4_r0b_regenerated_fold.py",
         root / "scripts" / "aggregate_p4_r0b_regeneration.py",
         root / "tools" / "run_p4_r0b_full_chain_oof.sh",
@@ -176,6 +171,10 @@ def main() -> None:
         "status": "PASSED",
         "artifact_identity": authorization["artifact_identity"],
         "experiment_id": authorization["experiment_id"],
+        "chain_identity": authorization["chain_contract"]["identity"],
+        "siglip2_included": False,
+        "reliability_included": False,
+        "null_release_included": False,
         "authorization": str(authorization_path),
         "authorization_sha256": sha256_file(authorization_path),
         "archived_fold_summary_sha256_exact": True,

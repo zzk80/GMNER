@@ -19,15 +19,17 @@ from gmner.data.full_chain_oof_contract import (
 )
 from gmner.data.null_release_oof_cache import (
     sha256_file,
-    validate_fold_oof_payload,
 )
 from gmner.data.p4_r0b_regeneration_contract import (
     P4_R0B_ARTIFACT_IDENTITY,
     P4_R0B_EXECUTION_FOLDS,
     P4_R0B_FOLD_REPORT_KIND,
+    P4_R0B_M33A_REQUIRED_STAGES,
+    P4_R0B_M33A_SUPERVISED_STAGES,
     canonical_formal_triple_digest,
     compare_compact_semantics,
     validate_fold_cleanup_path,
+    validate_m33a_formal_oof_payload,
     validate_r0b_preregistration,
     validate_regeneration_metadata,
 )
@@ -123,10 +125,8 @@ def main() -> None:
     fold_work = work_root / f"fold{args.fold_id}"
     fold_output = output_root / f"fold{args.fold_id}"
     candidate_dir = fold_work / "candidates"
-    siglip2_dir = fold_work / "siglip2"
     pipeline_path = fold_work / "pipeline_manifest.json"
-    proof_path = fold_work / "fold_proof.json"
-    compact_path = fold_work / "heldout_features.pt"
+    compact_path = fold_work / "m33a_formal_state.pt"
     regenerated_r16_source = candidate_dir / "heldout_r16.pt"
     retained_r16 = fold_work / "regenerated_heldout_r16.pt"
     reference_compact = (
@@ -144,6 +144,8 @@ def main() -> None:
         pipeline_path,
         fold_manifest=manifest,
         fold_id=args.fold_id,
+        required_stages=P4_R0B_M33A_REQUIRED_STAGES,
+        supervised_stages=P4_R0B_M33A_SUPERVISED_STAGES,
     )
     expected_identity = {
         "artifact_identity": P4_R0B_ARTIFACT_IDENTITY,
@@ -169,11 +171,10 @@ def main() -> None:
         for fold in manifest["folds"]
         if int(fold["fold"]) == args.fold_id
     )
-    validate_fold_oof_payload(
+    validate_m33a_formal_oof_payload(
         regenerated_compact,
         expected_fold_id=args.fold_id,
         expected_record_ids=heldout_ids,
-        require_reliability=True,
     )
     validate_regeneration_metadata(
         dict(regenerated_compact["metadata"]),
@@ -214,9 +215,6 @@ def main() -> None:
         archive_metadata_files(candidate_dir, archive_root / "candidates")
     )
     metadata_archive.extend(
-        archive_metadata_files(siglip2_dir, archive_root / "siglip2")
-    )
-    metadata_archive.extend(
         archive_metadata_files(fold_output, archive_root / "training")
     )
 
@@ -235,7 +233,7 @@ def main() -> None:
             "path": str(reference_compact),
             "sha256": sha256_file(reference_compact),
         },
-        "regenerated_compact": {
+        "regenerated_m33a_formal_state": {
             "path": str(compact_path),
             "sha256": sha256_file(compact_path),
         },
@@ -248,6 +246,9 @@ def main() -> None:
         "attached_to_p4": False,
         "folds_8_9_accessed": False,
         "p4_dev_accessed": False,
+        "siglip2_included": False,
+        "reliability_included": False,
+        "null_release_included": False,
         "oracle_run": False,
         "p4_1_run": False,
         "test_accessed": False,
@@ -256,7 +257,7 @@ def main() -> None:
 
     bytes_to_delete = sum(
         directory_bytes(path)
-        for path in (candidate_dir, siglip2_dir, fold_output)
+        for path in (candidate_dir, fold_output)
     )
     archive_manifest = {
         "kind": "p4_r0_b_regenerated_fold_archive",
@@ -269,10 +270,6 @@ def main() -> None:
             "path": str(pipeline_path),
             "sha256": sha256_file(pipeline_path),
         },
-        "fold_proof": {
-            "path": str(proof_path),
-            "sha256": sha256_file(proof_path),
-        },
         "checkpoint_inventory": checkpoint_inventory(pipeline),
         "metadata_archive": metadata_archive,
         "semantic_report": {
@@ -280,7 +277,7 @@ def main() -> None:
             "sha256": sha256_file(report_path),
         },
         "retained_artifacts": {
-            "compact": {
+            "m33a_formal_state": {
                 "path": str(compact_path),
                 "sha256": sha256_file(compact_path),
             },
@@ -303,11 +300,6 @@ def main() -> None:
                 fold_id=args.fold_id,
             ),
             validate_fold_cleanup_path(
-                siglip2_dir,
-                allowed_root=work_root,
-                fold_id=args.fold_id,
-            ),
-            validate_fold_cleanup_path(
                 fold_output,
                 allowed_root=output_root,
                 fold_id=args.fold_id,
@@ -319,6 +311,11 @@ def main() -> None:
 
     reloaded_compact = torch.load(compact_path, map_location="cpu")
     reloaded_r16 = torch.load(retained_r16, map_location="cpu")
+    validate_m33a_formal_oof_payload(
+        reloaded_compact,
+        expected_fold_id=args.fold_id,
+        expected_record_ids=heldout_ids,
+    )
     validate_regeneration_metadata(
         dict(reloaded_compact["metadata"]),
         authorization_sha256=authorization_sha256,

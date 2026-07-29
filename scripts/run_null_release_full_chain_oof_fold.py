@@ -35,10 +35,13 @@ from gmner.data.null_release_oof_cache import (
 from gmner.data.p4_r0b_regeneration_contract import (
     P4_R0B_ARTIFACT_IDENTITY,
     P4_R0B_EXECUTION_FOLDS,
+    P4_R0B_M33A_REQUIRED_STAGES,
+    P4_R0B_M33A_SUPERVISED_STAGES,
     file_bundle_sha256,
     regeneration_metadata,
     validate_r0b_preregistration,
     validate_regeneration_metadata,
+    validate_m33a_formal_oof_payload,
 )
 
 
@@ -59,6 +62,7 @@ STAGE_ORDER = (
     "evidence",
     "siglip2_caches",
     "reliability",
+    "formal_materialize",
     "materialize",
 )
 
@@ -441,6 +445,8 @@ class FoldPipeline:
         dry_run: bool,
         regeneration: dict | None = None,
         recover_completed_stage1_sigsegv: bool = False,
+        required_pipeline_stages: tuple[str, ...] | None = None,
+        supervised_pipeline_stages: tuple[str, ...] | None = None,
     ) -> None:
         self.root = root
         self.manifest_path = manifest_path
@@ -453,6 +459,8 @@ class FoldPipeline:
         self.recover_completed_stage1_sigsegv = bool(
             recover_completed_stage1_sigsegv
         )
+        self.required_pipeline_stages = required_pipeline_stages
+        self.supervised_pipeline_stages = supervised_pipeline_stages
         if pipeline_path.exists():
             self.payload = json.loads(pipeline_path.read_text(encoding="utf-8"))
             if int(self.payload.get("fold_id", -1)) != int(fold["fold"]):
@@ -633,6 +641,8 @@ class FoldPipeline:
             self.pipeline_path,
             fold_manifest=self.manifest,
             fold_id=int(self.fold["fold"]),
+            required_stages=self.required_pipeline_stages,
+            supervised_stages=self.supervised_pipeline_stages,
         )
 
 
@@ -836,6 +846,8 @@ def main() -> None:
             != regeneration["regeneration_experiment_id"]
             or tuple(manifest_regeneration.get("execution_folds") or ())
             != P4_R0B_EXECUTION_FOLDS
+            or dict(manifest_regeneration.get("chain_contract") or {})
+            != dict(authorization["chain_contract"])
             or not implementation_files
             or file_bundle_sha256(implementation_files).get("sha256")
             != implementation.get("sha256")
@@ -849,7 +861,10 @@ def main() -> None:
     config_dir = fold_work / "configs"
     candidate_dir = fold_work / "candidates"
     siglip2_root = fold_work / "siglip2"
-    for directory in (config_dir, candidate_dir, siglip2_root, fold_output):
+    directories = [config_dir, candidate_dir, fold_output]
+    if not regeneration:
+        directories.append(siglip2_root)
+    for directory in directories:
         directory.mkdir(parents=True, exist_ok=True)
 
     stage1_template = load_yaml(stage1_template_path)
@@ -857,8 +872,16 @@ def main() -> None:
     coarse_template = load_yaml(resolve(args.coarse_config, root))
     fine_template = load_yaml(resolve(args.fine_config, root))
     evidence_template = load_yaml(resolve(args.evidence_config, root))
-    reliability_template = load_yaml(resolve(args.reliability_config, root))
-    release_template = load_yaml(resolve(args.release_config, root))
+    reliability_template = (
+        None
+        if regeneration
+        else load_yaml(resolve(args.reliability_config, root))
+    )
+    release_template = (
+        None
+        if regeneration
+        else load_yaml(resolve(args.release_config, root))
+    )
 
     train_file = Path(fold["train_file"]).resolve()
     heldout_file = Path(fold["heldout_file"]).resolve()
@@ -887,18 +910,24 @@ def main() -> None:
         )
         for name in model_dirs
     }
-    config_paths = {
-        name: config_dir / f"{name}.yaml"
-        for name in (
-            "stage1",
-            "hierarchical",
-            "coarse",
-            "fine",
-            "evidence",
+    config_names = [
+        "stage1",
+        "hierarchical",
+        "coarse",
+        "fine",
+        "evidence",
+    ]
+    config_names.extend(
+        ["evidence_heldout"]
+        if regeneration
+        else [
             "reliability",
             "reliability_heldout",
             "release_materialize",
-        )
+        ]
+    )
+    config_paths = {
+        name: config_dir / f"{name}.yaml" for name in config_names
     }
 
     stage1 = deepcopy(stage1_template)
@@ -972,59 +1001,83 @@ def main() -> None:
     _no_test_contract(evidence)
     write_yaml(config_paths["evidence"], evidence)
 
-    siglip2_dirs = {
-        split: siglip2_root / split for split in ("train", "dev", "heldout")
-    }
-    siglip2_manifests = {
-        split: path / "manifest.json" for split, path in siglip2_dirs.items()
-    }
-    reliability = deepcopy(reliability_template)
-    reliability["data"].update(
-        {
-            **deepcopy(fine["data"]),
-            "siglip2_train_cache": str(siglip2_dirs["train"]),
-            "siglip2_dev_cache": str(siglip2_dirs["dev"]),
-            "verify_siglip2_cache_hashes": True,
+    if regeneration:
+        evidence_heldout = deepcopy(evidence)
+        evidence_heldout["data"].update(
+            {
+                "formal_train_cache": str(candidate_paths["heldout_r16"]),
+                "expanded_train_cache": str(candidate_paths["heldout_r36"]),
+                "require_oof_train_cache": True,
+            }
+        )
+        _no_test_contract(evidence_heldout)
+        write_yaml(config_paths["evidence_heldout"], evidence_heldout)
+    else:
+        assert reliability_template is not None
+        assert release_template is not None
+        siglip2_dirs = {
+            split: siglip2_root / split
+            for split in ("train", "dev", "heldout")
         }
-    )
-    reliability["frozen"].update(
-        {
-            "fine_config": str(config_paths["fine"]),
-            "fine_checkpoint": str(checkpoints["fine"]),
-            "evidence_visibility_config": str(config_paths["evidence"]),
-            "evidence_visibility_checkpoint": str(checkpoints["evidence"]),
+        siglip2_manifests = {
+            split: path / "manifest.json"
+            for split, path in siglip2_dirs.items()
         }
-    )
-    reliability["runtime"]["output_dir"] = str(model_dirs["reliability"])
-    reliability["runtime"]["seed"] = args.seed
-    _no_test_contract(reliability)
-    write_yaml(config_paths["reliability"], reliability)
+        reliability = deepcopy(reliability_template)
+        reliability["data"].update(
+            {
+                **deepcopy(fine["data"]),
+                "siglip2_train_cache": str(siglip2_dirs["train"]),
+                "siglip2_dev_cache": str(siglip2_dirs["dev"]),
+                "verify_siglip2_cache_hashes": True,
+            }
+        )
+        reliability["frozen"].update(
+            {
+                "fine_config": str(config_paths["fine"]),
+                "fine_checkpoint": str(checkpoints["fine"]),
+                "evidence_visibility_config": str(config_paths["evidence"]),
+                "evidence_visibility_checkpoint": str(checkpoints["evidence"]),
+            }
+        )
+        reliability["runtime"]["output_dir"] = str(
+            model_dirs["reliability"]
+        )
+        reliability["runtime"]["seed"] = args.seed
+        _no_test_contract(reliability)
+        write_yaml(config_paths["reliability"], reliability)
 
-    reliability_heldout = deepcopy(reliability)
-    reliability_heldout["data"].update(
-        {
-            "formal_train_cache": str(candidate_paths["heldout_r16"]),
-            "expanded_train_cache": str(candidate_paths["heldout_r36"]),
-            "siglip2_train_cache": str(siglip2_dirs["heldout"]),
-            "require_oof_train_cache": True,
-        }
-    )
-    _no_test_contract(reliability_heldout)
-    write_yaml(config_paths["reliability_heldout"], reliability_heldout)
+        reliability_heldout = deepcopy(reliability)
+        reliability_heldout["data"].update(
+            {
+                "formal_train_cache": str(candidate_paths["heldout_r16"]),
+                "expanded_train_cache": str(candidate_paths["heldout_r36"]),
+                "siglip2_train_cache": str(siglip2_dirs["heldout"]),
+                "require_oof_train_cache": True,
+            }
+        )
+        _no_test_contract(reliability_heldout)
+        write_yaml(
+            config_paths["reliability_heldout"], reliability_heldout
+        )
 
-    release = deepcopy(release_template)
-    release["frozen"].update(
-        {
-            "reliability_config": str(config_paths["reliability_heldout"]),
-            "reliability_checkpoint": str(checkpoints["reliability"]),
-        }
-    )
-    release["oof"]["train_feature_cache"] = str(
-        work_root / "full_chain_train_oof.pt"
-    )
-    release["runtime"]["output_dir"] = str(fold_output / "release_materialize")
-    _no_test_contract(release)
-    write_yaml(config_paths["release_materialize"], release)
+        release = deepcopy(release_template)
+        release["frozen"].update(
+            {
+                "reliability_config": str(
+                    config_paths["reliability_heldout"]
+                ),
+                "reliability_checkpoint": str(checkpoints["reliability"]),
+            }
+        )
+        release["oof"]["train_feature_cache"] = str(
+            work_root / "full_chain_train_oof.pt"
+        )
+        release["runtime"]["output_dir"] = str(
+            fold_output / "release_materialize"
+        )
+        _no_test_contract(release)
+        write_yaml(config_paths["release_materialize"], release)
 
     pipeline = FoldPipeline(
         root=root,
@@ -1037,6 +1090,12 @@ def main() -> None:
         regeneration=regeneration,
         recover_completed_stage1_sigsegv=(
             args.recover_completed_stage1_sigsegv
+        ),
+        required_pipeline_stages=(
+            P4_R0B_M33A_REQUIRED_STAGES if regeneration else None
+        ),
+        supervised_pipeline_stages=(
+            P4_R0B_M33A_SUPERVISED_STAGES if regeneration else None
         ),
     )
 
@@ -1157,6 +1216,91 @@ def main() -> None:
         )
         if args.stop_after == name:
             return
+
+    if regeneration:
+        formal_state_path = fold_work / "m33a_formal_state.pt"
+        formal_materialize_command = [
+            python,
+            "-u",
+            str(root / "scripts" / "build_p4_r0b_m33a_formal_oof.py"),
+            "--config",
+            str(config_paths["evidence_heldout"]),
+            "--checkpoint",
+            str(checkpoints["evidence"]),
+            "--fold-summary",
+            str(manifest_path),
+            "--pipeline-manifest",
+            str(pipeline_path),
+            "--fold-id",
+            str(args.fold_id),
+            "--output",
+            str(formal_state_path),
+            "--batch-size",
+            str(args.inference_batch_size),
+            "--device",
+            args.device,
+        ]
+
+        def validate_formal_state() -> None:
+            payload = torch.load(formal_state_path, map_location="cpu")
+            validate_m33a_formal_oof_payload(
+                payload,
+                expected_fold_id=args.fold_id,
+                expected_record_ids=list(fold["heldout_record_ids"]),
+            )
+            validate_regeneration_metadata(
+                dict(payload["metadata"]),
+                authorization_sha256=str(
+                    regeneration["regeneration_authorization_sha256"]
+                ),
+                fold_id=args.fold_id,
+                experiment_id=str(
+                    regeneration["regeneration_experiment_id"]
+                ),
+            )
+
+        pipeline.run(
+            "formal_materialize",
+            [formal_materialize_command],
+            [formal_state_path],
+            inputs=[
+                checkpoints["hierarchical"],
+                checkpoints["coarse"],
+                checkpoints["fine"],
+                checkpoints["evidence"],
+                candidate_paths["heldout_r16"],
+                candidate_paths["heldout_r36"],
+                config_paths["evidence_heldout"],
+            ],
+            validator=validate_formal_state,
+        )
+        if args.stop_after == "formal_materialize":
+            return
+        if args.dry_run:
+            return
+        pipeline.seal()
+        payload = torch.load(formal_state_path, map_location="cpu")
+        validated = validate_m33a_formal_oof_payload(
+            payload,
+            expected_fold_id=args.fold_id,
+            expected_record_ids=list(fold["heldout_record_ids"]),
+        )
+        print(
+            json.dumps(
+                {
+                    "fold_id": args.fold_id,
+                    "records": validated["records"],
+                    "pipeline_manifest": str(pipeline_path),
+                    "formal_state": str(formal_state_path),
+                    "siglip2_included": False,
+                    "reliability_included": False,
+                    "test_accessed": False,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return
 
     siglip2_commands = []
     for split, source in (

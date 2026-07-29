@@ -7,7 +7,6 @@ AUTHORIZATION="${AUTHORIZATION:-docs/experiments/p4_r0_b_full_chain_oof_regenera
 WORK_ROOT="${WORK_ROOT:-knowledge/p4_r0b_full_chain_oof/roberta128}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-outputs/p4_r0b_full_chain_oof/roberta128}"
 FOLD_SUMMARY="${FOLD_SUMMARY:-${WORK_ROOT}/folds/fold_summary.json}"
-SIGLIP2_MODEL="${SIGLIP2_MODEL:-/home/zzk/gmner/siglip2-base-patch16-224}"
 MASTER_LOG="${MASTER_LOG:-${ROOT}/p4_r0b_full_chain_oof_master.log}"
 MIN_DISK_BYTES="${MIN_DISK_BYTES:-12884901888}"
 MIN_GPU_FREE_MIB="${MIN_GPU_FREE_MIB:-12000}"
@@ -80,7 +79,6 @@ PY
 log "Running P4-R0-B read-only preflight."
 PYTHONPATH=. "$PYTHON_BIN" -u scripts/prepare_p4_r0b_regeneration.py \
   --authorization "$AUTHORIZATION" \
-  --siglip2-model "$SIGLIP2_MODEL" \
   --output-fold-summary "$FOLD_SUMMARY" \
   --output-report "$WORK_ROOT/regeneration_preflight.json" \
   >> "$MASTER_LOG" 2>&1
@@ -106,7 +104,6 @@ for fold_id in 0 1 2 3 4 5 6 7; do
       --fold-summary "$FOLD_SUMMARY" \
       --work-root "$WORK_ROOT" \
       --output-root "$OUTPUT_ROOT" \
-      --siglip2-model "$SIGLIP2_MODEL" \
       --regeneration-authorization "$AUTHORIZATION" \
       --recover-completed-stage1-sigsegv \
       --resume \
