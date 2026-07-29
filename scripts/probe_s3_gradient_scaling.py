@@ -21,6 +21,7 @@ from gmner.data.s3_stage1_builder import (
     resolve_project_path,
 )
 from gmner.engine.s3_stage1_training import (
+    build_s3_optimizer,
     run_s3_scaling_probe,
     verify_student_backbone_initialization,
 )
@@ -109,10 +110,14 @@ def main() -> None:
             f"{initialization_check}"
         )
     if args.preflight:
+        optimizer = build_s3_optimizer(student, config)
+        optimizer_group_audit = optimizer.s3_group_audit
+        del optimizer
         preflight = {
             "kind": "s3_1_scaling_probe_preflight",
             "scope": "train_only",
             "initialization_check": initialization_check,
+            "optimizer_group_audit": optimizer_group_audit,
             "records": len(train_dataset),
             "probe_updates": 0,
             "checkpoint_saved": False,

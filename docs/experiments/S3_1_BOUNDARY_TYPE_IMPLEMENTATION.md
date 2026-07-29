@@ -5,7 +5,27 @@
 **Method status**: scaling probe and Seed42 Gate pending
 
 **Data scope**: Train and Dev only
+
 **Test access**: locked
+
+## Optimizer Grouping Amendment
+
+The first cloud probe and Seed42 launch on 2026-07-29 are archived as
+`INVALID_ENGINEERING_RUN`. The original implementation assigned only
+RoBERTa layers 8-11 to `backbone_learning_rate`; layers 0-7 incorrectly
+fell through to the default learning rate.
+
+The corrected S3.1 contract trains every `text_encoder.backbone.*`
+parameter at `backbone_learning_rate = 3e-6`. New Boundary/Type heads use
+`1e-4`; the aligner, text projector, and highest text-graph layer use
+`1e-5`; the explicitly audited remaining modules use `2e-5`.
+`bert_unfreeze_last_n_layers` is not part of the S3.1 configuration.
+
+Optimizer construction now fails unless every trainable parameter belongs
+to exactly one group and every RoBERTa backbone parameter belongs to the
+backbone group. The startup log reports each group name, learning rate,
+parameter tensor count, trainable element count, and first five names.
+The pre-amendment scaling report is invalid and must not be reused.
 
 ## Scope
 

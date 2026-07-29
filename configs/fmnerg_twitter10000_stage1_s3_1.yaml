@@ -16,7 +16,6 @@ optim:
   new_module_learning_rate: 1.0e-4
   high_level_learning_rate: 1.0e-5
   backbone_learning_rate: 3.0e-6
-  bert_unfreeze_last_n_layers: 4
   weight_decay: 0.01
   num_epochs: 20
   warmup_ratio: 0.1

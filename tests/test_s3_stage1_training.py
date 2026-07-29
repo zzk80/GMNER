@@ -4,12 +4,16 @@ from pathlib import Path
 
 import pytest
 import torch
+import torch.nn as nn
 
 from gmner.engine.s3_stage1_evaluator import (
     _update_change_diagnostics,
 )
-from gmner.engine.s3_stage1_training import derive_static_lambdas
-from gmner.s3_config import load_s3_config
+from gmner.engine.s3_stage1_training import (
+    build_s3_optimizer,
+    derive_static_lambdas,
+)
+from gmner.s3_config import S3Stage1Config, load_s3_config
 
 
 def _observation(step: int) -> dict:
@@ -88,3 +92,83 @@ def test_boundary_shift_diagnostic_handles_new_non_gold_span() -> None:
     assert diagnostics["boundary_shift_span_count"] == 1.0
     assert diagnostics["boundary_shift_type_correct"] == 1.0
     assert diagnostics["boundary_shift_grounding_correct"] == 1.0
+
+
+class _FakeBackbone(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.embeddings = nn.Linear(2, 2)
+        self.encoder = nn.Module()
+        self.encoder.layer = nn.ModuleList(
+            nn.Linear(2, 2) for _ in range(12)
+        )
+
+
+class _FakeS3Model(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.text_encoder = nn.Module()
+        self.text_encoder.backbone = _FakeBackbone()
+        self.text_projector = nn.Linear(2, 2)
+        self.text_graph_encoder = nn.Module()
+        self.text_graph_encoder.layers = nn.ModuleList(
+            [nn.Linear(2, 2), nn.Linear(2, 2)]
+        )
+        self.aligner = nn.Linear(2, 2)
+        self.boundary_head = nn.Linear(2, 3)
+        self.span_type_head = nn.Linear(2, 4)
+        self.grounding_head = nn.Linear(2, 2)
+        self.region_projector = nn.Linear(2, 2)
+        self.image_graph_encoder = nn.Linear(2, 2)
+
+
+def test_s3_optimizer_assigns_all_roberta_layers_to_backbone_lr(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    model = _FakeS3Model()
+    config = S3Stage1Config()
+    optimizer = build_s3_optimizer(model, config)
+
+    owner_by_id = {}
+    lr_by_group = {}
+    for group in optimizer.param_groups:
+        group_name = str(group["group_name"])
+        lr_by_group[group_name] = float(group["lr"])
+        for parameter in group["params"]:
+            identity = id(parameter)
+            assert identity not in owner_by_id
+            owner_by_id[identity] = group_name
+
+    trainable = {
+        id(parameter): name
+        for name, parameter in model.named_parameters()
+        if parameter.requires_grad
+    }
+    assert set(owner_by_id) == set(trainable)
+    backbone_names = {
+        identity: name
+        for identity, name in trainable.items()
+        if name.startswith("text_encoder.backbone.")
+    }
+    assert backbone_names
+    assert all(
+        owner_by_id[identity] == "backbone"
+        for identity in backbone_names
+    )
+    assert lr_by_group["backbone"] == pytest.approx(
+        config.optim.backbone_learning_rate
+    )
+    assert owner_by_id[
+        id(model.text_encoder.backbone.encoder.layer[0].weight)
+    ] == "backbone"
+    assert owner_by_id[
+        id(model.text_encoder.backbone.encoder.layer[11].weight)
+    ] == "backbone"
+
+    audit = optimizer.s3_group_audit
+    assert all(audit["checks"].values())
+    assert audit["wrong_backbone_group"] == []
+    output = capsys.readouterr().out
+    assert "S3.1 optimizer groups:" in output
+    assert "backbone: lr=3.00e-06" in output
+    assert "first_parameters=[" in output

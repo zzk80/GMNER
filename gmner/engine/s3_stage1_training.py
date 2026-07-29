@@ -52,25 +52,26 @@ def build_s3_optimizer(
         high_prefixes.append(
             f"text_graph_encoder.layers.{len(graph_layers) - 1}"
         )
-    backbone_prefixes = _top_backbone_prefixes(
-        model,
-        count=config.optim.bert_unfreeze_last_n_layers,
-    )
+    backbone_prefixes = ("text_encoder.backbone",)
     grouped = {
         "new": {
             "params": [],
+            "parameter_names": [],
             "lr": float(config.optim.new_module_learning_rate),
         },
         "high": {
             "params": [],
+            "parameter_names": [],
             "lr": float(config.optim.high_level_learning_rate),
         },
         "backbone": {
             "params": [],
+            "parameter_names": [],
             "lr": float(config.optim.backbone_learning_rate),
         },
         "default": {
             "params": [],
+            "parameter_names": [],
             "lr": float(config.optim.learning_rate),
         },
     }
@@ -86,20 +87,32 @@ def build_s3_optimizer(
         else:
             key = "default"
         grouped[key]["params"].append(parameter)
-    groups = [
-        {
-            **value,
-            "group_name": key,
-        }
-        for key, value in grouped.items()
-        if value["params"]
-    ]
+        grouped[key]["parameter_names"].append(name)
+    audit = _audit_s3_optimizer_assignments(
+        model=model,
+        grouped=grouped,
+        config=config,
+    )
+    groups = []
+    for key, value in grouped.items():
+        if not value["params"]:
+            continue
+        groups.append(
+            {
+                "params": value["params"],
+                "lr": value["lr"],
+                "group_name": key,
+            }
+        )
     if not groups:
         raise ValueError("S3.1 optimizer has no trainable parameters.")
-    return AdamW(
+    optimizer = AdamW(
         groups,
         weight_decay=float(config.optim.weight_decay),
     )
+    optimizer.s3_group_audit = audit
+    _print_s3_optimizer_audit(audit)
+    return optimizer
 
 
 def build_s3_scheduler(
@@ -170,6 +183,7 @@ def run_s3_scaling_probe(
 
     model.to(device).train()
     optimizer = build_s3_optimizer(model, config)
+    optimizer_group_audit = optimizer.s3_group_audit
     scheduler = build_s3_scheduler(
         optimizer,
         loader_length=len(train_loader),
@@ -274,6 +288,7 @@ def run_s3_scaling_probe(
         },
         "denominator_totals": dict(denominator_totals),
         "initialization_check": initialization_check,
+        "optimizer_group_audit": optimizer_group_audit,
         "formal_config_sha256": initialization.formal_config_sha256,
         "initialization_checkpoint_sha256": (
             initialization.checkpoint_sha256
@@ -297,6 +312,10 @@ def load_and_apply_scaling_report(
             f"S3.1 scaling report not found: {report_path}"
         )
     report = json.loads(report_path.read_text(encoding="utf-8"))
+    optimizer_audit = dict(
+        report.get("optimizer_group_audit") or {}
+    )
+    optimizer_checks = dict(optimizer_audit.get("checks") or {})
     checks = {
         "kind": report.get("kind")
         == "s3_1_train_only_scaling_probe",
@@ -317,6 +336,8 @@ def load_and_apply_scaling_report(
         "probe_not_saved": not bool(
             report.get("probe_checkpoint_saved", True)
         ),
+        "optimizer_grouping": bool(optimizer_checks)
+        and all(bool(value) for value in optimizer_checks.values()),
     }
     if not all(checks.values()):
         raise ValueError(
@@ -462,6 +483,7 @@ class S3Stage1Trainer:
         self.fixed_audit_batch = fixed_audit_batch
         self.weights = s3_loss_weights(config)
         self.optimizer = build_s3_optimizer(model, config)
+        self.optimizer_group_audit = self.optimizer.s3_group_audit
         self.scheduler = build_s3_scheduler(
             self.optimizer,
             loader_length=len(train_loader),
@@ -549,6 +571,7 @@ class S3Stage1Trainer:
                 task: float(getattr(self.weights, task))
                 for task in _TASKS
             },
+            "optimizer_group_audit": self.optimizer_group_audit,
             "test_accessed": False,
         }
         (self.output_dir / "gradient_audit.json").write_text(
@@ -694,6 +717,7 @@ class S3Stage1Trainer:
             "scaling_report_sha256": _file_sha256(
                 self.config.loss.scaling_report
             ),
+            "optimizer_group_audit": self.optimizer_group_audit,
             "test_accessed": False,
         }
         temporary = self.best_path.with_suffix(".pt.tmp")
@@ -767,21 +791,120 @@ def _gradient_parameter_regions(model) -> dict[str, list[torch.nn.Parameter]]:
     return regions
 
 
-def _top_backbone_prefixes(
-    model,
+def _audit_s3_optimizer_assignments(
     *,
-    count: int,
-) -> tuple[str, ...]:
-    backbone = model.text_encoder.backbone
-    encoder = getattr(backbone, "encoder", None)
-    layers = getattr(encoder, "layer", None)
-    if layers is None:
-        return tuple()
-    start = max(0, len(layers) - max(1, int(count)))
-    return tuple(
-        f"text_encoder.backbone.encoder.layer.{index}"
-        for index in range(start, len(layers))
+    model,
+    grouped: dict[str, dict[str, Any]],
+    config: S3Stage1Config,
+) -> dict[str, Any]:
+    trainable = {
+        id(parameter): name
+        for name, parameter in model.named_parameters()
+        if parameter.requires_grad
+    }
+    owners: dict[int, str] = {}
+    duplicate_names: list[str] = []
+    group_summaries = []
+    for group_name, values in grouped.items():
+        parameters = list(values["params"])
+        names = list(values["parameter_names"])
+        if len(parameters) != len(names):
+            raise ValueError(
+                f"S3.1 optimizer group {group_name} lost parameter names."
+            )
+        for name, parameter in zip(names, parameters):
+            identity = id(parameter)
+            if identity in owners:
+                duplicate_names.append(name)
+            owners[identity] = group_name
+        group_summaries.append(
+            {
+                "group_name": group_name,
+                "learning_rate": float(values["lr"]),
+                "parameter_tensor_count": len(parameters),
+                "trainable_element_count": int(
+                    sum(parameter.numel() for parameter in parameters)
+                ),
+                "first_parameter_names": names[:5],
+            }
+        )
+
+    missing_names = sorted(
+        trainable[identity]
+        for identity in set(trainable) - set(owners)
     )
+    unexpected_ids = sorted(
+        str(identity)
+        for identity in set(owners) - set(trainable)
+    )
+    backbone_names = sorted(
+        name
+        for name in trainable.values()
+        if _matches_prefix(name, ("text_encoder.backbone",))
+    )
+    wrong_backbone_group = sorted(
+        name
+        for identity, name in trainable.items()
+        if _matches_prefix(name, ("text_encoder.backbone",))
+        and owners.get(identity) != "backbone"
+    )
+    group_lr = {
+        item["group_name"]: float(item["learning_rate"])
+        for item in group_summaries
+    }
+    checks = {
+        "every_trainable_parameter_assigned_once": (
+            not missing_names
+            and not unexpected_ids
+            and not duplicate_names
+            and len(owners) == len(trainable)
+        ),
+        "roberta_backbone_present": bool(backbone_names),
+        "all_roberta_backbone_in_backbone_group": (
+            bool(backbone_names) and not wrong_backbone_group
+        ),
+        "roberta_backbone_lr_matches_config": (
+            group_lr.get("backbone")
+            == float(config.optim.backbone_learning_rate)
+        ),
+    }
+    report = {
+        "kind": "s3_1_optimizer_group_audit",
+        "format_version": 1,
+        "groups": group_summaries,
+        "checks": checks,
+        "trainable_parameter_tensor_count": len(trainable),
+        "trainable_element_count": int(
+            sum(
+                parameter.numel()
+                for parameter in model.parameters()
+                if parameter.requires_grad
+            )
+        ),
+        "missing_parameter_names": missing_names,
+        "duplicate_parameter_names": sorted(duplicate_names),
+        "unexpected_parameter_ids": unexpected_ids,
+        "wrong_backbone_group": wrong_backbone_group,
+    }
+    if not all(checks.values()):
+        raise ValueError(f"S3.1 optimizer grouping failed: {report}")
+    return report
+
+
+def _print_s3_optimizer_audit(report: dict[str, Any]) -> None:
+    print("S3.1 optimizer groups:", flush=True)
+    for group in report["groups"]:
+        if not group["parameter_tensor_count"]:
+            continue
+        names = ", ".join(group["first_parameter_names"])
+        print(
+            f"  {group['group_name']}: "
+            f"lr={group['learning_rate']:.2e}, "
+            f"parameter_count={group['parameter_tensor_count']}, "
+            f"trainable_elements={group['trainable_element_count']}, "
+            f"first_parameters=[{names}]",
+            flush=True,
+        )
 
 
 def _matches_prefix(name: str, prefixes: tuple[str, ...]) -> bool:

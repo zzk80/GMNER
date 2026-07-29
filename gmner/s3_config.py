@@ -36,7 +36,6 @@ class S3OptimConfig:
     new_module_learning_rate: float = 1e-4
     high_level_learning_rate: float = 1e-5
     backbone_learning_rate: float = 3e-6
-    bert_unfreeze_last_n_layers: int = 4
     weight_decay: float = 0.01
     num_epochs: int = 20
     warmup_ratio: float = 0.1
@@ -124,10 +123,6 @@ def validate_s3_config(config: S3Stage1Config) -> S3Stage1Config:
     if config.optim.gradient_accumulation_steps < 1:
         raise ValueError(
             "S3.1 gradient_accumulation_steps must be positive."
-        )
-    if config.optim.bert_unfreeze_last_n_layers < 1:
-        raise ValueError(
-            "S3.1 bert_unfreeze_last_n_layers must be positive."
         )
     if config.probe.steps != 100:
         raise ValueError(
