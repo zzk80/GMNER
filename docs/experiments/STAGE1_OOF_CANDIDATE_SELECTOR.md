@@ -17,6 +17,13 @@ Test accessed: false
 Formal M3.3A changed: false
 ```
 
+P4 Protected Joint Promotion is a separate hypothesis, not a D1 continuation
+or rescue. D1 tested selective rejection of formal candidates. P4 will test
+gold-free, add-only recovery of complete GMNER triples while preserving the
+frozen final Model-G output set. D1 gains are not accepted as evidence for
+P4. See
+[`P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
+
 The completed Phase 1 cache audit reports:
 
 | Quantity | Train OOF | Dev full-fit |

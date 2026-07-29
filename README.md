@@ -134,7 +134,7 @@ M3.3A rebuild are not run. The compact OOF caches, checkpoint, protocol, and
 summary are retained as a frozen ablation. Formal metrics remain unchanged
 and Test was not accessed.
 
-The active experiment is the phased S3 hierarchical Stage1:
+The completed S3 experiment tested a phased hierarchical Stage1:
 
 ```text
 shared RoBERTa / graph / cross-modal representation
@@ -159,6 +159,25 @@ and
 [`docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md`](docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md).
 The compact result is archived in
 [`docs/experiments/s3_1_seed42_dev_summary.json`](docs/experiments/s3_1_seed42_dev_summary.json).
+
+The next preregistered experiment is P4 Protected Joint Promotion. P4 is a
+new recovery hypothesis, not a continuation of D1:
+
+```text
+D1 = selective rejection of formal predictions
+P4 = preserve all frozen Model-G predictions and append at most one
+     complete GMNER triple per record
+```
+
+P4.0 is a strict full-chain OOF, read-only actionability audit. Candidate
+generation must be gold-free, promoted spans must not overlap frozen formal
+spans, and every score prefix must recompute exact GMNER. Folds 0-7 are
+reserved for source/feature development, folds 8-9 for one calibration, Dev
+for one frozen execution, and Test remains locked. P4.1 selector training is
+not yet authorized.
+
+Protocol:
+[`docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
 
 ## Repository Layout
 
