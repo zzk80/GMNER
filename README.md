@@ -9,7 +9,9 @@ Model-F: F3 subtype encoder on frozen M3.3A predictions -> FMNERG
 
 Historical no-go branches are summarized in
 [`docs/EXPERIMENT_RESULTS_TABLE.md`](docs/EXPERIMENT_RESULTS_TABLE.md) and are
-not part of the runnable primary surface.
+not part of the runnable primary surface. Their final P4/S3/D1 code remains
+recoverable from Git history and the
+`archive/m33a-r0b-oof-20260730` tag.
 
 ## Formal Results
 
@@ -187,8 +189,8 @@ gmner/       core models, data contracts, losses, and evaluators
 scripts/     primary training, evaluation, and cache builders
 configs/     formal Model-G configs
 sidecars/    formal F3 subtype implementation
-tools/       F3 and D1 orchestration
-tests/       tests for the retained formal and active paths
+tools/       formal F3 orchestration
+tests/       regression tests for the formal chains and shared infrastructure
 docs/        final results, protocols, and method documentation
 ```
 
@@ -204,7 +206,6 @@ Local model paths expected by the formal configuration:
 
 ```text
 roberta-base/
-clip-vit-base-patch32/
 ```
 
 ## Validation

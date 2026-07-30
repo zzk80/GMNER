@@ -20,7 +20,7 @@ from gmner.data.full_chain_oof_contract import (
     source_tree_sha256,
     validate_fold_manifest,
 )
-from gmner.data.null_release_oof_cache import sha256_file, stable_id_digest
+from gmner.data.artifact_utils import sha256_file, stable_id_digest
 from gmner.utils.io import maybe_convert_conll, read_jsonl, write_jsonl
 
 

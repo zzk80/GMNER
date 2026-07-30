@@ -106,7 +106,6 @@ Dev:
 PYTHONPATH=. python tools/evaluate_fmnerg_subtype_encoder.py \
   --config sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml \
   --checkpoint outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed42/best_model.pt \
-  --split dev \
   --device cuda
 ```
 

@@ -12,17 +12,6 @@ __all__ = [
     "CorrectionPreservationGroundingAdapter",
     "EvidenceVisibilityHeadConfig",
     "RegionEvidenceVisibilityHead",
-    "Siglip2RegionReliabilityHeadConfig",
-    "Siglip2RegionReliabilityHead",
-    "LayeredActionVerifierConfig",
-    "LayeredActionVerifier",
-    "NullReleaseVerifier",
-    "SameTypeRegionResolverConfig",
-    "ConditionalSameTypeRegionResolver",
-    "Stage1CandidateSelectorConfig",
-    "Stage1CandidateSelector",
-    "HierarchicalJointStage1",
-    "LegacyStage1RecordWrapper",
 ]
 
 
@@ -86,71 +75,4 @@ def __getattr__(name):
             "EvidenceVisibilityHeadConfig": EvidenceVisibilityHeadConfig,
             "RegionEvidenceVisibilityHead": RegionEvidenceVisibilityHead,
         }[name]
-    if name in {
-        "Siglip2RegionReliabilityHeadConfig",
-        "Siglip2RegionReliabilityHead",
-    }:
-        from .siglip2_region_reliability import (
-            Siglip2RegionReliabilityHead,
-            Siglip2RegionReliabilityHeadConfig,
-        )
-
-        return {
-            "Siglip2RegionReliabilityHeadConfig": (
-                Siglip2RegionReliabilityHeadConfig
-            ),
-            "Siglip2RegionReliabilityHead": Siglip2RegionReliabilityHead,
-        }[name]
-    if name in {"LayeredActionVerifierConfig", "LayeredActionVerifier"}:
-        from .layered_action_verifier import (
-            LayeredActionVerifier,
-            LayeredActionVerifierConfig,
-        )
-
-        return {
-            "LayeredActionVerifierConfig": LayeredActionVerifierConfig,
-            "LayeredActionVerifier": LayeredActionVerifier,
-        }[name]
-    if name == "NullReleaseVerifier":
-        from .null_release_verifier import NullReleaseVerifier
-
-        return NullReleaseVerifier
-    if name in {
-        "SameTypeRegionResolverConfig",
-        "ConditionalSameTypeRegionResolver",
-    }:
-        from .same_type_region_resolver import (
-            ConditionalSameTypeRegionResolver,
-            SameTypeRegionResolverConfig,
-        )
-
-        return {
-            "SameTypeRegionResolverConfig": (
-                SameTypeRegionResolverConfig
-            ),
-            "ConditionalSameTypeRegionResolver": (
-                ConditionalSameTypeRegionResolver
-            ),
-        }[name]
-    if name in {
-        "Stage1CandidateSelectorConfig",
-        "Stage1CandidateSelector",
-    }:
-        from .stage1_candidate_selector import (
-            Stage1CandidateSelector,
-            Stage1CandidateSelectorConfig,
-        )
-
-        return {
-            "Stage1CandidateSelectorConfig": Stage1CandidateSelectorConfig,
-            "Stage1CandidateSelector": Stage1CandidateSelector,
-        }[name]
-    if name == "LegacyStage1RecordWrapper":
-        from .stage1 import LegacyStage1RecordWrapper
-
-        return LegacyStage1RecordWrapper
-    if name == "HierarchicalJointStage1":
-        from .stage1 import HierarchicalJointStage1
-
-        return HierarchicalJointStage1
     raise AttributeError(name)
