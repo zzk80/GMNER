@@ -1,0 +1,229 @@
+{
+  "kind": "p4_r0_b_fold_semantic_consistency_report",
+  "format_version": 1,
+  "status": "SEMANTIC_GATE_EVALUATED",
+  "artifact_identity": "REGENERATED_FULL_CHAIN_OOF_R16",
+  "regeneration_authorization_sha256": "76b83fbebcb5efa33bd1e7e4b3c9a29b7dfe02fb0ffa74e402cd865d7d5028d3",
+  "regeneration_fold_id": 2,
+  "regeneration_experiment_id": "p4_r0b_20260729_seed42",
+  "fold_id": 2,
+  "records": 700,
+  "heldout_record_ids_sha256": "35f89f8712e18150fb521d26bbee7cc3db1b538d2d2a12dfbf0a2875f74722d6",
+  "semantic_consistency": {
+    "record_ids_and_order_exact": true,
+    "records": 700,
+    "semantic_fields": {
+      "base_is_null": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "current_visible": {
+        "exact_records": 677,
+        "records": 700,
+        "exact_ratio": 0.9671428571428572,
+        "mismatched_record_id_examples": [
+          "5029",
+          "3508",
+          "1808",
+          "5918",
+          "1599",
+          "6623",
+          "390",
+          "1125",
+          "2853",
+          "3812",
+          "3890",
+          "629",
+          "3749",
+          "2077",
+          "6252",
+          "6666",
+          "6546",
+          "823",
+          "6658",
+          "1783"
+        ]
+      },
+      "deployment_span_mask": {
+        "exact_records": 699,
+        "records": 700,
+        "exact_ratio": 0.9985714285714286,
+        "mismatched_record_id_examples": [
+          "1991"
+        ]
+      },
+      "expanded.span_mask": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "expanded.span_source_ids": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "expanded.type_candidates": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "expanded.region_mask": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "expanded.region_is_null": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "expanded.region_detector_scores": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "fine_outputs.candidate_mask": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "fine_outputs.fine_top4_indices": {
+        "exact_records": 433,
+        "records": 700,
+        "exact_ratio": 0.6185714285714285,
+        "mismatched_record_id_examples": [
+          "4667",
+          "4106",
+          "5298",
+          "3368",
+          "2256",
+          "6368",
+          "2314",
+          "5409",
+          "3848",
+          "2244",
+          "6330",
+          "1764",
+          "6723",
+          "4670",
+          "587",
+          "852",
+          "5958",
+          "5868",
+          "2814",
+          "5918"
+        ]
+      },
+      "fine_outputs.fine_top4_valid_mask": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "fine_outputs.promoted_candidate_mask": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "fine_outputs.fixed_type_ids": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      },
+      "hierarchy_outputs.fixed_type_ids": {
+        "exact_records": 700,
+        "records": 700,
+        "exact_ratio": 1.0,
+        "mismatched_record_id_examples": []
+      }
+    },
+    "all_semantic_fields_exact": false,
+    "fine_top1_region": {
+      "exact_records": 643,
+      "records": 700,
+      "exact_ratio": 0.9185714285714286,
+      "mismatched_record_id_examples": [
+        "4667",
+        "5298",
+        "587",
+        "2814",
+        "1787",
+        "633",
+        "6464",
+        "2395",
+        "3426",
+        "5900",
+        "1771",
+        "3408",
+        "6998",
+        "6051",
+        "19",
+        "2532",
+        "2958",
+        "6974",
+        "1409",
+        "6393"
+      ]
+    },
+    "continuous_diagnostics": {
+      "fine_outputs.final_region_logits": {
+        "shape_comparable_records": 700,
+        "records": 700,
+        "max_abs_error": 0.943115234375,
+        "gate_field": false
+      }
+    },
+    "gate_passed": false
+  },
+  "formal_coordinates_valid": true,
+  "canonical_formal_predictions": {
+    "records": 700,
+    "predictions": 1170,
+    "canonical_formal_triple_sha256": "007b1dd9e2a860784d9f32b5fb068239d0a8bf9a4e72aa3b9136e5713c6b73f1"
+  },
+  "sealing_implementation": {
+    "contract": {
+      "path": "/home/zzk/gmner/gmner/data/p4_r0b_regeneration_contract.py",
+      "sha256": "98e7659610f5746e44c758db2119f340bb6da8eb9d8606330e446c095648f754"
+    },
+    "script": {
+      "path": "/home/zzk/gmner/scripts/seal_p4_r0b_regenerated_fold.py",
+      "sha256": "c2dafcf37b9a36c8d4fe49b6641917049a6259007c2d45291d471e75fa8883af"
+    },
+    "alignment_rule": "All formal Stage1 rows remain active and source/type aligned; unmatched non-Stage1 R16 rows may be masked but never selected."
+  },
+  "reference_compact": {
+    "path": "/home/zzk/gmner/knowledge/null_release_oof/roberta128/fold2/heldout_features.pt",
+    "sha256": "2a2f9f43b6a78b3b479149f921d8cdb10e72c09a9c3a50142cc154597188ebea"
+  },
+  "regenerated_m33a_formal_state": {
+    "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold2/m33a_formal_state.pt",
+    "sha256": "c67db139c820638f8d2f4c92e5ed8ea3e8859ae2b2ecd21a30eebad3e0225b13"
+  },
+  "regenerated_r16": {
+    "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold2/regenerated_heldout_r16.pt",
+    "sha256": "07665b96a5a5942f21adbaa6f0321803b8bcdd2ebf53772001a045af8b9b3e36"
+  },
+  "fold_semantic_gate_passed": false,
+  "formal_sidecar_generated": false,
+  "attached_to_p4": false,
+  "folds_8_9_accessed": false,
+  "p4_dev_accessed": false,
+  "siglip2_included": false,
+  "reliability_included": false,
+  "null_release_included": false,
+  "oracle_run": false,
+  "p4_1_run": false,
+  "test_accessed": false
+}

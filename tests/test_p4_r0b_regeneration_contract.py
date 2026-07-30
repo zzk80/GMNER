@@ -193,6 +193,7 @@ def test_canonical_formal_digest_uses_regenerated_r16_coordinates() -> None:
                 "metadata": {"record_id": "record-0"},
                 "span_candidates": torch.tensor([[2, 4]]),
                 "span_source_ids": torch.tensor([0]),
+                "fixed_type_ids": torch.tensor([1]),
             }
         ],
     }
@@ -216,6 +217,79 @@ def test_canonical_formal_digest_uses_regenerated_r16_coordinates() -> None:
     assert len(first["canonical_formal_triple_sha256"]) == 64
 
 
+def test_canonical_formal_digest_allows_masked_non_stage1_rows() -> None:
+    compact = _payload(regenerated=True)
+    batch = compact["batches"][0]
+    batch["expanded"]["span_mask"] = torch.tensor([[True, False]])
+    batch["expanded"]["span_source_ids"] = torch.tensor([[0, 3]])
+    batch["expanded"]["type_candidates"] = torch.tensor([[1, 2]])
+    batch["deployment_span_mask"] = torch.tensor([[True, False]])
+    batch["fine_outputs"]["candidate_mask"] = torch.ones(
+        1, 2, 4, dtype=torch.bool
+    )
+    batch["fine_outputs"]["final_region_logits"] = torch.tensor(
+        [[[4.0, 3.0, 2.0, 1.0], [1.0, 2.0, 3.0, 4.0]]]
+    )
+    batch["fine_outputs"]["fixed_type_ids"] = torch.tensor([[1, 2]])
+    batch["hierarchy_outputs"]["fixed_type_ids"] = torch.tensor([[1, 2]])
+    batch["current_visible"] = torch.tensor([[True, True]])
+    batch["base_is_null"] = torch.tensor([[False, False]])
+    r16 = {
+        "metadata": regeneration_metadata(
+            authorization_sha256=AUTHORIZATION_SHA256,
+            fold_id=0,
+            experiment_id=EXPERIMENT_ID,
+        ),
+        "records": [
+            {
+                "metadata": {"record_id": "record-0"},
+                "span_candidates": torch.tensor([[2, 4], [5, 6]]),
+                "span_source_ids": torch.tensor([0, 3]),
+                "fixed_type_ids": torch.tensor([1, 2]),
+            }
+        ],
+    }
+
+    report = canonical_formal_triple_digest(
+        r16,
+        compact,
+        fold_id=0,
+        authorization_sha256=AUTHORIZATION_SHA256,
+        experiment_id=EXPERIMENT_ID,
+    )
+
+    assert report["predictions"] == 1
+
+
+def test_canonical_formal_digest_rejects_masked_stage1_row() -> None:
+    compact = _payload(regenerated=True)
+    compact["batches"][0]["expanded"]["span_mask"].zero_()
+    r16 = {
+        "metadata": regeneration_metadata(
+            authorization_sha256=AUTHORIZATION_SHA256,
+            fold_id=0,
+            experiment_id=EXPERIMENT_ID,
+        ),
+        "records": [
+            {
+                "metadata": {"record_id": "record-0"},
+                "span_candidates": torch.tensor([[2, 4]]),
+                "span_source_ids": torch.tensor([0]),
+                "fixed_type_ids": torch.tensor([1]),
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="masks a formal Stage1 span"):
+        canonical_formal_triple_digest(
+            r16,
+            compact,
+            fold_id=0,
+            authorization_sha256=AUTHORIZATION_SHA256,
+            experiment_id=EXPERIMENT_ID,
+        )
+
+
 def test_cleanup_is_limited_to_child_of_authorized_fold(tmp_path: Path) -> None:
     allowed = tmp_path / "work"
     target = allowed / "fold3" / "candidates"
@@ -234,6 +308,12 @@ def test_cleanup_is_limited_to_child_of_authorized_fold(tmp_path: Path) -> None:
             allowed_root=allowed,
             fold_id=3,
         )
+    assert validate_fold_cleanup_path(
+        allowed / "fold3",
+        allowed_root=allowed,
+        fold_id=3,
+        allow_fold_root=True,
+    ) == (allowed / "fold3").resolve()
 
 
 def test_candidate_command_propagates_regeneration_identity(

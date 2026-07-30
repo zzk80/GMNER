@@ -254,6 +254,7 @@ def validate_fold_cleanup_path(
     *,
     allowed_root: str | Path,
     fold_id: int,
+    allow_fold_root: bool = False,
 ) -> Path:
     resolved_target = Path(target).resolve()
     resolved_root = Path(allowed_root).resolve()
@@ -265,7 +266,10 @@ def validate_fold_cleanup_path(
         raise ValueError("Cleanup target is outside its authorized root.") from error
     if not relative.parts or relative.parts[0] != f"fold{int(fold_id)}":
         raise ValueError("Cleanup target does not belong to the requested fold.")
-    if resolved_target == resolved_root / f"fold{int(fold_id)}":
+    if (
+        resolved_target == resolved_root / f"fold{int(fold_id)}"
+        and not allow_fold_root
+    ):
         raise ValueError("Cleanup cannot remove the retained fold root itself.")
     return resolved_target
 
@@ -649,25 +653,49 @@ def canonical_formal_triple_digest(
         record = by_id[record_id]
         spans = record["span_candidates"].long()
         formal_sources = record["span_source_ids"].long()
+        formal_types = record["fixed_type_ids"].long()
         batch, row = compact_rows[record_id]
         span_mask = batch["expanded"]["span_mask"][row].bool()
-        active_span_indices = span_mask.nonzero(as_tuple=False).flatten()
-        expected_active = torch.arange(
-            spans.size(0),
-            device=active_span_indices.device,
-        )
-        if not torch.equal(active_span_indices, expected_active):
+        span_count = int(spans.size(0))
+        compact_sources = batch["expanded"]["span_source_ids"][row].long()
+        if (
+            span_mask.ndim != 1
+            or span_mask.numel() < span_count
+            or compact_sources.numel() < span_count
+        ):
             raise ValueError(
-                f"Record {record_id} compact span rows do not align with R16."
+                f"Record {record_id} compact span table is shorter than R16."
             )
-        selected = batch["deployment_span_mask"][row].bool() & span_mask
-        if (selected[: spans.size(0)] & formal_sources.ne(0)).any():
+        if span_mask[span_count:].any():
+            raise ValueError(
+                f"Record {record_id} compact span table has active padded rows."
+            )
+        if not torch.equal(compact_sources[:span_count], formal_sources):
+            raise ValueError(
+                f"Record {record_id} compact span sources do not align with R16."
+            )
+        formal_stage1 = formal_sources.eq(0)
+        if not span_mask[:span_count][formal_stage1].all():
+            raise ValueError(
+                f"Record {record_id} masks a formal Stage1 span."
+            )
+        selected_full = (
+            batch["deployment_span_mask"][row].bool() & span_mask
+        )
+        if selected_full[span_count:].any():
+            raise ValueError(
+                f"Record {record_id} selected a padded compact span."
+            )
+        selected = selected_full[:span_count]
+        if (selected & formal_sources.ne(0)).any():
             raise ValueError(
                 f"Record {record_id} selected a non-formal R16 span."
             )
-        fine_fixed_type = batch["fine_outputs"]["fixed_type_ids"][row].long()
+        fine_fixed_type = batch["fine_outputs"]["fixed_type_ids"][
+            row, :span_count
+        ].long()
         hierarchy_fixed_type = batch["hierarchy_outputs"]["fixed_type_ids"][
-            row
+            row, :span_count
         ].long()
         if (
             selected
@@ -676,14 +704,20 @@ def canonical_formal_triple_digest(
             raise ValueError(
                 f"Record {record_id} has inconsistent fixed coarse types."
             )
-        visible = batch["current_visible"][row].bool()
+        if (selected & fine_fixed_type.ne(formal_types)).any():
+            raise ValueError(
+                f"Record {record_id} changed a formal R16 coarse type."
+            )
+        visible = batch["current_visible"][row, :span_count].bool()
         region_mask = batch["expanded"]["region_mask"][row].bool()
         null_mask = batch["expanded"]["region_is_null"][row].bool()
         null_indices = null_mask.nonzero(as_tuple=False).flatten()
         if len(null_indices) != 1:
             raise ValueError(f"Record {record_id} has no unique NULL region.")
         null_index = int(null_indices.item())
-        candidate_mask = batch["fine_outputs"]["candidate_mask"][row].bool()
+        candidate_mask = batch["fine_outputs"]["candidate_mask"][
+            row, :span_count
+        ].bool()
         real_mask = (
             candidate_mask
             & region_mask.unsqueeze(0)
@@ -694,7 +728,7 @@ def canonical_formal_triple_digest(
                 f"Record {record_id} has a visible span without a real candidate."
             )
         fine_top1 = (
-            batch["fine_outputs"]["final_region_logits"][row]
+            batch["fine_outputs"]["final_region_logits"][row, :span_count]
             .float()
             .masked_fill(~real_mask, -torch.inf)
             .argmax(dim=-1)

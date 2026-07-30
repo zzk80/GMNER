@@ -229,6 +229,24 @@ def main() -> None:
         "semantic_consistency": semantic,
         "formal_coordinates_valid": True,
         "canonical_formal_predictions": formal_digest,
+        "sealing_implementation": {
+            "contract": {
+                "path": str(
+                    root / "gmner" / "data" / "p4_r0b_regeneration_contract.py"
+                ),
+                "sha256": sha256_file(
+                    root / "gmner" / "data" / "p4_r0b_regeneration_contract.py"
+                ),
+            },
+            "script": {
+                "path": str(Path(__file__).resolve()),
+                "sha256": sha256_file(Path(__file__).resolve()),
+            },
+            "alignment_rule": (
+                "All formal Stage1 rows remain active and source/type aligned; "
+                "unmatched non-Stage1 R16 rows may be masked but never selected."
+            ),
+        },
         "reference_compact": {
             "path": str(reference_compact),
             "sha256": sha256_file(reference_compact),
@@ -276,6 +294,7 @@ def main() -> None:
             "path": str(report_path),
             "sha256": sha256_file(report_path),
         },
+        "sealing_implementation": report["sealing_implementation"],
         "retained_artifacts": {
             "m33a_formal_state": {
                 "path": str(compact_path),
@@ -303,6 +322,7 @@ def main() -> None:
                 fold_output,
                 allowed_root=output_root,
                 fold_id=args.fold_id,
+                allow_fold_root=True,
             ),
         )
         for target in cleanup_targets:

@@ -193,6 +193,11 @@ Evidence final visibility
 deployment span mask
 ```
 
+R36 alignment may mask an R16 candidate row only when that non-Stage1 span is
+absent from the independently generated R36 span table. Every formal Stage1
+row must remain active and source/type aligned, and no masked row may enter the
+deployment prediction set.
+
 The regenerated R16 must additionally provide:
 
 ```text
