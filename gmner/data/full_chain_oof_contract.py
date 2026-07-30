@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Iterable
 
 from gmner.data.null_release_oof_cache import sha256_file, stable_id_digest
 from gmner.utils.io import read_jsonl
@@ -85,6 +86,7 @@ def validate_fold_manifest(
     *,
     expected_num_folds: int = 10,
     verify_files: bool = True,
+    verify_fold_ids: Iterable[int] | None = None,
 ) -> dict:
     manifest_path = Path(path).resolve()
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -110,6 +112,16 @@ def validate_fold_manifest(
     fold_ids = sorted(int(item.get("fold", -1)) for item in folds)
     if fold_ids != list(range(int(expected_num_folds))):
         raise ValueError(f"OOF manifest fold ids are invalid: {fold_ids}.")
+    verified_folds = (
+        set(fold_ids)
+        if verify_fold_ids is None
+        else {int(value) for value in verify_fold_ids}
+    )
+    unknown_verified_folds = sorted(verified_folds - set(fold_ids))
+    if unknown_verified_folds:
+        raise ValueError(
+            f"Cannot verify unknown OOF folds: {unknown_verified_folds}."
+        )
     source_set = set(all_ids)
     observed_heldout: set[str] = set()
     for fold in folds:
@@ -130,7 +142,7 @@ def validate_fold_manifest(
             raise ValueError(f"Fold {fold.get('fold')} train-id digest mismatch.")
         if stable_id_digest(heldout_ids) != fold.get("heldout_record_ids_sha256"):
             raise ValueError(f"Fold {fold.get('fold')} heldout-id digest mismatch.")
-        if not verify_files:
+        if not verify_files or int(fold.get("fold", -1)) not in verified_folds:
             continue
         for role, expected_ids in (
             ("train", train_ids),
@@ -163,6 +175,8 @@ def validate_pipeline_manifest(
     *,
     fold_manifest: dict,
     fold_id: int,
+    required_stages: Iterable[str] | None = None,
+    supervised_stages: Iterable[str] | None = None,
 ) -> dict:
     pipeline_path = Path(path).resolve()
     pipeline = json.loads(pipeline_path.read_text(encoding="utf-8"))
@@ -186,7 +200,11 @@ def validate_pipeline_manifest(
     if pipeline.get("heldout_record_ids_sha256") != expected_heldout_digest:
         raise ValueError("Pipeline heldout-id digest does not match the fold.")
     stages = dict(pipeline.get("stages") or {})
-    for name in REQUIRED_PIPELINE_STAGES:
+    required = tuple(required_stages or REQUIRED_PIPELINE_STAGES)
+    supervised = tuple(supervised_stages or SUPERVISED_PIPELINE_STAGES)
+    if not set(supervised).issubset(required):
+        raise ValueError("Supervised pipeline stages must be required stages.")
+    for name in required:
         stage = dict(stages.get(name) or {})
         if stage.get("status") != "complete":
             raise ValueError(f"Required OOF stage {name!r} is not complete.")
@@ -204,7 +222,7 @@ def validate_pipeline_manifest(
                     )
                 if sha256_file(artifact_path) != artifact.get("sha256"):
                     raise ValueError(f"{name} {group} artifact hash changed.")
-    for name in SUPERVISED_PIPELINE_STAGES:
+    for name in supervised:
         stage = dict(stages.get(name) or {})
         if stage.get("status") != "complete":
             raise ValueError(f"Supervised OOF stage {name!r} is not complete.")

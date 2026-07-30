@@ -88,6 +88,27 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Mark this cache as predictions from one held-out OOF fold.",
     )
+    parser.add_argument(
+        "--artifact-identity",
+        default=None,
+        help="Optional immutable experiment identity for regenerated caches.",
+    )
+    parser.add_argument(
+        "--regeneration-authorization-sha256",
+        default=None,
+        help="Authorization fingerprint paired with --artifact-identity.",
+    )
+    parser.add_argument(
+        "--regeneration-fold-id",
+        type=int,
+        default=None,
+        help="Regeneration fold identity for every cache split in one fold chain.",
+    )
+    parser.add_argument(
+        "--regeneration-experiment-id",
+        default=None,
+        help="Preregistered regeneration experiment identifier.",
+    )
     parser.add_argument("--output", required=True)
     parser.add_argument("--k-best", type=int, default=6)
     parser.add_argument("--max-span-candidates", type=int, default=12)
@@ -297,6 +318,23 @@ def count_matches(predictions: list[dict], gold: list[dict]) -> dict[str, int]:
 @torch.no_grad()
 def build(args: argparse.Namespace) -> dict:
     root = Path(__file__).resolve().parents[1]
+    regeneration_values = (
+        args.artifact_identity,
+        args.regeneration_authorization_sha256,
+        args.regeneration_fold_id,
+        args.regeneration_experiment_id,
+    )
+    if any(value is not None for value in regeneration_values) and not all(
+        value is not None for value in regeneration_values
+    ):
+        raise ValueError(
+            "Regenerated cache identity requires artifact identity, authorization "
+            "SHA256, fold id, and experiment id together."
+        )
+    if args.regeneration_authorization_sha256 is not None and len(
+        str(args.regeneration_authorization_sha256)
+    ) != 64:
+        raise ValueError("Invalid regeneration authorization SHA256.")
     if args.oof_fold_id is not None and (
         args.split != "train" or args.input_file is None
     ):
@@ -1051,6 +1089,19 @@ def build(args: argparse.Namespace) -> dict:
             else {}
         ),
     }
+    if args.artifact_identity is not None:
+        cache_metadata.update(
+            {
+                "artifact_identity": str(args.artifact_identity),
+                "regeneration_authorization_sha256": str(
+                    args.regeneration_authorization_sha256
+                ),
+                "regeneration_fold_id": int(args.regeneration_fold_id),
+                "regeneration_experiment_id": str(
+                    args.regeneration_experiment_id
+                ),
+            }
+        )
     if formal_anchor_provenance is not None:
         cache_metadata["formal_anchor_cache"] = formal_anchor_provenance
     if args.oof_fold_id is not None:

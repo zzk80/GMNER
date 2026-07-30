@@ -160,8 +160,8 @@ and
 The compact result is archived in
 [`docs/experiments/s3_1_seed42_dev_summary.json`](docs/experiments/s3_1_seed42_dev_summary.json).
 
-The next preregistered experiment is P4 Protected Joint Promotion. P4 is a
-new recovery hypothesis, not a continuation of D1:
+P4 Protected Joint Promotion was preregistered as a new recovery hypothesis,
+not a continuation of D1:
 
 ```text
 D1 = selective rejection of formal predictions
@@ -169,15 +169,16 @@ P4 = preserve all frozen Model-G predictions and append at most one
      complete GMNER triple per record
 ```
 
-P4.0 is a strict full-chain OOF, read-only actionability audit. Candidate
-generation must be gold-free, promoted spans must not overlap frozen formal
-spans, and every score prefix must recompute exact GMNER. Folds 0-7 are
-reserved for source/feature development, folds 8-9 for one calibration, Dev
-for one frozen execution, and Test remains locked. P4.1 selector training is
-not yet authorized.
+The P4-R0-B rebuild produced complete, sealed artifacts for 5600 OOF records,
+but failed the preregistered semantic replacement Gate. Folds 2, 4, 5, and 7
+did not exactly reproduce the archived compact formal state. The regenerated
+artifacts therefore cannot replace the missing historical R16 caches. P4.0
+remains blocked; folds 8-9, Dev, P4.1, and Test were not accessed.
 
 Protocol:
 [`docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
+Result:
+[`docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md`](docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md).
 
 ## Repository Layout
 

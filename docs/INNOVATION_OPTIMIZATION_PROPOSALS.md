@@ -425,16 +425,12 @@ reported; neither may be treated as a secondary metric.
 
 ```text
 0. Keep M3.3A, F3, D0, D1, and S3.1 artifacts frozen
-1. Validate full-chain OOF provenance available to P4
-2. Freeze the P4 candidate-source and feature manifest on OOF folds 0-7
-3. Materialize the cumulative oracle levels without using gold for generation
-4. Seal source, feature, score, deduplication, and tie-break definitions
-5. Open OOF folds 8-9 once for threshold/prefix calibration
-6. Recompute exact full GMNER for every calibrated prefix
-7. Apply the complete P4.0 Gate
-8. If passed, execute the sealed rule on Dev once
-9. Only then propose a separate P4.1 training protocol
-10. If P4.0 fails, close Selector and design a decoupled Stage1 correction
+1. Archive the failed P4-R0-B semantic replacement Gate
+2. Keep regenerated R16/formal-state artifacts as diagnostic evidence only
+3. Do not open OOF folds 8-9, Dev, P4.1, or Test
+4. Close the current P4 selector route
+5. Start any future Stage1 correction as a separately preregistered,
+   grounding-protected hypothesis
 ```
 
 No time-to-result or expected-gain claim is preregistered. Progress is
@@ -451,10 +447,10 @@ D0: valid diagnostic, no adversarial training
 D1: selective-rejection signal, deployment no-go, parked
 S3.0: forward/decode equivalence passed under amended numeric tolerance
 S3.1: engineering-valid, method no-go
-Old OOF caches: retained, not rerun
-Next main experiment: P4.0 Protected Joint Promotion audit
-P4 status: new hypothesis, preregistered, not run
-P4 Train features: strict full-chain OOF
+Old OOF compact caches: retained as read-only semantic references
+P4-R0-B: 5600 records rebuilt; semantic replacement Gate failed
+P4 status: blocked and archived without Oracle execution
+P4 Train features: not authorized for selector training
 P4.1 selector: not authorized
 Downstream rebuild: not authorized
 Test: locked

@@ -1,0 +1,126 @@
+{
+  "kind": "p4_r0_b_regeneration_aggregate_report",
+  "format_version": 1,
+  "status": "SEMANTIC_GATE_FAILED_P4_REMAINS_BLOCKED",
+  "artifact_identity": "REGENERATED_FULL_CHAIN_OOF_R16",
+  "regeneration_authorization_sha256": "76b83fbebcb5efa33bd1e7e4b3c9a29b7dfe02fb0ffa74e402cd865d7d5028d3",
+  "regeneration_experiment_id": "p4_r0b_20260729_seed42",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "fold_reports": [
+    {
+      "fold_id": 0,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold0/regeneration_semantic_report.json",
+      "sha256": "8461ba414c6ba86bd75fc14cd65f2e10187169fa933682f27ceeec54514df09c",
+      "semantic_gate_passed": true
+    },
+    {
+      "fold_id": 1,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold1/regeneration_semantic_report.json",
+      "sha256": "8dca3304f971f14019114b2cae3da4b9db8c1554d3067ff26688accfa871496a",
+      "semantic_gate_passed": true
+    },
+    {
+      "fold_id": 2,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold2/regeneration_semantic_report.json",
+      "sha256": "84bbc59f6e4e90d5ab3900ebe5ebe0260ac3e8d7f0513910596e28d355a4cc7f",
+      "semantic_gate_passed": false
+    },
+    {
+      "fold_id": 3,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold3/regeneration_semantic_report.json",
+      "sha256": "8d0e2cd2c65b0c38b21b2d3789a13119fdd2818547cfbba022b9f3c5ff92289b",
+      "semantic_gate_passed": true
+    },
+    {
+      "fold_id": 4,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold4/regeneration_semantic_report.json",
+      "sha256": "ce19c09ffe973c80d2945b261e02a034569769ea69b81483f11b2eb78b56526b",
+      "semantic_gate_passed": false
+    },
+    {
+      "fold_id": 5,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold5/regeneration_semantic_report.json",
+      "sha256": "1921c7e4e21b3a449f3e47b207105e4ec7a5d8cc5ac96765c597bad0da4263f4",
+      "semantic_gate_passed": false
+    },
+    {
+      "fold_id": 6,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold6/regeneration_semantic_report.json",
+      "sha256": "b226addc0e8fa391bc488a3036f978ca2a5ceb3ad20ff10228b5b48e0e91eeb4",
+      "semantic_gate_passed": true
+    },
+    {
+      "fold_id": 7,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold7/regeneration_semantic_report.json",
+      "sha256": "4954edfca6012b3b45b304c66121190d4eecf82afd69b810389be85f3d711ac1",
+      "semantic_gate_passed": false
+    }
+  ],
+  "fold_archives": [
+    {
+      "fold_id": 0,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold0/fold_archive_manifest.json",
+      "sha256": "42e57cc6dffa9a5aec516961213ab00a490a1bfe2596462d2313b3a1f1bb6e77"
+    },
+    {
+      "fold_id": 1,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold1/fold_archive_manifest.json",
+      "sha256": "a1ce5592e5dcec3529dac1654ad7be3e7d08b454b34637812321c9efb3c0e904"
+    },
+    {
+      "fold_id": 2,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold2/fold_archive_manifest.json",
+      "sha256": "0b1a02fc17078218668b1a5abc0cab7f2e2eb36ba32006433aa4e4c842720ca2"
+    },
+    {
+      "fold_id": 3,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold3/fold_archive_manifest.json",
+      "sha256": "c7985a32b8eb9ab37235feb49ccf0f93d59ec20aedd9396077558a9e6fe78678"
+    },
+    {
+      "fold_id": 4,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold4/fold_archive_manifest.json",
+      "sha256": "1593c981692c1b4430b992005415ca71b10179ba94d2170e31ded7712845f471"
+    },
+    {
+      "fold_id": 5,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold5/fold_archive_manifest.json",
+      "sha256": "3d3db01cd4194c37f2ab19eb72020e370a5035ec24ca9bd17c4ce3dfad90d21b"
+    },
+    {
+      "fold_id": 6,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold6/fold_archive_manifest.json",
+      "sha256": "c1ccf69086b3c08703794aa801226afade1072420f7067ad7198a2a8bf4b8165"
+    },
+    {
+      "fold_id": 7,
+      "path": "/home/zzk/gmner/knowledge/p4_r0b_full_chain_oof/roberta128/fold7/fold_archive_manifest.json",
+      "sha256": "ed4e01b8d46f4f19f378aa3f9ef4e1313df53259d7a557c1db96f727817984a2"
+    }
+  ],
+  "record_coverage": 5600,
+  "required_record_coverage": 5600,
+  "record_coverage_passed": true,
+  "all_fold_semantic_gates_passed": false,
+  "semantic_gate_passed": false,
+  "canonical_formal_fold_digest_sha256": "fabfa5b11b9420864ed25d74c68062108335acae7c60db2899429357373c74af",
+  "formal_sidecar_generated": false,
+  "attached_to_p4": false,
+  "siglip2_included": false,
+  "reliability_included": false,
+  "null_release_included": false,
+  "folds_8_9_accessed": false,
+  "p4_dev_accessed": false,
+  "oracle_run": false,
+  "p4_1_run": false,
+  "test_accessed": false
+}

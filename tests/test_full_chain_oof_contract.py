@@ -99,6 +99,25 @@ def test_ten_fold_manifest_is_complete_disjoint_and_reproducible(
     assert validate_fold_manifest(path, expected_num_folds=10) == manifest
 
 
+def test_manifest_can_verify_only_authorized_fold_files(
+    tmp_path, monkeypatch
+) -> None:
+    path, manifest = _build_manifest(tmp_path, monkeypatch)
+    for fold_id in (8, 9):
+        fold = fold_from_manifest(manifest, fold_id)
+        Path(fold["train_file"]).unlink()
+        Path(fold["heldout_file"]).unlink()
+
+    validated = validate_fold_manifest(
+        path,
+        expected_num_folds=10,
+        verify_fold_ids=range(8),
+    )
+    assert validated["records"] == 20
+    with pytest.raises(FileNotFoundError):
+        validate_fold_manifest(path, expected_num_folds=10)
+
+
 def test_pipeline_contract_requires_all_supervised_fold_specific_stages(
     tmp_path, monkeypatch
 ) -> None:
@@ -146,6 +165,49 @@ def test_pipeline_contract_requires_all_supervised_fold_specific_stages(
     pipeline["stages"]["fine"]["heldout_excluded"] = False
     path.write_text(json.dumps(pipeline), encoding="utf-8")
     with pytest.raises(ValueError, match="heldout exclusion"):
+        validate_pipeline_manifest(path, fold_manifest=manifest, fold_id=0)
+
+
+def test_pipeline_contract_supports_preregistered_stage_subset(
+    tmp_path, monkeypatch
+) -> None:
+    _, manifest = _build_manifest(tmp_path, monkeypatch)
+    fold = fold_from_manifest(manifest, 0)
+    artifact = tmp_path / "artifact.bin"
+    artifact.write_bytes(b"formal-chain")
+    item = {"path": str(artifact), "sha256": sha256_file(artifact)}
+    stage = {
+        "status": "complete",
+        "test_accessed": False,
+        "inputs": [item],
+        "outputs": [item],
+        "heldout_excluded": True,
+        "train_record_ids_sha256": fold["train_record_ids_sha256"],
+        "config": item,
+        "checkpoint": item,
+    }
+    pipeline = {
+        "format_version": FULL_CHAIN_PIPELINE_VERSION,
+        "kind": FULL_CHAIN_PIPELINE_KIND,
+        "fold_id": 0,
+        "source_tree_sha256": manifest["source_tree_sha256"],
+        "train_record_ids_sha256": fold["train_record_ids_sha256"],
+        "heldout_record_ids_sha256": fold["heldout_record_ids_sha256"],
+        "test_accessed": False,
+        "stages": {"stage1": stage},
+    }
+    path = tmp_path / "pipeline.json"
+    path.write_text(json.dumps(pipeline), encoding="utf-8")
+
+    validated = validate_pipeline_manifest(
+        path,
+        fold_manifest=manifest,
+        fold_id=0,
+        required_stages=("stage1",),
+        supervised_stages=("stage1",),
+    )
+    assert validated == pipeline
+    with pytest.raises(ValueError, match="candidate_caches"):
         validate_pipeline_manifest(path, fold_manifest=manifest, fold_id=0)
 
 
