@@ -9,21 +9,8 @@ __all__ = [
     "RecordCandidateDataset",
     "PairedRecordCandidateDataset",
     "PairedRecordCandidateCollator",
-    "Siglip2RegionFeatureCache",
-    "Siglip2PairedRecordDataset",
-    "Siglip2PairedRecordCollator",
-    "Stage1CandidateSelectorDataset",
-    "Stage1CandidateSelectorCollator",
-    "RecordLevelStage1Dataset",
-    "RecordLevelStage1Collator",
-    "S3Initialization",
-    "build_s3_dataloader",
-    "build_s3_record_dataset",
-    "file_sha256",
-    "load_formal_stage1_teacher",
-    "load_locked_s3_initialization",
-    "load_s3_tokenizer",
-    "resolve_project_path",
+    "sha256_file",
+    "stable_id_digest",
     "encode_words_with_alignment",
     "infer_model_input_limit",
     "load_word_aligned_tokenizer",
@@ -68,75 +55,12 @@ def __getattr__(name):
             "PairedRecordCandidateDataset": PairedRecordCandidateDataset,
             "PairedRecordCandidateCollator": PairedRecordCandidateCollator,
         }[name]
-    if name in {
-        "Siglip2RegionFeatureCache",
-        "Siglip2PairedRecordDataset",
-        "Siglip2PairedRecordCollator",
-    }:
-        from .siglip2_region_cache import (
-            Siglip2PairedRecordCollator,
-            Siglip2PairedRecordDataset,
-            Siglip2RegionFeatureCache,
-        )
+    if name in {"sha256_file", "stable_id_digest"}:
+        from .artifact_utils import sha256_file, stable_id_digest
 
         return {
-            "Siglip2RegionFeatureCache": Siglip2RegionFeatureCache,
-            "Siglip2PairedRecordDataset": Siglip2PairedRecordDataset,
-            "Siglip2PairedRecordCollator": Siglip2PairedRecordCollator,
-        }[name]
-    if name in {
-        "Stage1CandidateSelectorDataset",
-        "Stage1CandidateSelectorCollator",
-    }:
-        from .stage1_candidate_selector import (
-            Stage1CandidateSelectorCollator,
-            Stage1CandidateSelectorDataset,
-        )
-
-        return {
-            "Stage1CandidateSelectorDataset": Stage1CandidateSelectorDataset,
-            "Stage1CandidateSelectorCollator": Stage1CandidateSelectorCollator,
-        }[name]
-    if name == "RecordLevelStage1Dataset":
-        from .record_level_stage1_dataset import RecordLevelStage1Dataset
-
-        return RecordLevelStage1Dataset
-    if name == "RecordLevelStage1Collator":
-        from .record_level_stage1_collator import RecordLevelStage1Collator
-
-        return RecordLevelStage1Collator
-    if name in {
-        "S3Initialization",
-        "build_s3_dataloader",
-        "build_s3_record_dataset",
-        "file_sha256",
-        "load_formal_stage1_teacher",
-        "load_locked_s3_initialization",
-        "load_s3_tokenizer",
-        "resolve_project_path",
-    }:
-        from .s3_stage1_builder import (
-            S3Initialization,
-            build_s3_dataloader,
-            build_s3_record_dataset,
-            file_sha256,
-            load_formal_stage1_teacher,
-            load_locked_s3_initialization,
-            load_s3_tokenizer,
-            resolve_project_path,
-        )
-
-        return {
-            "S3Initialization": S3Initialization,
-            "build_s3_dataloader": build_s3_dataloader,
-            "build_s3_record_dataset": build_s3_record_dataset,
-            "file_sha256": file_sha256,
-            "load_formal_stage1_teacher": load_formal_stage1_teacher,
-            "load_locked_s3_initialization": (
-                load_locked_s3_initialization
-            ),
-            "load_s3_tokenizer": load_s3_tokenizer,
-            "resolve_project_path": resolve_project_path,
+            "sha256_file": sha256_file,
+            "stable_id_digest": stable_id_digest,
         }[name]
     if name in {
         "encode_words_with_alignment",

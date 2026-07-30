@@ -7,12 +7,6 @@ __all__ = [
     "evaluate_coarse_region_selector",
     "evaluate_fine_grounding_adapter",
     "evaluate_evidence_visibility",
-    "evaluate_siglip2_region_reliability",
-    "evaluate_layered_action_verifier",
-    "evaluate_same_type_region_resolver",
-    "evaluate_stage1_candidate_selector",
-    "evaluate_s3_forward_equivalence",
-    "evaluate_s3_stage1",
 ]
 
 
@@ -49,38 +43,4 @@ def __getattr__(name):
         )
 
         return evaluate_evidence_visibility
-    if name == "evaluate_siglip2_region_reliability":
-        from .siglip2_region_reliability_evaluator import (
-            evaluate_siglip2_region_reliability,
-        )
-
-        return evaluate_siglip2_region_reliability
-    if name == "evaluate_layered_action_verifier":
-        from .layered_action_verifier_evaluator import (
-            evaluate_layered_action_verifier,
-        )
-
-        return evaluate_layered_action_verifier
-    if name == "evaluate_same_type_region_resolver":
-        from .same_type_region_resolver_evaluator import (
-            evaluate_same_type_region_resolver,
-        )
-
-        return evaluate_same_type_region_resolver
-    if name == "evaluate_stage1_candidate_selector":
-        from .stage1_candidate_selector_evaluator import (
-            evaluate_stage1_candidate_selector,
-        )
-
-        return evaluate_stage1_candidate_selector
-    if name == "evaluate_s3_forward_equivalence":
-        from .s3_forward_equivalence import (
-            evaluate_s3_forward_equivalence,
-        )
-
-        return evaluate_s3_forward_equivalence
-    if name == "evaluate_s3_stage1":
-        from .s3_stage1_evaluator import evaluate_s3_stage1
-
-        return evaluate_s3_stage1
     raise AttributeError(name)
