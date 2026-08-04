@@ -7,6 +7,12 @@ Model-G: M3.3A -> GMNER
 Model-F: F3 subtype encoder on frozen M3.3A predictions -> FMNERG
 ```
 
+The formal visual input is precomputed VinVL region evidence. The legacy
+raw-image ResNet fallback has been removed because it was bypassed whenever
+formal region features were present. Any future full-image visual branch must
+use an explicit frozen CLIP feature contract rather than an implicit CNN
+fallback.
+
 Historical no-go branches are summarized in
 [`docs/EXPERIMENT_RESULTS_TABLE.md`](docs/EXPERIMENT_RESULTS_TABLE.md) and are
 not part of the runnable primary surface. Their final P4/S3/D1 code remains
@@ -182,6 +188,49 @@ Protocol:
 Result:
 [`docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md`](docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md).
 
+## S4.0 Read-Only Oracle
+
+S4.0 evaluated two independent Dev-only hypotheses without training, OOF,
+formal threshold changes, or Test access. The frozen M3.3A metrics and all 911
+gold-failure assignments reproduced exactly.
+
+Decision A passed its oracle-space Gate. Of 238 false-NULL failures, 105 become
+complete correct triples when forced visible with the frozen Fine Top-1 region;
+74 remain region-misranked and 59 lack an R36 gold region. Together with 130
+directly recoverable false-visible predictions, the visibility-only oracle is
+`+0.094873` GMNER. This authorizes S4.5 method development only; action
+selection has not been solved.
+
+Decision B failed its preregistered protected Gate. The gold-free CRF k-best
+and `+/-1` boundary cache contained 91 frozen-replay complete triples, but
+non-overlap and max-one-per-record protection left 35 zero-damage actions:
+
+```text
+Dev GMNER 0.621316 -> 0.630988
+delta      +0.009672 < required +0.010
+```
+
+The threshold is not relaxed. S4.1-S4.3 and P4-v2 on this candidate contract
+remain stopped; Model-G and Test remain frozen. Protocol and result:
+[`S4_0_READ_ONLY_ORACLE_PROTOCOL.md`](docs/experiments/S4_0_READ_ONLY_ORACLE_PROTOCOL.md),
+[`S4_0_READ_ONLY_ORACLE_RESULT.md`](docs/experiments/S4_0_READ_ONLY_ORACLE_RESULT.md).
+
+## S4.5 Visibility Coordinator
+
+S4.5 Phase A tested whether the S4.0 visibility oracle could be exposed by a
+frozen, gold-free score on the strict 7000-record full-chain OOF Train cache.
+The action space contained 530 `TO_VISIBLE` fixes and 631 `TO_NULL` fixes;
+FIX-vs-DAMAGE AUROC was `0.780840` and `0.627068`, respectively.
+
+Neither direction produced the preregistered folds 0-7 prefix of at least 25
+actions with 60% consequential precision. No threshold was frozen, folds 8-9
+executed no action, and Dev/Test were not accessed. The current deterministic
+score contract is therefore stopped and Coordinator training was not started.
+This is not a rejection of the S4.0 oracle; a learned set model would require a
+new protocol rather than a post-hoc relaxation. Protocol and result:
+[`S4_5_VISIBILITY_COORDINATOR_PROTOCOL.md`](docs/experiments/S4_5_VISIBILITY_COORDINATOR_PROTOCOL.md),
+[`S4_5_VISIBILITY_COORDINATOR_RESULT.md`](docs/experiments/S4_5_VISIBILITY_COORDINATOR_RESULT.md).
+
 ## Repository Layout
 
 ```text
@@ -216,3 +265,17 @@ PYTHONPATH=. python -m pytest -q
 
 Formal result selection rules are recorded in
 [`docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md`](docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md).
+
+## TQ-DV-MNER Experimental Branch
+
+The current MNER-focused branch implements **Type-Query Dual-Visual MNER** as
+an independent Train/Dev model. Four natural-language coarse-type queries
+condition extraction before boundary decisions; frozen CLIP global/patch
+features and VinVL R16 regions are retrieved per type and enter through a
+zero-initialized text-preserving residual. All typed-span candidates are
+decoded jointly with a deterministic non-overlap objective.
+
+This branch does not initialize from a previous checkpoint, does not train a
+Grounding chain, and rejects Test access. Checkpoints are selected only by Dev
+MNER. Architecture, loss, Gate, staging, and commands are frozen in
+[`TQ_DV_MNER_README.md`](docs/experiments/TQ_DV_MNER_README.md).

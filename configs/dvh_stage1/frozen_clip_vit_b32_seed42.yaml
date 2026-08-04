@@ -1,12 +1,14 @@
 data:
   task_type: multimodal_ner
-  dataset_name: twitter10000_fmnerg
+  dataset_name: twitter10000_dvh_stage1
   train_file: GMNER-main/Twitter10000_v2.0/txt_fine/train.txt
   dev_file: GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt
-  test_file: GMNER-main/Twitter10000_v2.0/txt_fine/test.txt
+  test_file: ""
   image_dir: GMNER-main/Twitter10000_v2.0/images
   image_feature_dir: GMNER-main/Twitter10000_v2.0/VinVL
   image_annotation_dir: GMNER-main/Twitter10000_v2.0/xml
+  frozen_clip_feature_dir: knowledge/dvh_frozen_clip
+  frozen_clip_cache_kind: dvh_frozen_clip_cache
   max_length: 128
   num_workers: 0
   use_dependency_graph: true
@@ -18,8 +20,8 @@ data:
   add_null_region: true
   grounding_enabled: true
   expand_entities_for_grounding: true
-  groundability_type_priors: knowledge/grounding/groundability_by_type.jsonl
-  groundability_mention_priors: knowledge/grounding/groundability_by_mention_type.jsonl
+  groundability_type_priors: ""
+  groundability_mention_priors: ""
   region_min_score: 0.0
 
 model:
@@ -30,16 +32,26 @@ model:
   graph_layers: 3
   graph_dropout: 0.1
   cross_attention_heads: 8
-  use_crf: true
   region_feature_dim: 2048
-  grounding_null_prior_weight: 1.0
-  grounding_null_logit_bias: 0.0
   region_score_prior_weight: 0.1
-  region_object_compatibility_weight: 0.2
+  dvh_enabled: true
+  dvh_use_clip: true
+  dvh_use_vinvl: true
+  dvh_shuffle_clip: false
+  dvh_clip_feature_dim: 768
+  dvh_clip_patch_grid_size: 7
+  dvh_type_query_count: 4
+  dvh_gate_initial_bias: -2.0
+  dvh_boundary_visual: true
+  dvh_type_visual: true
+  dvh_grounding_visual: true
 
 optim:
   batch_size: 8
   learning_rate: 2e-5
+  new_module_learning_rate: 1e-4
+  high_level_learning_rate: 1e-5
+  backbone_learning_rate: 3e-6
   weight_decay: 0.01
   num_epochs: 20
   warmup_ratio: 0.1
@@ -48,17 +60,20 @@ optim:
 
 loss:
   label_smoothing: 0.0
-  lambda_ner: 1.0
+  lambda_boundary: 1.0
+  lambda_type: 1.0
   lambda_grounding: 1.0
   lambda_alignment: 0.1
+  lambda_gate_regularization: 0.01
 
 runtime:
   seed: 42
   device: cuda
   fp16: true
-  output_dir: outputs/fmnerg_stage1_roberta128
+  output_dir: outputs/dvh_stage1/frozen_clip_vit_b32_seed42
   init_checkpoint: ""
   trainable_modules: all
   save_best_metric: gmner_score
   save_latest_checkpoint: false
+  early_stopping_patience: 3
   log_every_steps: 20
