@@ -266,16 +266,23 @@ PYTHONPATH=. python -m pytest -q
 Formal result selection rules are recorded in
 [`docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md`](docs/EXPERIMENT_ACCEPTANCE_CRITERIA.md).
 
-## TQ-DV-MNER Experimental Branch
+## Archived Visual Stage1 Controls
 
-The current MNER-focused branch implements **Type-Query Dual-Visual MNER** as
-an independent Train/Dev model. Four natural-language coarse-type queries
-condition extraction before boundary decisions; frozen CLIP global/patch
-features and VinVL R16 regions are retrieved per type and enter through a
-zero-initialized text-preserving residual. All typed-span candidates are
-decoded jointly with a deterministic non-overlap objective.
+The independent DVH and TQ-DV Stage1 replacements are closed as `NO_GO` Dev
+controls. DVH reached MNER F1 `0.799355`; the TQ-DV typed-span generator reached
+`0.810275`. Both lost too many correct boundaries to replace the formal
+Typed-BIO Stage1.
 
-This branch does not initialize from a previous checkpoint, does not train a
-Grounding chain, and rejects Test access. Checkpoints are selected only by Dev
-MNER. Architecture, loss, Gate, staging, and commands are frozen in
-[`TQ_DV_MNER_README.md`](docs/experiments/TQ_DV_MNER_README.md).
+A final fixed-span replay kept the formal Stage1 prediction set unchanged and
+used TQ-DV only to reassign coarse types. It changed 121 types, corrected 40,
+damaged 33, and increased MNER F1 from `0.814740` to `0.817559` (`+7` correct,
+`+0.002819`). This is a positive diagnostic, but it is well below the roughly
+33 net corrections motivating the branch and does not justify additional
+seeds, downstream reconstruction, or Test access.
+
+The formal routes remain M3.3A for GMNER and F3 for FMNERG. DVH/TQ-DV
+checkpoints and feature caches are retained on the server for reproducibility
+and will be deleted only during a later experiment cleanup. Architecture and
+results are archived in
+[`TQ_DV_MNER_README.md`](docs/experiments/TQ_DV_MNER_README.md) and
+[`TQ_DV_FIXED_SPAN_REPLAY_RESULT.md`](docs/experiments/TQ_DV_FIXED_SPAN_REPLAY_RESULT.md).

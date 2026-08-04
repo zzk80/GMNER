@@ -1,6 +1,6 @@
 # TQ-DV-MNER: Type-Query Dual-Visual MNER
 
-**Status:** implementation and Train/Dev validation
+**Status:** `ARCHIVED_NO_GO` after Seed 42 and fixed-span replay
 **Primary metric:** Dev MNER F1
 **Test:** locked
 **Initialization:** independent; no previous GMNER checkpoint
@@ -136,6 +136,33 @@ The research target is approximately `0.83`, but `0.825` is the first-stage
 Gate for deciding whether seeds 41/43 and later grounding reconstruction are
 worth running.
 
+## Final Dev Results
+
+The independent typed-span generator did not pass the Seed 42 Gate:
+
+```text
+Span F1 = 0.852346
+MNER F1 = 0.810275
+status  = NO_GO
+```
+
+The final causal check retained every formal Stage1 span and prediction count,
+then used the TQ-DV score only to choose the coarse type:
+
+```text
+formal fixed-span MNER F1 = 0.8147402336 (2023 correct)
+TQ-DV replay MNER F1      = 0.8175594039 (2030 correct)
+delta                     = +0.0028191704 (+7 correct)
+type changes              = 121
+corrected / damaged       = 40 / 33
+test_accessed             = false
+```
+
+The replay proves that the type-query representation contains some transferable
+type signal. Its net gain is nevertheless far below the approximately 33
+additional correct typed spans motivating this route. The experiment is
+therefore archived as a positive diagnostic, not promoted as a new Stage1.
+
 ## Staging
 
 ### M0: Engineering smoke
@@ -193,9 +220,9 @@ PYTHONPATH=. python scripts/train_tq_dv_mner.py \
   --device cuda
 ```
 
-## Current Boundary
+## Final Archive Boundary
 
-Implemented in this branch:
+Retained implementation:
 
 ```text
 type-query record contract
@@ -206,7 +233,7 @@ joint non-overlap decoder
 MNER-only Train/Dev evaluator and checkpoint selection
 ```
 
-Not authorized by this implementation:
+Closed without execution:
 
 ```text
 Test evaluation
@@ -214,4 +241,11 @@ old checkpoint initialization
 new grounding chain
 R16/R36 cache replacement
 M3.3A replacement
+Seeds 41/43
+downstream reconstruction
 ```
+
+The formal GMNER and FMNERG routes remain M3.3A and F3. The server retains the
+Seed 42 checkpoint and frozen visual caches for reproducibility; this archive
+does not delete them. The machine-readable replay output is
+[`tq_dv_fixed_span_type_replay_dev.json`](tq_dv_fixed_span_type_replay_dev.json).

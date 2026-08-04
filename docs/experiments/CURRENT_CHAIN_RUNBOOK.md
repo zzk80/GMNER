@@ -746,12 +746,14 @@ PY
 | F3 | Test | 固定 Model-G | 0.66510 +/- 0.00160 | 固定 | 0.50431 +/- 0.00111 | 冻结正式结果 |
 | DVH best | Dev | 0.851785 | 0.799355 | 0.653761 | 0.615043 | NO_GO 对照 |
 | TQ-DV best | Dev | 0.852346 | 0.810275 | 不适用 | 不适用 | NO_GO 对照 |
+| TQ-DV fixed-span replay | Dev | 0.870721 | 0.817559 | 不适用 | 不适用 | +7，POSITIVE_DIAGNOSTIC / NO_GO |
 
 说明：
 
 - DVH 表中是按 Dev GMNER 选出的 epoch 18，而不是 epoch 20 诊断项；
 - TQ-DV 不训练正式完整 Grounding，不能报告可比的 EEG/GMNER；
-- fixed-span replay 尚未生成结果时，不写入冻结表；
+- fixed-span replay 保留正式 span 和预测数量，MNER 从 `0.814740` 提升到 `0.817559`，
+  但净增仅 7 个正确 typed spans，不进入下游重建；
 - DVH/TQ-DV 均未访问 Test。
 
 ## 9. 产物目录速查

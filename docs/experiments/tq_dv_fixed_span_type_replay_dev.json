@@ -1,0 +1,72 @@
+{
+  "kind": "tq_fixed_span_type_replay",
+  "format_version": 1,
+  "scope": "dev",
+  "score_formula": "start_logit + end_logit + span_match + 0.5 * log_sigmoid(type_existence_logit)",
+  "span_source": "frozen_formal_stage1_typed_bio_decode",
+  "boundary_changed": false,
+  "threshold_scanned": false,
+  "baseline": {
+    "prediction_count": 2516.0,
+    "gold_count": 2450.0,
+    "span_precision": 0.8593004769475358,
+    "span_recall": 0.8824489795918368,
+    "span_f1": 0.8707209021345148,
+    "span_correct": 2162.0,
+    "mner_precision": 0.8040540540540541,
+    "mner_recall": 0.8257142857142857,
+    "mner_f1": 0.8147402335884012,
+    "mner_correct": 2023.0
+  },
+  "replay": {
+    "prediction_count": 2516.0,
+    "gold_count": 2450.0,
+    "span_precision": 0.8593004769475358,
+    "span_recall": 0.8824489795918368,
+    "span_f1": 0.8707209021345148,
+    "span_correct": 2162.0,
+    "mner_precision": 0.8068362480127186,
+    "mner_recall": 0.8285714285714286,
+    "mner_f1": 0.8175594039468385,
+    "mner_correct": 2030.0
+  },
+  "delta": {
+    "mner_f1": 0.002819170358437262,
+    "mner_correct": 7
+  },
+  "actions": {
+    "type_changed": 121,
+    "corrected": 40,
+    "damaged": 33,
+    "net_correction": 7,
+    "unavailable_fallback": 0
+  },
+  "checks": {
+    "frozen_baseline_reproduced": true,
+    "prediction_count_preserved": true,
+    "span_metrics_preserved": true,
+    "test_accessed_false": true
+  },
+  "baseline_checks": {
+    "prediction_count": true,
+    "gold_count": true,
+    "span_correct": true,
+    "mner_correct": true,
+    "span_f1": true,
+    "mner_f1": true
+  },
+  "baseline_prediction_sha256": "934d702ae90b2af994b92a110b5604b7ea71fd33ac729070c7b6da41a0ba219d",
+  "replay_prediction_sha256": "104825cd22bfbaec2e7016c74f956484c8172ec4532cfba7f7ea3ba840ef931b",
+  "formal_load": {
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  "artifacts": {
+    "formal_config_sha256": "fe6af9d0e92376aa00f57d9793726c970c69bf1b8b9bf8a9d5a4cc784de22eaa",
+    "formal_checkpoint_sha256": "efc617f09e5a7cda818560a4640d606623a2f386cf4035f3b90c3fc620a4d29d",
+    "tq_config_sha256": "03be3f98b0a6cb1ef173daf143841245c3ccfa2574e51bbfa82796b98fea1778",
+    "tq_checkpoint_sha256": "da697f7efe726e95840850d00b4a377742cca5455959fd81e152641c1abc0d25",
+    "clip_dev_manifest_sha256": "0ab6f34d09da08a1e519d861898db257b6b0694219e54a6dd0e03ca6d1c9e6bc"
+  },
+  "test_accessed": false
+}

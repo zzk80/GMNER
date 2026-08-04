@@ -163,6 +163,8 @@ scripts/evaluate_tq_fixed_span_type_replay.py
 tests/test_tq_dv_mner.py
 
 docs/experiments/TQ_DV_MNER_README.md
+docs/experiments/TQ_DV_FIXED_SPAN_REPLAY_RESULT.md
+docs/experiments/tq_dv_fixed_span_type_replay_dev.json
 ```
 
 ### 云端保留资产
@@ -173,6 +175,7 @@ knowledge/tq_dv_mner/
 ```
 
 TQ-DV 复用 DVH 的 Frozen CLIP cache，不重复保存 CLIP patch 特征。
+`dev_fixed_span_type_replay.json` 同时以机器可读形式归档到 `docs/experiments/`。
 
 ## 三链比较文档
 
@@ -191,7 +194,7 @@ docs/HIERARCHICAL_RECORD_VERIFIER.md
 __pycache__ / .pytest_cache / tmp
 根目录历史 *.log / *.pid
 关闭实验的未提交代码入口
-关闭实验的 checkpoint、optimizer state 和可重建缓存
+明确获准删除的关闭实验 checkpoint、optimizer state 和可重建缓存
 .codex_sync_tmp / .codex_backups / .codex_transfers
 ```
 
@@ -203,6 +206,10 @@ M3.3A R16/R36 candidate caches
 M3.3A 五阶段 best checkpoints
 DVH best checkpoint 与 Frozen CLIP cache
 TQ-DV best checkpoint
+TQ-DV fixed-span replay JSON 与训练 summary
 RoBERTa/CLIP本地模型目录
 Twitter10000、VinVL、XML和原始图像
 ```
+
+当前归档节点明确要求暂时保留 DVH/TQ-DV checkpoint 和相关 cache；只有后续实验需要
+释放空间时再单独清理，不能因 `NO_GO` 状态自动删除。

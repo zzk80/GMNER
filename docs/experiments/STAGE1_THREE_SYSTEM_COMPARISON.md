@@ -32,13 +32,19 @@ TQ-DV-MNER：
 结果：条件类型准确率提高，但新的span生成器仍损失更多正确边界。
 ```
 
-因此，现有证据不支持继续从零替换正式 Typed-BIO CRF。更合理的待验证方向是：
+因此，现有证据不支持继续从零替换正式 Typed-BIO CRF。随后完成的固定 span
+类型 replay 进一步验证了类型模块的独立贡献：
 
 ```text
-保留正式 Typed-BIO CRF 的span
-+
-使用TQ-DV对固定span重新计算type分数
+保留正式 Typed-BIO CRF 的 span 与预测数量
++ 使用 TQ-DV 对固定 span 重新计算 type 分数
+-> MNER 0.814740 -> 0.817559
+-> corrected / damaged = 40 / 33
+-> net = +7
 ```
+
+该结果为正，但距离约 `+33` 个净正确 typed spans 的目标较远，不足以支持其他 seed、
+下游重建或 Test。DVH/TQ-DV 分支至此终止并归档。
 
 ---
 
@@ -53,8 +59,9 @@ TQ-DV-MNER：
 | 正式 RoBERTa Stage1 bypass | 0.870721 | 0.814740 | 0.645993 | 0.607330 | 有效基线 |
 | **完整 M3.3A** | **0.872830** | **0.816714** | **0.660880** | **0.621316** | **FORMAL** |
 | DVH 正式归档 checkpoint | 0.851785 | 0.799355 | 未完整归档 | 未完整归档 | NO_GO |
+| TQ-DV typed-span generator | 0.852346 | 0.810275 | 不适用 | 不适用 | NO_GO |
+| TQ-DV fixed-span type replay | 0.870721 | 0.817559 | 不适用 | 不适用 | POSITIVE_DIAGNOSTIC / NO_GO |
 | DVH epoch 20 诊断 | 0.854314 | 0.800970 | 0.651041 | 0.612245 | 诊断项，非正式最优 |
-| TQ-DV Seed42 | 0.852346 | 0.810275 | 不适用 | 不适用 | NO_GO |
 
 说明：
 
@@ -63,6 +70,7 @@ TQ-DV-MNER：
   epoch 20 的单项最大值替代正式 checkpoint。
 - TQ-DV 本阶段只训练 MNER，不训练正式 Grounding，因此不能报告可比较的
   EEG/GMNER，也不能复用旧 R16/R36 下游结果。
+- fixed-span replay 同样只检验类型，不产生新的 EEG/GMNER 输出。
 
 ### 正式 M3.3A Test
 
@@ -1194,20 +1202,23 @@ M3.3A 后半链固定 Stage1 span/type，只能：
 它不能新增漏掉的span，也不能把错误类型改成正确类型。因此 MNER correct 从
 Stage1 到最终链保持 2023，F1 小幅上升来自错误预测减少。
 
-### Q6：下一步最小实验回答什么？
+### Q6：fixed-span replay 最终回答了什么？
 
-fixed-span type replay 固定正式 Stage1 的2162个正确span和完整预测集合，只替换类型
-评分。它将直接输出：
+fixed-span type replay 固定正式 Stage1 的 2162 个正确 span 和完整预测集合，只替换
+类型评分。最终结果为：
 
 ```text
-type corrected
-type damaged
-net typed-span correction
-各LOC/PER/ORG/OTHER切片
-最终exact MNER
+type changed = 121
+type corrected = 40
+type damaged = 33
+net typed-span correction = +7
+exact MNER = 0.817559 (+0.002819)
+prediction count = 2516 (unchanged)
+test_accessed = false
 ```
 
-若净修正达到约33个且错误类型损伤可控，TQ 类型模块才具备进入正式 Stage1 的依据。
+净修正没有达到约 33 个的目标，而且 40 次修正伴随 33 次损伤。该实验确认类型信号
+存在，但没有达到替换正式 Stage1 或重建下游链的投入门槛。
 
 ---
 
@@ -1216,28 +1227,20 @@ net typed-span correction
 ```text
 保留：
 M3.3A 作为正式 GMNER 最优链
+F3 作为正式 FMNERG 最优链
 Typed-BIO CRF 作为当前最强span生成器
-TQ-DV 的类型条件编码和视觉检索作为可复用组件
+DVH/TQ-DV checkpoint 与冻结视觉 cache 作为可复现实验资产
 
 关闭：
 DVH 的 B/I/O -> post-hoc type 完整替换路线
 TQ-DV 的四查询 typed-span generator 正式替换路线
-两条失败分支的 Seeds 41/43、下游重建和 Test
+TQ-DV fixed-span replay 的继续优化
+两条失败分支的 Seeds 41/43、下游重建和 Test 访问
 ```
 
-下一项最小、可归因的验证是 fixed-span type replay：
-
-```text
-冻结正式 Stage1 span集合
--> 使用TQ-DV对每个固定span计算四类分数
--> 只允许type变化
--> 比较type corrected/damaged和精确MNER
-```
-
-它回答的不是“整套 TQ-DV 是否有效”，而是：
-
-> TQ-DV 已观察到的条件类型提升，能否在完全保护正式边界的条件下转化为至少
-> 33 个净正确 typed spans。
+fixed-span replay 已完成，因此不存在待执行的最小实验。后续工作回归正式 M3.3A/F3
+路线；只有提出新的、独立预注册且不依赖继续扫描该 Dev 结果的假设时，才重新启用
+这些 checkpoint。
 
 ---
 
