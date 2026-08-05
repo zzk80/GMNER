@@ -32,15 +32,16 @@ from gmner.data.null_release_oof_cache import (
     sha256_file,
     validate_fold_oof_payload,
 )
+from gmner.data.final_chain_oof_population_contract import (
+    FinalChainExecutionContract,
+    regeneration_metadata_for_contract,
+    validate_dynamic_regeneration_metadata,
+    validate_final_chain_authorization,
+)
 from gmner.data.p4_r0b_regeneration_contract import (
-    P4_R0B_ARTIFACT_IDENTITY,
-    P4_R0B_EXECUTION_FOLDS,
     P4_R0B_M33A_REQUIRED_STAGES,
     P4_R0B_M33A_SUPERVISED_STAGES,
     file_bundle_sha256,
-    regeneration_metadata,
-    validate_r0b_preregistration,
-    validate_regeneration_metadata,
     validate_m33a_formal_oof_payload,
 )
 from gmner.utils.io import read_jsonl
@@ -156,8 +157,8 @@ def parse_args() -> argparse.Namespace:
         "--regeneration-authorization",
         default=None,
         help=(
-            "Enable the separately authorized P4-R0-B regeneration contract. "
-            "This mode is limited to folds 0-7 and independent output roots."
+            "Enable a separately authorized formal-chain regeneration contract "
+            "with independent output roots."
         ),
     )
     parser.add_argument(
@@ -330,8 +331,9 @@ def validate_candidate_caches(
         if metadata.get("stage1_checkpoint_sha256") != expected_stage1:
             raise ValueError(f"{name} cache uses another Stage1 checkpoint.")
         if regeneration:
-            validate_regeneration_metadata(
+            validate_dynamic_regeneration_metadata(
                 metadata,
+                artifact_identity=str(regeneration["artifact_identity"]),
                 authorization_sha256=str(
                     regeneration["regeneration_authorization_sha256"]
                 ),
@@ -739,6 +741,7 @@ def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
     regeneration: dict | None = None
+    execution_contract: FinalChainExecutionContract | None = None
     authorization: dict | None = None
     authorization_path: Path | None = None
     if args.regeneration_authorization:
@@ -746,13 +749,15 @@ def main() -> None:
         authorization = json.loads(
             authorization_path.read_text(encoding="utf-8")
         )
-        validate_r0b_preregistration(authorization)
-        regeneration = regeneration_metadata(
+        execution_contract = validate_final_chain_authorization(
+            authorization, fold_id=args.fold_id
+        )
+        regeneration = regeneration_metadata_for_contract(
+            execution_contract,
             authorization_sha256=sha256_file(authorization_path),
             fold_id=args.fold_id,
-            experiment_id=str(authorization["experiment_id"]),
         )
-        if args.seed != int(authorization["source_contract"]["seed"]):
+        if args.seed != execution_contract.seed:
             raise ValueError("R0-B seed differs from the preregistered seed.")
         if args.rebuild_fold_manifest:
             raise PermissionError(
@@ -761,8 +766,11 @@ def main() -> None:
             )
     if args.fold_id not in range(10):
         raise ValueError("Formal full-chain OOF fold id must be in 0..9.")
-    if regeneration and args.fold_id not in P4_R0B_EXECUTION_FOLDS:
-        raise PermissionError("P4-R0-B execution is limited to folds 0-7.")
+    if regeneration and (
+        execution_contract is None
+        or args.fold_id not in execution_contract.execution_folds
+    ):
+        raise PermissionError("Fold is outside the authorized execution set.")
     if args.fold_id != 0 and not args.allow_nonzero_fold:
         raise ValueError(
             "Fold 0 must pass end-to-end validation first. Use "
@@ -827,7 +835,9 @@ def main() -> None:
         manifest_path,
         expected_num_folds=10,
         verify_fold_ids=(
-            P4_R0B_EXECUTION_FOLDS if regeneration else None
+            execution_contract.execution_folds
+            if execution_contract is not None
+            else None
         ),
     )
     if regeneration:
@@ -840,14 +850,15 @@ def main() -> None:
             for item in implementation.get("files") or []
         ]
         if (
-            manifest_regeneration.get("artifact_identity")
-            != P4_R0B_ARTIFACT_IDENTITY
+            execution_contract is None
+            or manifest_regeneration.get("artifact_identity")
+            != execution_contract.artifact_identity
             or manifest_regeneration.get("regeneration_authorization_sha256")
             != regeneration["regeneration_authorization_sha256"]
             or manifest_regeneration.get("regeneration_experiment_id")
             != regeneration["regeneration_experiment_id"]
             or tuple(manifest_regeneration.get("execution_folds") or ())
-            != P4_R0B_EXECUTION_FOLDS
+            != execution_contract.execution_folds
             or dict(manifest_regeneration.get("chain_contract") or {})
             != dict(authorization["chain_contract"])
             or not implementation_files
@@ -888,17 +899,21 @@ def main() -> None:
     d0_path = fold_work / "d0_preflight.json"
     if not d0_path.is_file():
         raise FileNotFoundError(
-            "Fold-0 D0 preflight must pass before the chain can start."
+            "Per-fold D0 preflight must pass before the chain can start."
         )
     d0 = json.loads(d0_path.read_text(encoding="utf-8"))
     if (
         d0.get("status") != "PASSED"
-        or d0.get("fold0_execution_authorized") is not True
+        or int(d0.get("fold_id", 0)) != int(args.fold_id)
+        or (
+            d0.get("fold0_execution_authorized") is not True
+            and d0.get("execution_authorized") is not True
+        )
         or d0.get("official_dev_accessed") is not False
         or d0.get("test_accessed") is not False
         or d0.get("fold_manifest_sha256") != sha256_file(manifest_path)
     ):
-        raise PermissionError("Fold-0 D0 preflight proof is invalid.")
+        raise PermissionError("Per-fold D0 preflight proof is invalid.")
     train_file = Path(d0["fit_file"]).resolve()
     dev_file = Path(d0["selection_file"]).resolve()
     train_record_ids = [
@@ -1287,8 +1302,9 @@ def main() -> None:
                 expected_fold_id=args.fold_id,
                 expected_record_ids=list(fold["heldout_record_ids"]),
             )
-            validate_regeneration_metadata(
+            validate_dynamic_regeneration_metadata(
                 dict(payload["metadata"]),
+                artifact_identity=str(regeneration["artifact_identity"]),
                 authorization_sha256=str(
                     regeneration["regeneration_authorization_sha256"]
                 ),
@@ -1483,8 +1499,9 @@ def main() -> None:
         require_reliability=True,
     )
     if regeneration:
-        validate_regeneration_metadata(
+        validate_dynamic_regeneration_metadata(
             dict(payload["metadata"]),
+            artifact_identity=str(regeneration["artifact_identity"]),
             authorization_sha256=str(
                 regeneration["regeneration_authorization_sha256"]
             ),

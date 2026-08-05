@@ -25,15 +25,16 @@ from gmner.data.full_chain_oof_contract import (
     validate_pipeline_manifest,
 )
 from gmner.data.null_release_oof_cache import sha256_file, stable_id_digest
+from gmner.data.final_chain_oof_population_contract import (
+    validate_dynamic_regeneration_metadata,
+)
 from gmner.data.p4_r0b_regeneration_contract import (
-    P4_R0B_EXECUTION_FOLDS,
     P4_R0B_M33A_CACHE_KIND,
     P4_R0B_M33A_CACHE_VERSION,
     P4_R0B_M33A_REQUIRED_STAGES,
     P4_R0B_M33A_SUPERVISED_STAGES,
     pack_m33a_formal_batch,
     validate_m33a_formal_oof_payload,
-    validate_regeneration_metadata,
 )
 from gmner.engine.fine_grounding_adapter_evaluator import (
     _selected_span_indices,
@@ -175,16 +176,19 @@ def _deployment_span_mask(
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
-    if args.fold_id not in P4_R0B_EXECUTION_FOLDS:
-        raise PermissionError("M3.3A regeneration is limited to folds 0-7.")
     config_path = resolve(args.config, root)
     checkpoint_path = resolve(args.checkpoint, root)
     manifest_path = resolve(args.fold_summary, root)
     pipeline_path = resolve(args.pipeline_manifest, root)
+    pipeline = json.loads(pipeline_path.read_text(encoding="utf-8"))
+    regeneration = dict(pipeline.get("regeneration") or {})
+    allowed_folds = tuple(int(value) for value in regeneration.get("execution_folds", ()))
+    if args.fold_id not in allowed_folds:
+        raise PermissionError("M3.3A materialization fold is not authorized.")
     manifest = validate_fold_manifest(
         manifest_path,
         expected_num_folds=10,
-        verify_fold_ids=P4_R0B_EXECUTION_FOLDS,
+        verify_fold_ids=allowed_folds,
     )
     fold = fold_from_manifest(manifest, args.fold_id)
     validate_pipeline_manifest(
@@ -194,9 +198,6 @@ def main() -> None:
         required_stages=P4_R0B_M33A_REQUIRED_STAGES[:-1],
         supervised_stages=P4_R0B_M33A_SUPERVISED_STAGES,
     )
-    pipeline = json.loads(pipeline_path.read_text(encoding="utf-8"))
-    regeneration = dict(pipeline.get("regeneration") or {})
-
     config = load_evidence_visibility_config(config_path)
     formal_path = resolve(config.data.formal_train_cache, root)
     expanded_path = resolve(config.data.expanded_train_cache, root)
@@ -208,8 +209,9 @@ def main() -> None:
     if actual_ids != expected_ids:
         raise ValueError("Heldout M3.3A candidate order differs from the fold.")
     for metadata in (formal.metadata, expanded.metadata):
-        validate_regeneration_metadata(
+        validate_dynamic_regeneration_metadata(
             dict(metadata),
+            artifact_identity=str(regeneration["artifact_identity"]),
             authorization_sha256=str(
                 regeneration["regeneration_authorization_sha256"]
             ),

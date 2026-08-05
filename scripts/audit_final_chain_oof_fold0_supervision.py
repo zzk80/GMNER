@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Attach Fold-0 gold supervision after sealing without mutating OOF rows."""
+"""Attach fold supervision after sealing without mutating gold-free OOF rows."""
 
 from __future__ import annotations
 
@@ -14,6 +14,9 @@ from typing import Any, Iterable
 
 from gmner.constants import DEFAULT_LABEL2ID, ENTITY_TYPE2ID
 from gmner.data.artifact_utils import sha256_file, stable_id_digest
+from gmner.data.final_chain_oof_population_contract import (
+    validate_final_chain_authorization,
+)
 from gmner.utils.metrics import extract_entities_from_word_labels
 
 
@@ -24,6 +27,7 @@ ID2LABEL = {value: key for key, value in DEFAULT_LABEL2ID.items()}
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--authorization", required=True)
+    parser.add_argument("--fold-id", type=int, default=0)
     parser.add_argument("--rows", required=True)
     parser.add_argument("--materialization-report", required=True)
     parser.add_argument("--heldout-source", required=True)
@@ -122,7 +126,7 @@ def distribution(values: Iterable[float]) -> dict[str, float | int | None]:
 
 
 def supervise_record(
-    row: dict[str, Any], source: dict[str, Any]
+    row: dict[str, Any], source: dict[str, Any], *, fold_id: int = 0
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     gold_mner = gold_entities(source)
     gold_spans = [(start, end) for start, end, _ in gold_mner]
@@ -218,10 +222,10 @@ def supervise_record(
         )
 
     supervision = {
-        "kind": "final_chain_oof_fold0_record_supervision",
+        "kind": "final_chain_oof_record_supervision",
         "format_version": 1,
         "record_id": row["record_id"],
-        "fold_id": 0,
+        "fold_id": int(fold_id),
         "source_row_sha256": canonical_sha256(row),
         "gold_entity_count": len(gold_mner),
         "base_span_correct_count": base_span_correct,
@@ -250,15 +254,26 @@ def main() -> None:
     for name in ("rows", "materialization_report", "heldout_source"):
         reject_forbidden_path(paths[name])
     authorization = json.loads(paths["authorization"].read_text(encoding="utf-8"))
-    if authorization.get("status") != "AUTHORIZED" or int(authorization.get("fold_id", -1)) != 0:
-        raise RuntimeError("Fold-0 post-seal supervision audit is not authorized.")
+    if authorization.get("kind") == "final_chain_oof_fold0_postseal_supervision_authorization":
+        if authorization.get("status") != "AUTHORIZED" or args.fold_id != 0:
+            raise RuntimeError("Fold-0 post-seal supervision audit is not authorized.")
+    else:
+        validate_final_chain_authorization(authorization, fold_id=args.fold_id)
     materialization = json.loads(
         paths["materialization_report"].read_text(encoding="utf-8")
     )
     rows_sha_before = sha256_file(paths["rows"])
     if materialization.get("status") != "PASSED" or materialization.get("rows_sha256") != rows_sha_before:
         raise RuntimeError("Sealed gold-free row hash does not match materialization report.")
-    if any(materialization.get(key) for key in ("folds_1_9_accessed", "dev_accessed", "test_accessed")):
+    if any(
+        materialization.get(key)
+        for key in (
+            "folds_1_9_accessed",
+            "other_folds_accessed",
+            "dev_accessed",
+            "test_accessed",
+        )
+    ):
         raise RuntimeError("Materialization access lock is not clean.")
 
     rows = read_jsonl(paths["rows"])
@@ -276,7 +291,9 @@ def main() -> None:
         serialized = json.dumps(row, ensure_ascii=False).casefold()
         if '"supervision"' in serialized or '"gold' in serialized:
             raise RuntimeError("Gold or supervision was present before post-seal attachment.")
-        sidecar, b1_rows, a1_rows = supervise_record(row, source_by_id[row["record_id"]])
+        sidecar, b1_rows, a1_rows = supervise_record(
+            row, source_by_id[row["record_id"]], fold_id=args.fold_id
+        )
         sidecars.append(sidecar)
         all_b1.extend(b1_rows)
         all_a1.extend(a1_rows)
@@ -322,9 +339,10 @@ def main() -> None:
         }
 
     report = {
-        "kind": "final_chain_oof_fold0_postseal_supervision_audit",
+        "kind": "final_chain_oof_fold_postseal_supervision_audit",
         "format_version": 1,
         "status": "DESCRIPTIVE_AUDIT_COMPLETE_METHOD_SIGNAL_NOT_EVALUATED",
+        "fold_id": int(args.fold_id),
         "records": len(rows),
         "record_ids_sha256": stable_id_digest([row["record_id"] for row in rows]),
         "sealed_rows_sha256_before": rows_sha_before,
@@ -353,7 +371,7 @@ def main() -> None:
         "threshold_selected": False,
         "oracle_policy_computed": False,
         "training_run": False,
-        "folds_1_9_accessed": False,
+        "other_folds_accessed": False,
         "dev_accessed": False,
         "test_accessed": False,
     }

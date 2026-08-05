@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Materialize deterministic Fold-0 final-chain OOF rows and action population."""
+"""Materialize deterministic final-chain OOF rows and action population."""
 
 from __future__ import annotations
 
@@ -27,6 +27,7 @@ TYPE_ORDER = ("LOC", "PER", "ORG", "OTHER")
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--formal-state", required=True)
+    parser.add_argument("--fold-id", type=int, default=0)
     parser.add_argument("--r16-cache", required=True)
     parser.add_argument("--r36-cache", required=True)
     parser.add_argument("--fold-summary", required=True)
@@ -264,13 +265,14 @@ def build_rows(
     fold: dict,
     pipeline: dict,
     d0: dict,
+    fold_id: int = 0,
 ) -> list[dict]:
     states = flatten_states(formal_payload)
     r16_by_id = {str(row["metadata"]["record_id"]): row for row in r16_payload["records"]}
     r36_by_id = {str(row["metadata"]["record_id"]): row for row in r36_payload["records"]}
     expected = [str(value) for value in fold["heldout_record_ids"]]
     if list(states) != expected or list(r16_by_id) != expected or list(r36_by_id) != expected:
-        raise ValueError("Formal state and candidate cache orders differ from Fold-0.")
+        raise ValueError("Formal state and candidate cache orders differ from the fold.")
     provenance = {
         "source_dataset_sha256": str(d0["heldout_file_sha256"]),
         "heldout_exclusion_proof_sha256": sha256_file(Path(d0["fold_manifest"])),
@@ -405,7 +407,7 @@ def build_rows(
             "format_version": 1,
             "record_id": record_id,
             "image_id": image_id,
-            "fold_id": 0,
+            "fold_id": int(fold_id),
             "heldout": True,
             "test_accessed": False,
             "provenance": provenance,
@@ -428,12 +430,14 @@ def build_rows(
 def main() -> None:
     args = parse_args()
     manifest_path = Path(args.fold_summary).resolve()
-    manifest = validate_fold_manifest(manifest_path, expected_num_folds=10, verify_fold_ids=(0,))
-    fold = fold_from_manifest(manifest, 0)
+    manifest = validate_fold_manifest(
+        manifest_path, expected_num_folds=10, verify_fold_ids=(args.fold_id,)
+    )
+    fold = fold_from_manifest(manifest, args.fold_id)
     formal_payload = torch.load(Path(args.formal_state), map_location="cpu")
     validate_m33a_formal_oof_payload(
         formal_payload,
-        expected_fold_id=0,
+        expected_fold_id=args.fold_id,
         expected_record_ids=[str(value) for value in fold["heldout_record_ids"]],
     )
     r16_payload = torch.load(Path(args.r16_cache), map_location="cpu")
@@ -441,15 +445,27 @@ def main() -> None:
     pipeline = json.loads(Path(args.pipeline_manifest).read_text(encoding="utf-8"))
     d0 = json.loads(Path(args.d0_preflight).read_text(encoding="utf-8"))
     rows = build_rows(
-        formal_payload, r16_payload, r36_payload, fold=fold, pipeline=pipeline, d0=d0
+        formal_payload,
+        r16_payload,
+        r36_payload,
+        fold=fold,
+        pipeline=pipeline,
+        d0=d0,
+        fold_id=args.fold_id,
     )
     replay = build_rows(
-        formal_payload, r16_payload, r36_payload, fold=fold, pipeline=pipeline, d0=d0
+        formal_payload,
+        r16_payload,
+        r36_payload,
+        fold=fold,
+        pipeline=pipeline,
+        d0=d0,
+        fold_id=args.fold_id,
     )
     first_discrete = discrete_projection(rows)
     replay_discrete = discrete_projection(replay)
     if first_discrete != replay_discrete:
-        raise RuntimeError("Fold-0 deterministic replay changed discrete outputs.")
+        raise RuntimeError("Fold deterministic replay changed discrete outputs.")
     discrete_sha = hashlib.sha256(canonical_bytes(first_discrete)).hexdigest()
     output = Path(args.output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -459,9 +475,10 @@ def main() -> None:
             stream.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
     temporary.replace(output)
     report = {
-        "kind": "final_chain_oof_fold0_materialization",
+        "kind": "final_chain_oof_fold_materialization",
         "format_version": 1,
         "status": "PASSED",
+        "fold_id": int(args.fold_id),
         "records": len(rows),
         "record_ids_sha256": stable_id_digest([row["record_id"] for row in rows]),
         "formal_prediction_count": sum(len(row["formal_predictions"]) for row in rows),
@@ -471,7 +488,7 @@ def main() -> None:
         "double_run_action_digest_exact": True,
         "rows": str(output),
         "rows_sha256": sha256_file(output),
-        "folds_1_9_accessed": False,
+        "other_folds_accessed": False,
         "dev_accessed": False,
         "test_accessed": False,
     }
