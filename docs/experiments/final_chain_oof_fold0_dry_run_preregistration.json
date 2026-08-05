@@ -25,6 +25,26 @@
     "clip",
     "fmnerg_subtype"
   ],
+  "semantic_contract": {
+    "coarse_type_order": ["LOC", "PER", "ORG", "OTHER"],
+    "coarse_type_ids": {"LOC": 0, "PER": 1, "ORG": 2, "OTHER": 3},
+    "type_logits_order": ["LOC", "PER", "ORG", "OTHER"],
+    "type_logits_semantics": "anchored_formal_stage1_span_type_logits",
+    "type_logits_pooling": "mean(0.5*(B_type_emission+I_type_emission))_over_span_subwords",
+    "formal_type_anchor": "formal_type_logit=max(current,max_all+1e-4)",
+    "formal_region_index_namespace": "expanded_r36_local_index",
+    "formal_null_index": "r36_candidates.null_region_index",
+    "stable_region_identity": "record_id+image_id+vinvl_source_index_or_NULL",
+    "id_hash": "sha256",
+    "id_serialization": "utf8_canonical_json_sorted_keys_compact",
+    "id_float_inputs_forbidden": true,
+    "runtime_row_indices_forbidden_in_ids": true,
+    "discrete_replay": "exact",
+    "continuous_atol": 0.00003,
+    "continuous_rtol": 0.000001,
+    "digest_includes_raw_float_bytes": false,
+    "nan_or_inf": "hard_stop"
+  },
   "resource_budget": {
     "gpu_free_gate_gib": 10,
     "preferred_free_disk_gib": 10,

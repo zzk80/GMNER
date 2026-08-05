@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from gmner.constants import ENTITY_TYPE2ID
 from scripts.audit_final_chain_oof_source_feasibility import (
     build_inventory,
     derive_status,
@@ -120,3 +121,40 @@ def test_fold0_dry_run_remains_preregistered_and_locked() -> None:
         "clip",
         "fmnerg_subtype",
     ]
+
+
+def test_fold0_type_region_identity_and_numeric_contracts_are_frozen() -> None:
+    schema = json.loads(
+        (ROOT / "docs/experiments/final_chain_oof_minimum_row_schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    preregistration = json.loads(
+        (
+            ROOT
+            / "docs/experiments/final_chain_oof_fold0_dry_run_preregistration.json"
+        ).read_text(encoding="utf-8")
+    )
+    expected_types = {"LOC": 0, "PER": 1, "ORG": 2, "OTHER": 3}
+    assert {name: ENTITY_TYPE2ID[name] for name in expected_types} == expected_types
+    assert schema["x_type_contract"]["type_id_map"] == expected_types
+    assert schema["x_type_contract"]["type_logits_order"] == [
+        "LOC",
+        "PER",
+        "ORG",
+        "OTHER",
+    ]
+    assert (
+        schema["x_region_contract"]["formal_region_index_namespace"]
+        == "expanded_r36_local_index"
+    )
+    assert schema["x_region_contract"]["local_index_excluded_from_stable_identity"]
+    assert schema["x_identity_contract"]["float_inputs_forbidden"]
+    assert schema["x_identity_contract"]["runtime_row_indices_forbidden"]
+    assert schema["x_numeric_replay_contract"]["continuous_atol"] == 3e-5
+    assert schema["x_numeric_replay_contract"]["continuous_rtol"] == 1e-6
+    assert schema["x_numeric_replay_contract"]["nan_or_inf"] == "hard_stop"
+    semantics = preregistration["semantic_contract"]
+    assert semantics["coarse_type_ids"] == expected_types
+    assert semantics["formal_region_index_namespace"] == "expanded_r36_local_index"
+    assert semantics["digest_includes_raw_float_bytes"] is False

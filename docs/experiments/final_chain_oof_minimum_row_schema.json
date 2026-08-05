@@ -8,6 +8,7 @@
     "kind",
     "format_version",
     "record_id",
+    "image_id",
     "fold_id",
     "heldout",
     "test_accessed",
@@ -22,6 +23,7 @@
     "kind": {"const": "final_chain_oof_record"},
     "format_version": {"const": 1},
     "record_id": {"type": "string", "minLength": 1},
+    "image_id": {"type": "string", "minLength": 1},
     "fold_id": {"type": "integer", "minimum": 0, "maximum": 9},
     "heldout": {"const": true},
     "test_accessed": {"const": false},
@@ -31,12 +33,10 @@
       "items": {"$ref": "#/$defs/formalPrediction"}
     },
     "r16_candidates": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/candidate"}
+      "$ref": "#/$defs/candidateSet"
     },
     "r36_candidates": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/candidate"}
+      "$ref": "#/$defs/candidateSet"
     },
     "chain_state": {"$ref": "#/$defs/chainState"},
     "replacement_actions": {
@@ -102,23 +102,43 @@
         "type_id",
         "type_logits",
         "region_index",
+        "region_candidate_id",
         "region_is_null",
         "stage1_identity",
         "observable_features"
       ],
       "properties": {
-        "prediction_id": {"type": "string", "minLength": 1},
+        "prediction_id": {
+          "type": "string",
+          "pattern": "^prediction:[0-9a-f]{64}$"
+        },
         "span": {"$ref": "#/$defs/span"},
-        "type_id": {"type": "integer", "minimum": 0, "maximum": 3},
+        "type_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Fixed order: LOC=0, PER=1, ORG=2, OTHER=3."
+        },
         "type_logits": {
           "type": "array",
           "minItems": 4,
           "maxItems": 4,
           "items": {"type": "number"}
         },
-        "region_index": {"type": "integer", "minimum": 0},
+        "region_index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Expanded R36 local row index; NULL equals that record's R36 null_region_index."
+        },
+        "region_candidate_id": {
+          "type": "string",
+          "pattern": "^region:[0-9a-f]{64}$"
+        },
         "region_is_null": {"type": "boolean"},
-        "stage1_identity": {"type": "string", "minLength": 1},
+        "stage1_identity": {
+          "type": "string",
+          "pattern": "^stage1:[0-9a-f]{64}$"
+        },
         "observable_features": {"type": "object"},
         "supervision": {
           "type": "object",
@@ -126,15 +146,78 @@
         }
       }
     },
-    "candidate": {
+    "spanCandidate": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["candidate_id", "span", "source", "scores"],
+      "required": [
+        "candidate_id",
+        "span",
+        "type_id",
+        "source",
+        "region_candidate_id",
+        "scores"
+      ],
       "properties": {
-        "candidate_id": {"type": "string", "minLength": 1},
+        "candidate_id": {
+          "type": "string",
+          "pattern": "^candidate:[0-9a-f]{64}$"
+        },
         "span": {"$ref": "#/$defs/span"},
+        "type_id": {"type": "integer", "minimum": 0, "maximum": 3},
         "source": {"type": "string", "minLength": 1},
+        "region_candidate_id": {
+          "type": "string",
+          "pattern": "^region:[0-9a-f]{64}$"
+        },
         "scores": {"type": "object"}
+      }
+    },
+    "regionCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "region_candidate_id",
+        "local_index",
+        "vinvl_source_index",
+        "bbox_xyxy",
+        "detector_score",
+        "is_null"
+      ],
+      "properties": {
+        "region_candidate_id": {
+          "type": "string",
+          "pattern": "^region:[0-9a-f]{64}$"
+        },
+        "local_index": {"type": "integer", "minimum": 0},
+        "vinvl_source_index": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Original VinVL proposal row; null only for the NULL region."
+        },
+        "bbox_xyxy": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "number"}
+        },
+        "detector_score": {"type": "number"},
+        "is_null": {"type": "boolean"}
+      }
+    },
+    "candidateSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["null_region_index", "span_candidates", "region_candidates"],
+      "properties": {
+        "null_region_index": {"type": "integer", "minimum": 0},
+        "span_candidates": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/spanCandidate"}
+        },
+        "region_candidates": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/regionCandidate"}
+        }
       }
     },
     "chainState": {
@@ -164,9 +247,18 @@
         "observable_features"
       ],
       "properties": {
-        "action_id": {"type": "string", "minLength": 1},
-        "base_prediction_id": {"type": "string", "minLength": 1},
-        "candidate_id": {"type": "string", "minLength": 1},
+        "action_id": {
+          "type": "string",
+          "pattern": "^action:[0-9a-f]{64}$"
+        },
+        "base_prediction_id": {
+          "type": "string",
+          "pattern": "^prediction:[0-9a-f]{64}$"
+        },
+        "candidate_id": {
+          "type": "string",
+          "pattern": "^candidate:[0-9a-f]{64}$"
+        },
         "candidate_source": {"type": "string", "minLength": 1},
         "candidate_score": {"type": "number"},
         "base_candidate_margin": {"type": "number"},
@@ -200,5 +292,73 @@
     "heldout_exclusion_proof",
     "test_access_false",
     "deterministic_action_enumeration"
-  ]
+  ],
+  "x_type_contract": {
+    "type_id_order": ["LOC", "PER", "ORG", "OTHER"],
+    "type_id_map": {"LOC": 0, "PER": 1, "ORG": 2, "OTHER": 3},
+    "type_logits_order": ["LOC", "PER", "ORG", "OTHER"],
+    "type_logits_semantics": "anchored_formal_stage1_span_type_logits",
+    "token_type_score": "0.5*(B_type_emission+I_type_emission)",
+    "span_pooling": "masked_mean_over_span_subwords",
+    "formal_type_anchor": "formal_type_logit=max(current,max_all+1e-4)",
+    "materialized_before_top_m_truncation": true
+  },
+  "x_region_contract": {
+    "formal_region_index_namespace": "expanded_r36_local_index",
+    "formal_null_index": "r36_candidates.null_region_index",
+    "stable_real_identity_inputs": [
+      "record_id",
+      "image_id",
+      "vinvl_source_index"
+    ],
+    "stable_null_identity_inputs": ["record_id", "NULL"],
+    "r16_r36_shared_regions_keep_identity": true,
+    "local_index_excluded_from_stable_identity": true
+  },
+  "x_identity_contract": {
+    "algorithm": "sha256",
+    "encoding": "utf-8",
+    "serialization": "canonical_json_sorted_keys_compact",
+    "ensure_ascii": false,
+    "float_inputs_forbidden": true,
+    "prefixes": {
+      "prediction_id": "prediction:",
+      "candidate_id": "candidate:",
+      "action_id": "action:",
+      "stage1_identity": "stage1:",
+      "region_candidate_id": "region:"
+    },
+    "prediction_id_inputs": [
+      "record_id",
+      "word_half_open_span",
+      "type_id",
+      "region_candidate_id"
+    ],
+    "candidate_id_inputs": [
+      "record_id",
+      "word_half_open_span",
+      "type_id",
+      "candidate_source",
+      "region_candidate_id"
+    ],
+    "action_id_inputs": ["record_id", "base_prediction_id", "candidate_id"],
+    "stage1_identity_inputs": [
+      "record_id",
+      "word_half_open_span",
+      "type_id",
+      "region_candidate_id"
+    ],
+    "runtime_row_indices_forbidden": true
+  },
+  "x_numeric_replay_contract": {
+    "identity_and_set_fields": "exact",
+    "source_artifact_sha256": "exact",
+    "continuous_atol": 0.00003,
+    "continuous_rtol": 0.000001,
+    "finite_only": true,
+    "nan_or_inf": "hard_stop",
+    "digest_includes_raw_float_bytes": false,
+    "json_float_serialization": "finite_ieee754_shortest_round_trip",
+    "negative_zero_normalized": true
+  }
 }

@@ -18,6 +18,98 @@ run and its labels or metrics cannot authorize B1/A1 by themselves.
 The machine-readable lock is
 `final_chain_oof_fold0_dry_run_preregistration.json`.
 
+## Frozen semantic contracts
+
+### Coarse type evidence
+
+The formal order is the project-wide `ENTITY_TYPE2ID` order:
+
+```text
+0 = LOC
+1 = PER
+2 = ORG
+3 = OTHER
+```
+
+`type_logits` uses the same order. For each token in the final word-space span,
+the Stage1 typed-BIO evidence for type `t` is
+`0.5 * (B-t emission + I-t emission)`; the span score is the masked mean over
+its subwords. Because M3.3A fixes the Stage1 type downstream, the formal type
+entry is then anchored to at least `max(all type logits) + 1e-4`. This complete
+four-way vector is materialized before any Top-M truncation. It is named
+`anchored_formal_stage1_span_type_logits`; no downstream module may reorder or
+silently recompute it.
+
+### Region namespace
+
+The legacy integer `region_index` remains the final Evidence Visibility index:
+
+```text
+expanded R36 local row index
+NULL = that record's R36 null_region_index
+```
+
+Every formal prediction and region row additionally stores a stable
+`region_candidate_id`. A real-region identity is the SHA256 identity of
+`record_id`, `image_id`, and the original VinVL proposal index. The NULL
+identity uses `record_id` and the literal `NULL`. R16 and R36 rows derived from
+the same VinVL proposal therefore share one identity even if their local row
+positions differ. Local tensor indices never enter stable IDs.
+
+### Deterministic IDs
+
+All IDs use UTF-8 canonical JSON with sorted keys, compact separators, no
+ASCII escaping, no floating inputs, and lowercase SHA256. A domain prefix is
+prepended to the digest:
+
+```text
+prediction_id:
+  prediction:sha256(record_id, span, type_id, region_candidate_id)
+
+candidate_id:
+  candidate:sha256(record_id, span, type_id, candidate_source,
+                   region_candidate_id)
+
+action_id:
+  action:sha256(record_id, base_prediction_id, candidate_id)
+
+stage1_identity:
+  stage1:sha256(record_id, span, type_id, region_candidate_id)
+
+region_candidate_id:
+  region:sha256(record_id, image_id, vinvl_source_index)
+  region:sha256(record_id, "NULL") for NULL
+```
+
+The canonical object includes an explicit `kind` matching the prefix. Python
+object insertion order, tensor row index, process ID, pathname, and device are
+forbidden identity inputs.
+
+### Numerical replay
+
+The following are exact and form the discrete digests:
+
+```text
+record order and IDs
+all spans, types, source names, visibility and NULL flags
+region candidate IDs and local-to-stable mappings
+candidate ordering and tie-break results
+formal prediction set and replacement action set
+checkpoint/config/source artifact SHA256 values
+```
+
+Raw floating bytes are excluded from identity/set digests. Derived finite
+logits, scores, and continuous states are compared with:
+
+```text
+absolute tolerance = 3e-5
+relative tolerance = 1e-6
+```
+
+JSON diagnostics use shortest-round-trip finite IEEE-754 decimals and normalize
+negative zero. Any NaN or Inf is a hard stop. A tolerated float difference may
+not change an ordering, tie-break, discrete decision, identity, or digest.
+
 ## Frozen chain
 
 Fold 0 uses 6300 Train records and holds out the manifest-defined 700 records.
