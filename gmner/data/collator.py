@@ -179,6 +179,7 @@ class GMNERCollator:
                     "grounding_null_prior": feature.get("grounding_null_prior"),
                     "region_object_labels": feature.get("region_object_labels"),
                     "region_object_attributes": feature.get("region_object_attributes"),
+                    "region_source_indices": feature.get("region_source_indices"),
                     "image_size": feature.get("image_size"),
                 }
             )

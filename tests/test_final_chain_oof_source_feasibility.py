@@ -97,17 +97,17 @@ def test_declared_status_mismatch_is_rejected() -> None:
         build_inventory(registry, schema)
 
 
-def test_fold0_dry_run_remains_preregistered_and_locked() -> None:
+def test_fold0_dry_run_is_authorized_while_later_stages_remain_locked() -> None:
     payload = json.loads(
         (
             ROOT
             / "docs/experiments/final_chain_oof_fold0_dry_run_preregistration.json"
         ).read_text(encoding="utf-8")
     )
-    assert payload["status"] == "PREREGISTERED_NOT_STARTED"
+    assert payload["status"] == "AUTHORIZED_NOT_STARTED"
     assert payload["authorization"] == {
         "source_inventory_audit": True,
-        "fold0_execution": False,
+        "fold0_execution": True,
         "folds_1_9_execution": False,
         "b1_a1_population_training": False,
         "dev_execution": False,

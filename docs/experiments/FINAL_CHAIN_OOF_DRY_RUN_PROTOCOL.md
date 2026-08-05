@@ -4,7 +4,7 @@
 
 ```text
 Historical source inventory: AUTHORIZED, READ-ONLY
-New fold-0 source dry run: PREREGISTERED, NOT STARTED
+New fold-0 source dry run: AUTHORIZED, NOT STARTED
 Folds 1-9: LOCKED
 B1/A1 population training: LOCKED
 Dev: LOCKED
@@ -113,6 +113,11 @@ not change an ordering, tie-break, discrete decision, identity, or digest.
 ## Frozen chain
 
 Fold 0 uses 6300 Train records and holds out the manifest-defined 700 records.
+The 6300-record outer-train pool is deterministically partitioned, using seed
+1042, into 5600 fitting records and 700 internal checkpoint-selection records.
+The official Dev split is neither opened nor named by generated runtime
+configs. The outer 700 held-out records remain excluded from both subsets and
+from every supervised checkpoint-selection decision.
 Every supervised module must exclude the same held-out IDs:
 
 ```text

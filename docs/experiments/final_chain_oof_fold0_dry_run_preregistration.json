@@ -1,7 +1,8 @@
 {
   "kind": "final_chain_oof_fold0_dry_run_preregistration",
   "format_version": 1,
-  "status": "PREREGISTERED_NOT_STARTED",
+  "status": "AUTHORIZED_NOT_STARTED",
+  "experiment_id": "final_chain_oof_fold0_dry_run_v1",
   "fold_id": 0,
   "records": {
     "train": 6300,
@@ -53,6 +54,39 @@
     "sealed_retained_target_mib": 500,
     "execution": "single_sequential_gpu_process"
   },
+  "source_contract": {
+    "num_folds": 10,
+    "outer_seed": 42,
+    "seed": 42,
+    "inner_selection_seed": 1042,
+    "outer_train_records": 6300,
+    "inner_fit_records": 5600,
+    "inner_selection_records": 700,
+    "heldout_records": 700,
+    "official_dev_access": false,
+    "test_access": false
+  },
+  "selection_contract": {
+    "kind": "deterministic_nested_train_selection",
+    "fit_records": 5600,
+    "selection_records": 700,
+    "selection_source": "fold0_outer_train_only",
+    "heldout_excluded": true,
+    "official_dev_forbidden": true
+  },
+  "chain_contract": {
+    "identity": "M3.3A_FORMAL_BEST_CHAIN",
+    "siglip2": false,
+    "fusion_reliability": false,
+    "null_release": false,
+    "clip": false,
+    "fmnerg_subtype": false
+  },
+  "storage_contract": {
+    "work_root": "knowledge/final_chain_oof/fold0_dry_run",
+    "output_root": "outputs/final_chain_oof/fold0_dry_run",
+    "legacy_evidence_root": "knowledge/null_release_oof/roberta128"
+  },
   "required_gates": {
     "heldout_exclusion_all_supervised_stages": true,
     "minimum_row_schema_coverage": 1.0,
@@ -82,7 +116,7 @@
   ],
   "authorization": {
     "source_inventory_audit": true,
-    "fold0_execution": false,
+    "fold0_execution": true,
     "folds_1_9_execution": false,
     "b1_a1_population_training": false,
     "dev_execution": false,

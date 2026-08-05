@@ -653,6 +653,7 @@ def build(args: argparse.Namespace) -> dict:
             span_features = []
             type_candidates = []
             type_scores = []
+            type_full_scores = []
             region_scores = []
             compatibilities = []
             source_ids = []
@@ -671,6 +672,7 @@ def build(args: argparse.Namespace) -> dict:
                 logits = model._span_type_logits_from_ner(
                     outputs["base_ner_logits"][index : index + 1], mask.to(device)
                 )[0]
+                type_full_scores.append(F.log_softmax(logits.float(), dim=-1))
                 top_count = candidate_spec["top_m_types"]
                 selected_types = logits.topk(top_count).indices
                 stage1_type_id = stage1_types_by_span.get(candidate.boundary)
@@ -722,6 +724,7 @@ def build(args: argparse.Namespace) -> dict:
                 span_features_tensor = torch.stack(span_features)
                 type_candidates_tensor = torch.stack(type_candidates)
                 type_scores_tensor = torch.stack(type_scores)
+                type_full_scores_tensor = torch.stack(type_full_scores)
                 region_scores_tensor = torch.stack(region_scores)
                 compatibility_values = torch.stack(compatibilities)
                 proposal_scores = F.log_softmax(
@@ -731,6 +734,7 @@ def build(args: argparse.Namespace) -> dict:
                 span_features_tensor = torch.empty(0, hidden_size, device=device)
                 type_candidates_tensor = torch.empty(0, top_m, dtype=torch.long, device=device)
                 type_scores_tensor = torch.empty(0, top_m, device=device)
+                type_full_scores_tensor = torch.empty(0, 4, device=device)
                 region_scores_tensor = torch.empty(0, num_regions, device=device)
                 compatibility_values = torch.empty(0, top_m, num_regions, device=device)
                 proposal_scores = torch.empty(0, device=device)
@@ -955,11 +959,15 @@ def build(args: argparse.Namespace) -> dict:
                 ),
                 "type_candidates": type_candidates_tensor.detach().cpu().long(),
                 "type_base_scores": type_scores_tensor.detach().cpu().float(),
+                "stage1_type_logits": type_full_scores_tensor.detach().cpu().float(),
                 "type_mask": torch.ones(span_count, top_m, dtype=torch.bool),
                 "region_features": region_nodes.detach().cpu().to(torch.float16),
                 "region_boxes": region_boxes.detach().cpu().float(),
                 "region_geometry": geometry.detach().cpu().float(),
                 "region_detector_scores": batch["region_scores"][index].detach().cpu().float(),
+                "region_source_indices": torch.tensor(
+                    metadata.get("region_source_indices"), dtype=torch.long
+                ),
                 "region_base_scores": region_scores_tensor.detach().cpu().float(),
                 "type_region_compatibility": compatibility_values.detach().cpu().float(),
                 "fixed_type_ids": fixed_type_ids.detach().cpu(),
@@ -1001,6 +1009,7 @@ def build(args: argparse.Namespace) -> dict:
                 "visibility_targets": visibility_targets.detach().cpu(),
                 "metadata": {
                     "record_id": str(metadata.get("record_id", metadata.get("sample_id"))),
+                    "image_id": str(metadata.get("image_id") or ""),
                     "text": str(metadata.get("text") or " ".join(tokens)),
                     "tokens": tokens,
                     "candidate_sources": [
