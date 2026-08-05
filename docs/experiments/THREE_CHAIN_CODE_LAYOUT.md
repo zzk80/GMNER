@@ -164,7 +164,6 @@ tests/test_tq_dv_mner.py
 
 docs/experiments/TQ_DV_MNER_README.md
 docs/experiments/TQ_DV_FIXED_SPAN_REPLAY_RESULT.md
-docs/experiments/tq_dv_fixed_span_type_replay_dev.json
 ```
 
 ### 云端保留资产
@@ -174,8 +173,8 @@ outputs/tq_dv_mner/type_query_dual_visual_seed42/
 knowledge/tq_dv_mner/
 ```
 
-TQ-DV 复用 DVH 的 Frozen CLIP cache，不重复保存 CLIP patch 特征。
-`dev_fixed_span_type_replay.json` 同时以机器可读形式归档到 `docs/experiments/`。
+TQ-DV 复用 DVH 的 Frozen CLIP cache，不重复保存 CLIP patch 特征。机器可读
+replay 结果保留在对应输出目录，`docs/` 只保留紧凑结果说明。
 
 ## 三链比较文档
 

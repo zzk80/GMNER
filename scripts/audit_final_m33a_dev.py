@@ -76,6 +76,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir", default="docs/experiments/final_m33a_dev_audit"
     )
+    parser.add_argument(
+        "--write-jsonl",
+        action="store_true",
+        help="Also materialize duplicate JSONL row tables; CSV is always written.",
+    )
     return parser.parse_args()
 
 
@@ -369,11 +374,17 @@ def _json_value(value: Any) -> Any:
     return value
 
 
-def write_rows(output_base: Path, rows: list[dict[str, Any]]) -> None:
+def write_rows(
+    output_base: Path,
+    rows: list[dict[str, Any]],
+    *,
+    write_jsonl: bool = False,
+) -> None:
     output_base.parent.mkdir(parents=True, exist_ok=True)
-    with output_base.with_suffix(".jsonl").open("w", encoding="utf-8") as stream:
-        for row in rows:
-            stream.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+    if write_jsonl:
+        with output_base.with_suffix(".jsonl").open("w", encoding="utf-8") as stream:
+            for row in rows:
+                stream.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
     fieldnames = sorted({key for row in rows for key in row})
     with output_base.with_suffix(".csv").open(
         "w", encoding="utf-8-sig", newline=""
@@ -855,12 +866,21 @@ def main() -> None:
     if len(type_rows) != LOCKED["type_errors"]:
         raise RuntimeError(f"Expected 139 type rows, found {len(type_rows)}")
 
-    write_rows(output_dir / "final_m3_3a_dev_span_error_audit", span_rows)
+    write_rows(
+        output_dir / "final_m3_3a_dev_span_error_audit",
+        span_rows,
+        write_jsonl=args.write_jsonl,
+    )
     write_rows(
         output_dir / "final_m3_3a_dev_span_prediction_error_audit",
         prediction_error_rows,
+        write_jsonl=args.write_jsonl,
     )
-    write_rows(output_dir / "final_m3_3a_dev_type_error_audit", type_rows)
+    write_rows(
+        output_dir / "final_m3_3a_dev_type_error_audit",
+        type_rows,
+        write_jsonl=args.write_jsonl,
+    )
 
     span_classes = Counter(row["primary_error_class"] for row in span_rows)
     prediction_classes = Counter(

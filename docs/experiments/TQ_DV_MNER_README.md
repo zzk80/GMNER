@@ -247,5 +247,6 @@ downstream reconstruction
 
 The formal GMNER and FMNERG routes remain M3.3A and F3. The server retains the
 Seed 42 checkpoint and frozen visual caches for reproducibility; this archive
-does not delete them. The machine-readable replay output is
-[`tq_dv_fixed_span_type_replay_dev.json`](tq_dv_fixed_span_type_replay_dev.json).
+does not delete them. The retained compact result is
+[`TQ_DV_FIXED_SPAN_REPLAY_RESULT.md`](TQ_DV_FIXED_SPAN_REPLAY_RESULT.md); the
+machine-readable replay remains in the corresponding output directory.

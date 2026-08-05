@@ -5,6 +5,7 @@ from scripts.audit_final_m33a_dev import (
     primary_class,
     target_calculator,
     validate_gate,
+    write_rows,
 )
 
 
@@ -57,3 +58,10 @@ def test_target_calculator_matches_preregistered_expected_precision_math() -> No
         row["minimum_actions"]
         for row in report["pure_promotions_expected_precision"]
     ] == [57, 68, 86, 99, 116]
+
+
+def test_row_export_defaults_to_csv_only(tmp_path) -> None:
+    output = tmp_path / "audit"
+    write_rows(output, [{"record_id": "0", "value": 1}])
+    assert output.with_suffix(".csv").exists()
+    assert not output.with_suffix(".jsonl").exists()

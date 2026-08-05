@@ -128,8 +128,8 @@ D1 evaluated a standalone span candidate selector with the required strict
 -> distribution audit
 ```
 
-Protocol:
-[`docs/experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md`](docs/experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md).
+The compact D0/D1 archive is maintained in
+[`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
 D1 Phase 1 completed with a `VALID_AUDIT`: 7000 strict OOF Train records and
 1500 paired full-fit Dev records share the same v2 candidate contract. The
@@ -161,12 +161,8 @@ preservation was `0.95292`. S3.1 is therefore `NO_GO`. Seeds 41/43, S3.2,
 and the downstream M3.3A rebuild are not run. Test was not accessed and the
 formal Model-G results remain unchanged.
 
-The formal contract and current execution commands are recorded in
-[`docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md`](docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md)
-and
-[`docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md`](docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md).
-The compact result is archived in
-[`docs/experiments/s3_1_seed42_dev_summary.json`](docs/experiments/s3_1_seed42_dev_summary.json).
+The compact S3 method and result are archived in
+[`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
 P4 Protected Joint Promotion was preregistered as a new recovery hypothesis,
 not a continuation of D1:
@@ -183,10 +179,8 @@ did not exactly reproduce the archived compact formal state. The regenerated
 artifacts therefore cannot replace the missing historical R16 caches. P4.0
 remains blocked; folds 8-9, Dev, P4.1, and Test were not accessed.
 
-Protocol:
-[`docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
-Result:
-[`docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md`](docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md).
+The P4 protocol history and terminal result are summarized in
+[`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
 ## S4.0 Read-Only Oracle
 
@@ -211,9 +205,8 @@ delta      +0.009672 < required +0.010
 ```
 
 The threshold is not relaxed. S4.1-S4.3 and P4-v2 on this candidate contract
-remain stopped; Model-G and Test remain frozen. Protocol and result:
-[`S4_0_READ_ONLY_ORACLE_PROTOCOL.md`](docs/experiments/S4_0_READ_ONLY_ORACLE_PROTOCOL.md),
-[`S4_0_READ_ONLY_ORACLE_RESULT.md`](docs/experiments/S4_0_READ_ONLY_ORACLE_RESULT.md).
+remain stopped; Model-G and Test remain frozen. The compact record is in
+[`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
 ## S4.5 Visibility Coordinator
 
@@ -227,9 +220,8 @@ actions with 60% consequential precision. No threshold was frozen, folds 8-9
 executed no action, and Dev/Test were not accessed. The current deterministic
 score contract is therefore stopped and Coordinator training was not started.
 This is not a rejection of the S4.0 oracle; a learned set model would require a
-new protocol rather than a post-hoc relaxation. Protocol and result:
-[`S4_5_VISIBILITY_COORDINATOR_PROTOCOL.md`](docs/experiments/S4_5_VISIBILITY_COORDINATOR_PROTOCOL.md),
-[`S4_5_VISIBILITY_COORDINATOR_RESULT.md`](docs/experiments/S4_5_VISIBILITY_COORDINATOR_RESULT.md).
+new protocol rather than a post-hoc relaxation. The compact record is in
+[`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
 ## Repository Layout
 
