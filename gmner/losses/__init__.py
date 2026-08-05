@@ -26,6 +26,12 @@ from .evidence_visibility_loss import (
     evidence_visibility_loss,
     evidence_visibility_supervision,
 )
+from .protected_region_mner_loss import (
+    boundary_log_probabilities,
+    boundary_preservation_kl,
+    protected_gate_penalty,
+    protected_region_residual_l2,
+)
 
 __all__ = [
     "alignment_objective",
@@ -46,4 +52,8 @@ __all__ = [
     "evidence_visibility_loss",
     "evidence_visibility_supervision",
     "weighted_masked_cross_entropy",
+    "boundary_log_probabilities",
+    "boundary_preservation_kl",
+    "protected_gate_penalty",
+    "protected_region_residual_l2",
 ]

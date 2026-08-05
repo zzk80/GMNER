@@ -185,6 +185,17 @@ class ModelConfig:
     tq_span_score_threshold: float = 0.0
     tq_existence_score_weight: float = 0.5
     tq_visual_warmup_epochs: int = 3
+    use_protected_region_mner: bool = False
+    protected_region_bottleneck_size: int = 512
+    protected_region_gate_hidden_size: int = 128
+    protected_region_dropout: float = 0.1
+    protected_mner_attention_heads: int = 8
+    protected_mner_attention_dropout: float = 0.1
+    protected_mner_gate_hidden_size: int = 128
+    protected_mner_gate_max: float = 0.3
+    protected_mner_exclude_null: bool = True
+    protected_mner_grounding_use_refined_text: bool = False
+    protected_mner_grounding_use_refined_regions: bool = False
 
 
 @dataclass
@@ -268,6 +279,10 @@ class LossConfig:
     tq_start_positive_weight: float = 5.0
     tq_end_positive_weight: float = 5.0
     tq_span_positive_weight: float = 20.0
+    lambda_protected_boundary_preserve: float = 0.0
+    lambda_protected_visual_type: float = 0.0
+    lambda_protected_visual_gate: float = 0.0
+    lambda_protected_region_residual: float = 0.0
 
 
 @dataclass

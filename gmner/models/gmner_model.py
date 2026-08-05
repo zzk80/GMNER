@@ -31,6 +31,9 @@ from gmner.losses import (
     joint_visibility_loss,
     masked_cross_entropy,
     multi_positive_region_loss,
+    boundary_preservation_kl,
+    protected_gate_penalty,
+    protected_region_residual_l2,
     weighted_masked_cross_entropy,
 )
 from gmner.knowledge.region_compatibility import compatibility_score
@@ -48,6 +51,11 @@ from gmner.models.joint_type_region_verifier import (
 )
 from gmner.models.multiscale_grounding import MultiScaleGroundingAligner
 from gmner.models.prototype_bank import SemanticPrototypeBank
+from gmner.models.protected_region_mner import (
+    ProtectedBidirectionalAttention,
+    ProtectedRegionSemanticAdapter,
+    ProtectedVisualTypeHead,
+)
 from gmner.models.text_encoder import TextEncoder
 from gmner.utils.bio import entity_masks_from_bio
 
@@ -260,6 +268,52 @@ class GMNERModel(nn.Module):
             num_heads=config.model.cross_attention_heads,
             dropout=dropout,
         )
+
+        self.protected_region_adapter = None
+        self.protected_bidirectional_attention = None
+        self.protected_visual_type_head = None
+        if bool(getattr(config.model, "use_protected_region_mner", False)):
+            if not bool(getattr(config.model, "protected_mner_exclude_null", True)):
+                raise ValueError("PA1 requires the formal NULL region to be excluded.")
+            if bool(
+                getattr(config.model, "protected_mner_grounding_use_refined_text", False)
+            ) or bool(
+                getattr(config.model, "protected_mner_grounding_use_refined_regions", False)
+            ):
+                raise ValueError(
+                    "PA1 is MNER-only: refined text/regions cannot enter grounding."
+                )
+            has_null_region = bool(config.data.add_null_region)
+            self.protected_region_adapter = ProtectedRegionSemanticAdapter(
+                region_feature_dim=config.model.region_feature_dim,
+                hidden_size=hidden_size,
+                bottleneck_size=int(
+                    getattr(config.model, "protected_region_bottleneck_size", 512)
+                ),
+                gate_hidden_size=int(
+                    getattr(config.model, "protected_region_gate_hidden_size", 128)
+                ),
+                dropout=float(getattr(config.model, "protected_region_dropout", dropout)),
+                has_null_region=has_null_region,
+            )
+            self.protected_bidirectional_attention = ProtectedBidirectionalAttention(
+                hidden_size=hidden_size,
+                num_heads=int(
+                    getattr(config.model, "protected_mner_attention_heads", 8)
+                ),
+                dropout=float(
+                    getattr(config.model, "protected_mner_attention_dropout", dropout)
+                ),
+                gate_hidden_size=int(
+                    getattr(config.model, "protected_mner_gate_hidden_size", 128)
+                ),
+                gate_max=float(getattr(config.model, "protected_mner_gate_max", 0.3)),
+                has_null_region=has_null_region,
+            )
+            self.protected_visual_type_head = ProtectedVisualTypeHead(
+                hidden_size=hidden_size,
+                dropout=dropout,
+            )
 
         self.ner_head = TokenClassificationHead(
             hidden_size=hidden_size,
@@ -489,6 +543,18 @@ class GMNERModel(nn.Module):
             float(getattr(config.loss, "joint_null_sample_weight", 1.0)),
         )
         self.label_smoothing = config.loss.label_smoothing
+        self.lambda_protected_boundary_preserve = float(
+            getattr(config.loss, "lambda_protected_boundary_preserve", 0.0)
+        )
+        self.lambda_protected_visual_type = float(
+            getattr(config.loss, "lambda_protected_visual_type", 0.0)
+        )
+        self.lambda_protected_visual_gate = float(
+            getattr(config.loss, "lambda_protected_visual_gate", 0.0)
+        )
+        self.lambda_protected_region_residual = float(
+            getattr(config.loss, "lambda_protected_region_residual", 0.0)
+        )
 
     def load_state_dict(
         self,
@@ -1289,22 +1355,22 @@ class GMNERModel(nn.Module):
         base_text_nodes = text_nodes
         text_nodes = self.text_graph_encoder(text_nodes, adjacency)
 
-        image_nodes = self.region_norm(self.region_projector(region_features))
+        projected_image_nodes = self.region_norm(self.region_projector(region_features))
         image_mask = region_mask if region_mask is not None else torch.ones(
-                (image_nodes.size(0), image_nodes.size(1)),
+                (projected_image_nodes.size(0), projected_image_nodes.size(1)),
                 dtype=torch.float32,
-                device=image_nodes.device,
+                device=projected_image_nodes.device,
         )
 
         image_adjacency = build_image_adjacency(
-            batch_size=image_nodes.size(0),
-            num_nodes=image_nodes.size(1),
-            device=image_nodes.device,
+            batch_size=projected_image_nodes.size(0),
+            num_nodes=projected_image_nodes.size(1),
+            device=projected_image_nodes.device,
             boxes=region_boxes,
             mask=image_mask,
             iou_threshold=self.config.data.grounding_iou_threshold,
         )
-        image_nodes = self.image_graph_encoder(image_nodes, image_adjacency)
+        image_nodes = self.image_graph_encoder(projected_image_nodes, image_adjacency)
 
         fused_tokens, fused_global, alignment_score = self.aligner(
             text_nodes=text_nodes,
@@ -1312,10 +1378,32 @@ class GMNERModel(nn.Module):
             text_mask=attention_mask.float(),
             image_mask=image_mask,
         )
-        pre_prototype_fused_tokens = fused_tokens
+        base_fused_tokens = fused_tokens
+        protected_outputs = None
+        if self.protected_region_adapter is not None:
+            if region_boxes is None:
+                raise ValueError("PA1 requires region_boxes for the metadata gate.")
+            region_outputs = self.protected_region_adapter(
+                raw_region_features=region_features,
+                base_region_states=image_nodes,
+                gate_region_states=projected_image_nodes,
+                image_mask=image_mask,
+                region_boxes=region_boxes,
+                region_scores=batch.get("region_scores"),
+                image_sizes=batch.get("image_sizes"),
+            )
+            protected_outputs = self.protected_bidirectional_attention(
+                base_text_states=base_fused_tokens,
+                semantic_region_states=region_outputs["region_states"],
+                attention_mask=attention_mask,
+                image_mask=image_mask,
+            )
+            protected_outputs.update(region_outputs)
+            fused_tokens = protected_outputs["refined_text_states"]
+        pre_prototype_fused_tokens = base_fused_tokens
 
         prototype_outputs = None
-        base_ner_logits = self.ner_head(fused_tokens)
+        base_ner_logits = self.ner_head(base_fused_tokens)
         prototype_target_mask = None
         prototype_type_ids = None
         if self.prototype_bank is not None:
@@ -1344,6 +1432,39 @@ class GMNERModel(nn.Module):
             "image_nodes": image_nodes,
             "image_mask": image_mask,
         }
+        if protected_outputs is not None:
+            outputs.update(
+                {
+                    "protected_refined_text_states": protected_outputs[
+                        "refined_text_states"
+                    ],
+                    "protected_refined_region_states": protected_outputs[
+                        "refined_region_states"
+                    ],
+                    "protected_region_delta": protected_outputs["region_delta"],
+                    "protected_region_gate": protected_outputs["region_gate"],
+                    "protected_token_gate": protected_outputs["token_gate"],
+                    "protected_feedback_delta": protected_outputs["feedback_delta"],
+                    "protected_feedback_attention": protected_outputs[
+                        "feedback_attention"
+                    ],
+                    "protected_attention_confidence": protected_outputs[
+                        "attention_confidence"
+                    ],
+                    "protected_attention_margin": protected_outputs[
+                        "attention_margin"
+                    ],
+                    "protected_attention_entropy": protected_outputs[
+                        "attention_entropy"
+                    ],
+                    "protected_attention_global_cosine": protected_outputs[
+                        "attention_global_cosine"
+                    ],
+                    "protected_real_region_mask": protected_outputs[
+                        "real_region_mask"
+                    ],
+                }
+            )
         if prototype_outputs is not None:
             for key in [
                 "base_type_logits",
@@ -1389,6 +1510,88 @@ class GMNERModel(nn.Module):
             outputs["weighted_loss_ner"] = (
                 self.lambda_ner * ner_loss.detach()
             )
+
+        if protected_outputs is not None and "ner_labels" in batch:
+            # The preservation comparison bypasses classifier dropout so an
+            # initialized no-op branch has exactly zero KL in train mode too.
+            base_preserve_logits = self.ner_head.classifier(base_fused_tokens)
+            refined_preserve_logits = self.ner_head.classifier(fused_tokens)
+            boundary_loss = boundary_preservation_kl(
+                base_logits=base_preserve_logits,
+                refined_logits=refined_preserve_logits,
+                attention_mask=attention_mask,
+                labels=batch["ner_labels"],
+            )
+            outputs["loss_protected_boundary_preserve"] = boundary_loss.detach()
+            if self.lambda_protected_boundary_preserve > 0:
+                weighted = self.lambda_protected_boundary_preserve * boundary_loss
+                total_loss = weighted if total_loss is None else total_loss + weighted
+
+            null_target = None
+            if "region_labels" in batch and bool(self.config.data.add_null_region):
+                null_target = batch["region_labels"].eq(image_mask.size(-1) - 1)
+            gate_loss = protected_gate_penalty(
+                token_gate=protected_outputs["token_gate"],
+                labels=batch["ner_labels"],
+                attention_mask=attention_mask,
+                target_mask=batch.get("target_mask"),
+                null_target=null_target,
+            )
+            outputs["loss_protected_visual_gate"] = gate_loss.detach()
+            if self.lambda_protected_visual_gate > 0:
+                weighted = self.lambda_protected_visual_gate * gate_loss
+                total_loss = weighted if total_loss is None else total_loss + weighted
+
+            residual_loss = protected_region_residual_l2(
+                region_delta=protected_outputs["region_delta"],
+                real_region_mask=protected_outputs["real_region_mask"],
+            )
+            outputs["loss_protected_region_residual"] = residual_loss.detach()
+            if self.lambda_protected_region_residual > 0:
+                weighted = self.lambda_protected_region_residual * residual_loss
+                total_loss = weighted if total_loss is None else total_loss + weighted
+
+            target_mask_for_type = batch.get("target_mask")
+            target_type_ids_for_type = batch.get("target_type_ids")
+            if target_mask_for_type is not None and target_type_ids_for_type is not None:
+                visual_type_logits = self.protected_visual_type_head(
+                    text_states=protected_outputs["refined_text_states"],
+                    region_states=protected_outputs["refined_region_states"],
+                    feedback_attention=protected_outputs["feedback_attention"],
+                    target_mask=target_mask_for_type,
+                )
+                outputs["protected_visual_type_logits"] = visual_type_logits
+                if "region_positive_mask" in batch:
+                    visible_target = (
+                        batch["region_positive_mask"].bool()
+                        & protected_outputs["real_region_mask"]
+                    ).any(dim=-1)
+                elif "region_labels" in batch:
+                    visible_target = batch["region_labels"].ne(IGNORE_INDEX)
+                    if bool(self.config.data.add_null_region):
+                        visible_target = visible_target & batch["region_labels"].ne(
+                            image_mask.size(-1) - 1
+                        )
+                else:
+                    visible_target = torch.zeros_like(target_type_ids_for_type, dtype=torch.bool)
+                valid_type = (
+                    visible_target
+                    & target_mask_for_type.bool().any(dim=-1)
+                    & target_type_ids_for_type.ge(0)
+                    & target_type_ids_for_type.lt(4)
+                )
+                outputs["protected_visual_type_count"] = valid_type.sum().detach()
+                if torch.any(valid_type):
+                    visual_type_loss = F.cross_entropy(
+                        visual_type_logits[valid_type],
+                        target_type_ids_for_type[valid_type],
+                    )
+                else:
+                    visual_type_loss = visual_type_logits.sum() * 0.0
+                outputs["loss_protected_visual_type"] = visual_type_loss.detach()
+                if self.lambda_protected_visual_type > 0:
+                    weighted = self.lambda_protected_visual_type * visual_type_loss
+                    total_loss = weighted if total_loss is None else total_loss + weighted
 
         target_type_ids = batch.get("target_type_ids")
         if (

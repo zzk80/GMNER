@@ -179,6 +179,9 @@ class GMNERTrainer:
             "joint_type_region_verifier",
             "external_knowledge_bank",
             "multiscale_grounding_aligner",
+            "protected_region_adapter",
+            "protected_bidirectional_attention",
+            "protected_visual_type_head",
         )
 
         groups = {

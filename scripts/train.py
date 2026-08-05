@@ -63,9 +63,20 @@ TRAINABLE_MODULE_ALIASES = {
     "joint_entity_adapter": ("joint_entity_adapter",),
     "ner": ("ner_head",),
     "ner_head": ("ner_head",),
+    "ner_classifier": ("ner_head.classifier",),
     "text": ("text_encoder", "text_projector", "text_graph_encoder"),
     "image": ("region_projector", "region_norm", "image_graph_encoder"),
     "aligner": ("aligner",),
+    "protected_mner": (
+        "protected_region_adapter",
+        "protected_bidirectional_attention",
+        "protected_visual_type_head",
+    ),
+    "protected_region_mner": (
+        "protected_region_adapter",
+        "protected_bidirectional_attention",
+        "protected_visual_type_head",
+    ),
     "all": ("",),
 }
 
