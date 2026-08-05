@@ -223,9 +223,10 @@ def main() -> None:
         "test_accessed": False,
     }
     report_path = output_dir / "review_manifest.json"
-    report_path.write_text(
-        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    report_path.write_bytes(
+        (json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode(
+            "utf-8"
+        )
     )
     print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
 
