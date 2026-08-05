@@ -111,3 +111,25 @@ The current evidence therefore supports continuing manual semantic review of
 the 139 type rows and risk analysis of the 122 boundary candidates. It does
 not authorize training, threshold search, OOF generation, CLIP, projector,
 PA2, downstream rebuilding, or Test access.
+
+## Locked next-stage priority
+
+The deep type review is the 111-row union of text rank-2 and
+visible/R16-covered errors: 21 rows have both signals, 4 are visual-covered
+only, and 86 are text rank-2 only. The remaining 28 rows are outside the first
+semantic review pass.
+
+The next modeling hypothesis is action separability rather than candidate
+capacity. B1 and A1 must use all final-chain OOF exact-span/action rows,
+including preservation and source/score-matched damaging negatives. Dev Oracle
+positive rows cannot train or calibrate either controller. The locked order is:
+
+```text
+B1 final-chain OOF text-first type correction
+-> A1 protected one-for-one boundary replacement
+-> B1 conditional visual verification
+-> A2 high-precision promotion tail
+```
+
+The complete source and Gate contract is in
+`B1_A1_ACTION_SEPARABILITY_PROTOCOL.md`.

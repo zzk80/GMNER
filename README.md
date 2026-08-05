@@ -182,6 +182,16 @@ remains blocked; folds 8-9, Dev, P4.1, and Test were not accessed.
 The P4 protocol history and terminal result are summarized in
 [`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
+The latest frozen final-chain Dev audit separates the next MNER work into two
+protected action-selection hypotheses. B1 is a post-final-M3.3A exact-span
+coarse-type correction head; A1 is a one-for-one boundary replacement head.
+The 111-row type semantic queue and 55/61 boundary review queues are Dev-only
+manual evidence and cannot be used for training, calibration, feature
+selection, or threshold selection. Both heads require complete final-chain OOF
+positive and negative populations before implementation is authorized. The
+contract is fixed in
+[`docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md`](docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md).
+
 ## S4.0 Read-Only Oracle
 
 S4.0 evaluated two independent Dev-only hypotheses without training, OOF,

@@ -756,6 +756,37 @@ PY
   但净增仅 7 个正确 typed spans，不进入下游重建；
 - DVH/TQ-DV 均未访问 Test。
 
+### 8.1 B1/A1 动作可分性准备
+
+最终 M3.3A Dev 只读审计已固定下一阶段的两个窄假设：
+
+```text
+B1：最终链 exact-span coarse-type correction
+A1：保持预测数不变的一换一 boundary replacement
+```
+
+当前只允许生成 Dev 人工语义审阅队列：
+
+```bash
+cd ~/gmner
+PYTHONPATH=. $PY scripts/prepare_m33a_action_review_queues.py
+```
+
+固定输出为：
+
+```text
+outputs/final_m33a_action_review/type_semantic_union_111.csv
+outputs/final_m33a_action_review/boundary_replacement_positive_55.csv
+outputs/final_m33a_action_review/boundary_promotion_positive_61.csv
+outputs/final_m33a_action_review/review_manifest.json
+```
+
+其中 111 条类型审阅并集由 `21 text+visual + 4 visual-only + 86
+text-only` 构成；另有 28 条 neither，不进入首轮人工队列。这些 Dev 行只用于解释
+Oracle 正动作，不得用于训练、校准、特征选择或阈值选择。B1/A1 正式训练必须先取得
+完整最终链 OOF 的全部正负动作总体；当前不生成 OOF、不训练、不访问 Test。正式约束见
+`docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md`。
+
 ## 9. 产物目录速查
 
 ```text
