@@ -70,6 +70,16 @@ class FinalChainOOFPopulationContractTest(unittest.TestCase):
         )
         self.assertEqual(metadata["execution_folds"], list(range(1, 10)))
 
+    def test_launcher_freezes_parent_pid_before_background_monitor(self) -> None:
+        launcher = (ROOT / "tools" / "run_final_chain_oof_folds1_9.sh").read_text(
+            encoding="utf-8"
+        )
+        assignment = 'fold_launcher_pid="$BASHPID"'
+        invocation = '--root-pid "$fold_launcher_pid"'
+        self.assertIn(assignment, launcher)
+        self.assertIn(invocation, launcher)
+        self.assertLess(launcher.index(assignment), launcher.index(invocation))
+
 
 if __name__ == "__main__":
     unittest.main()

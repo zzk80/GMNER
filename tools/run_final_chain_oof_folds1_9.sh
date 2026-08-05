@@ -25,11 +25,12 @@ run_fold() (
   failure_file="$run_dir/.fold_failure"
   samples="$run_dir/fold${fold}_resource_samples.jsonl"
   summary="$run_dir/fold${fold}_resource_summary.json"
+  fold_launcher_pid="$BASHPID"
   mkdir -p "$run_dir" "$output_dir"
   rm -f "$stop_file" "$failure_file" "$samples" "$summary"
 
   PYTHONPATH=. "$PYTHON_BIN" -u tools/monitor_final_chain_oof_fold.py \
-    --root-pid "$BASHPID" \
+    --root-pid "$fold_launcher_pid" \
     --fold-id "$fold" \
     --run-dir "$run_dir" \
     --output-dir "$output_dir" \
