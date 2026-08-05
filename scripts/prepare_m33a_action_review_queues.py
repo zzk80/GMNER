@@ -45,12 +45,10 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+def canonical_text_sha256(path: Path) -> str:
+    text = path.read_text(encoding="utf-8-sig")
+    canonical = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def manifest_path(path: Path, repository_root: Path) -> str:
@@ -205,11 +203,13 @@ def main() -> None:
         "sources": {
             "type_audit": {
                 "path": manifest_path(type_path, repository_root),
-                "sha256": sha256_file(type_path),
+                "canonical_sha256": canonical_text_sha256(type_path),
+                "canonicalization": "utf8_sig_decode_then_lf",
             },
             "span_audit": {
                 "path": manifest_path(span_path, repository_root),
-                "sha256": sha256_file(span_path),
+                "canonical_sha256": canonical_text_sha256(span_path),
+                "canonicalization": "utf8_sig_decode_then_lf",
             },
         },
         "outputs": {
