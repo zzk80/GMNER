@@ -1,0 +1,124 @@
+{
+  "kind": "final_chain_oof_source_registry",
+  "format_version": 1,
+  "scope": "train_oof_history_only",
+  "historical_evidence_commit": "107ad60",
+  "sources": [
+    {
+      "source_id": "compact_null_release_full_chain_oof",
+      "description": "Historical compact held-out features from the NULL Release full-chain OOF run.",
+      "artifact_state": "ARCHIVED_EVIDENCE_ONLY",
+      "provenance_valid": true,
+      "semantic_valid": true,
+      "declared_status": "INCOMPLETE",
+      "evidence": [
+        "docs/experiments/p4_0_source_preparation_report.json@107ad60",
+        "docs/experiments/P4_0_SOURCE_PREPARATION_REPORT.md@107ad60"
+      ],
+      "capabilities": {
+        "record_id": true,
+        "word_space_final_spans": false,
+        "final_m33a_prediction_identity": false,
+        "final_coarse_type_logits": false,
+        "final_region_null_decision": true,
+        "stage1_span_type_identity": false,
+        "r16_candidate_identity_scores": true,
+        "r36_candidate_identity_scores": true,
+        "hierarchical_state": true,
+        "coarse_selector_state": true,
+        "fine_grounding_state": true,
+        "evidence_visibility_state": true,
+        "fold_checkpoint_hashes": true,
+        "fold_config_hashes": true,
+        "source_dataset_hash": true,
+        "heldout_exclusion_proof": true,
+        "test_access_false": true,
+        "deterministic_action_enumeration": false
+      }
+    },
+    {
+      "source_id": "d1_strict_stage1_oof",
+      "description": "Strict ten-fold Stage1 candidate-selector OOF cache.",
+      "artifact_state": "COMPACT_ARCHIVE_RETAINED",
+      "provenance_valid": true,
+      "semantic_valid": true,
+      "declared_status": "INCOMPLETE",
+      "evidence": [
+        "docs/experiments/ARCHIVED_EXPERIMENTS.md",
+        "docs/experiments/stage1_candidate_selector_seed42_summary.json@107ad60"
+      ],
+      "capabilities": {
+        "record_id": true,
+        "word_space_final_spans": true,
+        "final_m33a_prediction_identity": false,
+        "final_coarse_type_logits": false,
+        "final_region_null_decision": false,
+        "stage1_span_type_identity": true,
+        "r16_candidate_identity_scores": true,
+        "r36_candidate_identity_scores": false,
+        "hierarchical_state": false,
+        "coarse_selector_state": false,
+        "fine_grounding_state": false,
+        "evidence_visibility_state": false,
+        "fold_checkpoint_hashes": true,
+        "fold_config_hashes": true,
+        "source_dataset_hash": true,
+        "heldout_exclusion_proof": true,
+        "test_access_false": true,
+        "deterministic_action_enumeration": false
+      }
+    },
+    {
+      "source_id": "p4_r0b_regenerated_full_chain_oof",
+      "description": "Regenerated full-chain folds 0-7 with formal coordinates.",
+      "artifact_state": "SEALED_THEN_CLEANED",
+      "provenance_valid": true,
+      "semantic_valid": false,
+      "declared_status": "SEMANTICALLY_INVALID",
+      "failed_folds": [2, 4, 5, 7],
+      "evidence": [
+        "docs/experiments/p4_r0_b_regeneration_aggregate_report.json@107ad60",
+        "docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md@107ad60"
+      ],
+      "capabilities": {
+        "record_id": true,
+        "word_space_final_spans": true,
+        "final_m33a_prediction_identity": true,
+        "final_coarse_type_logits": false,
+        "final_region_null_decision": true,
+        "stage1_span_type_identity": true,
+        "r16_candidate_identity_scores": true,
+        "r36_candidate_identity_scores": true,
+        "hierarchical_state": true,
+        "coarse_selector_state": true,
+        "fine_grounding_state": true,
+        "evidence_visibility_state": true,
+        "fold_checkpoint_hashes": true,
+        "fold_config_hashes": true,
+        "source_dataset_hash": true,
+        "heldout_exclusion_proof": true,
+        "test_access_false": true,
+        "deterministic_action_enumeration": false
+      }
+    },
+    {
+      "source_id": "other_full_chain_fold_artifacts",
+      "description": "Any other complete full-chain held-out artifact set in the retained workspace.",
+      "artifact_state": "NOT_FOUND",
+      "provenance_valid": false,
+      "semantic_valid": false,
+      "declared_status": "MISSING",
+      "evidence": [
+        "docs/experiments/ARCHIVED_EXPERIMENTS.md"
+      ],
+      "capabilities": {}
+    }
+  ],
+  "access": {
+    "payloads_deserialized": false,
+    "training_data_loaded": false,
+    "oracle_computed": false,
+    "dev_accessed": false,
+    "test_accessed": false
+  }
+}

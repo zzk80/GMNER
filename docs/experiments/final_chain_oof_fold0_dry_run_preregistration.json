@@ -1,0 +1,78 @@
+{
+  "kind": "final_chain_oof_fold0_dry_run_preregistration",
+  "format_version": 1,
+  "status": "PREREGISTERED_NOT_STARTED",
+  "fold_id": 0,
+  "records": {
+    "train": 6300,
+    "heldout": 700,
+    "source_total": 7000
+  },
+  "formal_chain": [
+    "stage1",
+    "r16_r36_candidates",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+    "final_decode",
+    "gold_free_action_enumeration"
+  ],
+  "excluded_modules": [
+    "siglip2",
+    "reliability",
+    "null_release",
+    "clip",
+    "fmnerg_subtype"
+  ],
+  "resource_budget": {
+    "gpu_free_gate_gib": 10,
+    "preferred_free_disk_gib": 10,
+    "hard_free_disk_floor_gib": 6,
+    "transient_fold_budget_gib": 5,
+    "sealed_retained_target_mib": 500,
+    "execution": "single_sequential_gpu_process"
+  },
+  "required_gates": {
+    "heldout_exclusion_all_supervised_stages": true,
+    "minimum_row_schema_coverage": 1.0,
+    "word_space_final_span_validity": 1.0,
+    "formal_prediction_identity_coverage": 1.0,
+    "all_stage_hashes_present": true,
+    "candidate_generation_gold_free": true,
+    "action_enumeration_deterministic": true,
+    "double_run_formal_digest_exact": true,
+    "double_run_action_digest_exact": true,
+    "folds_1_9_accessed": false,
+    "dev_accessed": false,
+    "test_accessed": false
+  },
+  "hard_stop_conditions": [
+    "heldout_leakage",
+    "full_fit_fold_specific_artifact_mixing",
+    "missing_word_space_coordinates",
+    "missing_final_type_logits",
+    "formal_digest_nondeterminism",
+    "action_digest_nondeterminism",
+    "gold_used_before_action_seal",
+    "unstable_candidate_identity_or_tie_break",
+    "schema_field_reconstructed_after_materialization",
+    "test_artifact_access",
+    "resource_budget_exceeded"
+  ],
+  "authorization": {
+    "source_inventory_audit": true,
+    "fold0_execution": false,
+    "folds_1_9_execution": false,
+    "b1_a1_population_training": false,
+    "dev_execution": false,
+    "test_execution": false
+  },
+  "access": {
+    "training_run": false,
+    "oof_generated": false,
+    "oracle_computed": false,
+    "dev_accessed": false,
+    "test_accessed": false
+  }
+}

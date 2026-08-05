@@ -192,6 +192,16 @@ positive and negative populations before implementation is authorized. The
 contract is fixed in
 [`docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md`](docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md).
 
+The metadata-only OOF-0 source inventory found no reusable final-chain source:
+two historical sources are incomplete, P4 R0-B is semantically invalid, and no
+other complete artifact set was found. No payload was deserialized and no
+Oracle, Dev, Test, or training operation was run. A newly generated fold-0
+full-chain dry run is preregistered as the only admissible next source step;
+folds 1-9 and B1/A1 training remain locked. See
+[`docs/experiments/final_chain_oof_source_inventory.md`](docs/experiments/final_chain_oof_source_inventory.md)
+and
+[`docs/experiments/FINAL_CHAIN_OOF_DRY_RUN_PROTOCOL.md`](docs/experiments/FINAL_CHAIN_OOF_DRY_RUN_PROTOCOL.md).
+
 ## S4.0 Read-Only Oracle
 
 S4.0 evaluated two independent Dev-only hypotheses without training, OOF,

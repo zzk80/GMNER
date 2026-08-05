@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmner.local/schemas/final-chain-oof-record-v1.json",
+  "title": "Final-chain M3.3A OOF record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "format_version",
+    "record_id",
+    "fold_id",
+    "heldout",
+    "test_accessed",
+    "provenance",
+    "formal_predictions",
+    "r16_candidates",
+    "r36_candidates",
+    "chain_state",
+    "replacement_actions"
+  ],
+  "properties": {
+    "kind": {"const": "final_chain_oof_record"},
+    "format_version": {"const": 1},
+    "record_id": {"type": "string", "minLength": 1},
+    "fold_id": {"type": "integer", "minimum": 0, "maximum": 9},
+    "heldout": {"const": true},
+    "test_accessed": {"const": false},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "formal_predictions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/formalPrediction"}
+    },
+    "r16_candidates": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/candidate"}
+    },
+    "r36_candidates": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/candidate"}
+    },
+    "chain_state": {"$ref": "#/$defs/chainState"},
+    "replacement_actions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/replacementAction"}
+    }
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "space"],
+      "properties": {
+        "start": {"type": "integer", "minimum": 0},
+        "end": {"type": "integer", "minimum": 1},
+        "space": {"const": "word_half_open"}
+      }
+    },
+    "stageArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkpoint_sha256", "config_sha256", "heldout_excluded"],
+      "properties": {
+        "checkpoint_sha256": {"$ref": "#/$defs/hash"},
+        "config_sha256": {"$ref": "#/$defs/hash"},
+        "heldout_excluded": {"const": true}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_dataset_sha256",
+        "heldout_exclusion_proof_sha256",
+        "code_sha256",
+        "stages"
+      ],
+      "properties": {
+        "source_dataset_sha256": {"$ref": "#/$defs/hash"},
+        "heldout_exclusion_proof_sha256": {"$ref": "#/$defs/hash"},
+        "code_sha256": {"$ref": "#/$defs/hash"},
+        "stages": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stage1", "hierarchical", "coarse", "fine", "evidence"],
+          "properties": {
+            "stage1": {"$ref": "#/$defs/stageArtifact"},
+            "hierarchical": {"$ref": "#/$defs/stageArtifact"},
+            "coarse": {"$ref": "#/$defs/stageArtifact"},
+            "fine": {"$ref": "#/$defs/stageArtifact"},
+            "evidence": {"$ref": "#/$defs/stageArtifact"}
+          }
+        }
+      }
+    },
+    "formalPrediction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prediction_id",
+        "span",
+        "type_id",
+        "type_logits",
+        "region_index",
+        "region_is_null",
+        "stage1_identity",
+        "observable_features"
+      ],
+      "properties": {
+        "prediction_id": {"type": "string", "minLength": 1},
+        "span": {"$ref": "#/$defs/span"},
+        "type_id": {"type": "integer", "minimum": 0, "maximum": 3},
+        "type_logits": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "number"}
+        },
+        "region_index": {"type": "integer", "minimum": 0},
+        "region_is_null": {"type": "boolean"},
+        "stage1_identity": {"type": "string", "minLength": 1},
+        "observable_features": {"type": "object"},
+        "supervision": {
+          "type": "object",
+          "description": "Added only after gold-free materialization; never used to generate candidates."
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "span", "source", "scores"],
+      "properties": {
+        "candidate_id": {"type": "string", "minLength": 1},
+        "span": {"$ref": "#/$defs/span"},
+        "source": {"type": "string", "minLength": 1},
+        "scores": {"type": "object"}
+      }
+    },
+    "chainState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hierarchical", "coarse", "fine", "evidence"],
+      "properties": {
+        "hierarchical": {"type": "object"},
+        "coarse": {"type": "object"},
+        "fine": {"type": "object"},
+        "evidence": {"type": "object"}
+      }
+    },
+    "replacementAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "base_prediction_id",
+        "candidate_id",
+        "candidate_source",
+        "candidate_score",
+        "base_candidate_margin",
+        "boundary_distance",
+        "candidate_type_id",
+        "conflict_features",
+        "observable_features"
+      ],
+      "properties": {
+        "action_id": {"type": "string", "minLength": 1},
+        "base_prediction_id": {"type": "string", "minLength": 1},
+        "candidate_id": {"type": "string", "minLength": 1},
+        "candidate_source": {"type": "string", "minLength": 1},
+        "candidate_score": {"type": "number"},
+        "base_candidate_margin": {"type": "number"},
+        "boundary_distance": {"type": "integer", "minimum": 0},
+        "candidate_type_id": {"type": "integer", "minimum": 0, "maximum": 3},
+        "conflict_features": {"type": "object"},
+        "observable_features": {"type": "object"},
+        "supervision": {
+          "type": "object",
+          "description": "Gold-defined action label attached after enumeration."
+        }
+      }
+    }
+  },
+  "x_final_chain_oof_required_capabilities": [
+    "record_id",
+    "word_space_final_spans",
+    "final_m33a_prediction_identity",
+    "final_coarse_type_logits",
+    "final_region_null_decision",
+    "stage1_span_type_identity",
+    "r16_candidate_identity_scores",
+    "r36_candidate_identity_scores",
+    "hierarchical_state",
+    "coarse_selector_state",
+    "fine_grounding_state",
+    "evidence_visibility_state",
+    "fold_checkpoint_hashes",
+    "fold_config_hashes",
+    "source_dataset_hash",
+    "heldout_exclusion_proof",
+    "test_access_false",
+    "deterministic_action_enumeration"
+  ]
+}

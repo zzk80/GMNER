@@ -787,6 +787,28 @@ Oracle 正动作，不得用于训练、校准、特征选择或阈值选择。B
 完整最终链 OOF 的全部正负动作总体；当前不生成 OOF、不训练、不访问 Test。正式约束见
 `docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md`。
 
+历史 OOF 来源只读库存审计：
+
+```bash
+cd ~/gmner
+PYTHONPATH=. $PY scripts/audit_final_chain_oof_source_feasibility.py
+```
+
+冻结结果为：
+
+```text
+compact NULL Release full-chain OOF  INCOMPLETE
+D1 strict Stage1 OOF                 INCOMPLETE
+P4 R0-B regenerated OOF              SEMANTICALLY_INVALID
+other complete full-chain source     MISSING
+VALID sources                        0
+```
+
+因此不得直接启动十折重训。唯一可继续的来源步骤是按
+`docs/experiments/FINAL_CHAIN_OOF_DRY_RUN_PROTOCOL.md` 新建 fold 0 完整链 dry
+run；该运行目前仅完成预注册，尚未执行。folds 1-9、B1/A1 训练、Dev 和 Test
+继续锁定。
+
 ## 9. 产物目录速查
 
 ```text
