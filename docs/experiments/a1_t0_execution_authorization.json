@@ -1,0 +1,38 @@
+{
+  "kind": "a1_t0_execution_authorization",
+  "format_version": 1,
+  "status": "AUTHORIZED",
+  "authorization_basis": "explicit_user_authorization",
+  "frozen_protocol_commit": "f31dcd2d31ddecd0b06ed997dbdaf9db3510644f",
+  "frozen_protocol": "docs/experiments/a1_t0_observable_tabular_preregistration.json",
+  "frozen_protocol_git_blob_sha256": "2e9cbdf051af42b325f1f3edb06691f3b8fb8b1e3d885dd8902dc2e462260346",
+  "feature_audit_sha256": "0896cfb5a435df24453eabdf3739e1ca7ef4712f64f2c5a3f56922bb69acce80",
+  "allowed": {
+    "materialize_strict_tabular_features": true,
+    "train_on_folds_0_7": true,
+    "leave_one_fold_out_development": true,
+    "freeze_calibration_utility_and_delta": true,
+    "train_three_seed_formal_and_ablation_models": true,
+    "one_locked_folds_8_9_evaluation": true
+  },
+  "forbidden": {
+    "protocol_modification": true,
+    "legacy_action_population": true,
+    "latent_feature_rematerialization": true,
+    "raw_text_or_token_access": true,
+    "b1_tv": true,
+    "dev_access": true,
+    "test_access": true,
+    "locked_fold_model_selection": true,
+    "locked_fold_calibration": true,
+    "locked_fold_threshold_selection": true,
+    "source_specific_thresholds": true
+  },
+  "outputs": {
+    "root": "knowledge/final_chain_oof/a1_t0",
+    "dataset_pattern": "dataset/fold{fold_id}.pt",
+    "dataset_manifest": "dataset/dataset_manifest.json",
+    "development_freeze": "development/development_freeze.json",
+    "locked_evaluation": "locked_evaluation.json"
+  }
+}
