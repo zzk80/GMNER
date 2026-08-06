@@ -155,7 +155,9 @@ def main() -> None:
     model_path = Path(authorization["feature_contract"]["text_encoder_path"]).resolve()
     reject_dev_test_path(model_path)
     model_fingerprint = directory_fingerprint(model_path)
-    tokenizer = AutoTokenizer.from_pretrained(str(model_path), use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(model_path), use_fast=True, add_prefix_space=True
+    )
     model = AutoModel.from_pretrained(str(model_path), add_pooling_layer=False)
     model.requires_grad_(False)
     model.eval().to(args.device)
