@@ -1,0 +1,53 @@
+{
+  "kind": "final_chain_oof_ten_fold_merge_authorization",
+  "format_version": 1,
+  "status": "AUTHORIZED",
+  "experiment_id": "final_chain_oof_ten_fold_merge_v1",
+  "input_folds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "input_contract": {
+    "records_per_fold": 700,
+    "total_records": 7000,
+    "fold0_root": "knowledge/final_chain_oof/fold0_dry_run/fold0",
+    "population_root": "knowledge/final_chain_oof/population_folds1_9",
+    "fold_manifest": "knowledge/final_chain_oof/population_folds1_9/folds/fold_summary.json",
+    "schema": "docs/experiments/final_chain_oof_minimum_row_schema.json"
+  },
+  "output_contract": {
+    "root": "knowledge/final_chain_oof/ten_fold_population",
+    "gold_free_rows": "gold_free_rows.jsonl",
+    "supervision_sidecar": "supervision_sidecar.jsonl",
+    "merge_manifest": "merge_manifest.json",
+    "distribution_gate": "distribution_gate.json",
+    "distribution_report": "distribution_gate.md"
+  },
+  "distribution_gate": {
+    "minimum_b1_base_wrong": 50,
+    "minimum_a1_protected_positive": 50,
+    "maximum_single_fold_share": 0.2,
+    "formal_dev_wrong_rate": 0.06429232192414432,
+    "acceptable_oof_to_dev_wrong_rate_ratio": [0.5, 2.0],
+    "require_b1_wrong_in_every_fold": true,
+    "require_a1_positive_in_every_fold": true,
+    "require_development_and_calibration_partition_support": true
+  },
+  "fold0_resource_waiver": {
+    "stage1_peak_missing": true,
+    "reason": "Fold-0 monitoring began after Stage1; the approved protocol does not require rerunning Fold-0."
+  },
+  "allowed": {
+    "validate_existing_artifacts": true,
+    "concatenate_gold_free_rows_without_reserialization": true,
+    "concatenate_supervision_sidecars_without_reserialization": true,
+    "descriptive_distribution_audit": true,
+    "resource_audit": true
+  },
+  "forbidden": {
+    "b1_a1_training": true,
+    "feature_selection": true,
+    "auroc_computation": true,
+    "threshold_selection": true,
+    "calibration": true,
+    "dev_file_access": true,
+    "test_access": true
+  }
+}
