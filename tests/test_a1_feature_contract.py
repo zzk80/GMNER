@@ -52,6 +52,27 @@ class A1FeatureContractTest(unittest.TestCase):
         ]
         self.assertTrue(all(not item["authorized_for_a1"] for item in latent))
 
+    def test_a1_t0_preregistration_does_not_authorize_training(self) -> None:
+        payload = json.loads(
+            (
+                ROOT
+                / "docs"
+                / "experiments"
+                / "a1_t0_observable_tabular_preregistration.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(payload["evidence_contract"]["actions"], 31138)
+        self.assertEqual(payload["evidence_contract"]["labels"]["FIX"], 286)
+        self.assertEqual(payload["final_gate"]["passing_seed_requirement"], "3_of_3")
+        self.assertFalse(
+            payload["access_and_authorization"]["a1_t0_training_authorized"]
+        )
+        self.assertFalse(
+            payload["access_and_authorization"][
+                "a1_t0_locked_evaluation_authorized"
+            ]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
