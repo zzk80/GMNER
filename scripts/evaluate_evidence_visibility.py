@@ -21,6 +21,11 @@ from gmner.engine.evidence_visibility_evaluator import (
     evaluate_evidence_visibility,
 )
 from gmner.evidence_visibility_config import load_evidence_visibility_config
+from gmner.models.evidence_visibility import (
+    EvidenceVisibilityHeadConfig,
+    RegionEvidenceVisibilityHead,
+)
+from gmner.models.protected_downstream import ProtectedEvidenceResidual
 from scripts.train_evidence_visibility import load_frozen_chain
 from scripts.train_fine_grounding_adapter import (
     decode_options,
@@ -46,6 +51,21 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--output", default=None)
     parser.add_argument("--device", default=None)
+    parser.add_argument(
+        "--allow-protected-cache-transfer",
+        action="store_true",
+        help=(
+            "Dev-only R0 diagnostic: replay a frozen downstream chain on an "
+            "explicitly different Stage1 cache."
+        ),
+    )
+    parser.add_argument(
+        "--allow-protected-test-evaluation",
+        action="store_true",
+        help="Explicitly evaluate the frozen R0/R1/R2 transfer on Test.",
+    )
+    parser.add_argument("--protected-teacher-checkpoint", default=None)
+    parser.add_argument("--fine-checkpoint", default=None)
     return parser.parse_args()
 
 
@@ -71,10 +91,38 @@ def evaluation_cache_paths(
     return formal_cache, expanded_cache
 
 
+def validate_protected_transfer_scope(
+    *,
+    enabled: bool,
+    split: str,
+    allow_test: bool = False,
+) -> None:
+    if enabled and split == "test" and not allow_test:
+        raise ValueError(
+            "Protected cache transfer is a Dev-only diagnostic and cannot "
+            "be used for Test evaluation without the explicit Test gate."
+        )
+    if allow_test and (not enabled or split != "test"):
+        raise ValueError(
+            "The protected Test gate requires protected transfer on Test."
+        )
+
+
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
     config = load_evidence_visibility_config(args.config)
+    if args.fine_checkpoint is not None:
+        config.frozen.fine_checkpoint = args.fine_checkpoint
+    protected_transfer = bool(
+        args.allow_protected_cache_transfer
+        or args.allow_protected_test_evaluation
+    )
+    validate_protected_transfer_scope(
+        enabled=protected_transfer,
+        split=args.split,
+        allow_test=args.allow_protected_test_evaluation,
+    )
     if args.device:
         config.runtime.device = args.device
     formal_cache, expanded_cache = evaluation_cache_paths(
@@ -101,13 +149,29 @@ def main() -> None:
         coarse_checkpoint,
         _,
     ) = load_frozen_chain(config, root, device)
-    validate_fingerprints(
-        paired,
-        hierarchy_checkpoint=hierarchy_checkpoint,
-        coarse_checkpoint=coarse_checkpoint,
-        require_oof=False,
-    )
+    if not protected_transfer:
+        validate_fingerprints(
+            paired,
+            hierarchy_checkpoint=hierarchy_checkpoint,
+            coarse_checkpoint=coarse_checkpoint,
+            require_oof=False,
+        )
     checkpoint = torch.load(resolve(args.checkpoint, root), map_location="cpu")
+    if checkpoint.get("kind") == "protected_evidence_residual":
+        if not args.protected_teacher_checkpoint:
+            raise ValueError(
+                "Protected Evidence evaluation requires "
+                "--protected-teacher-checkpoint."
+            )
+        teacher_checkpoint = torch.load(
+            resolve(args.protected_teacher_checkpoint, root), map_location="cpu"
+        )
+        teacher_config = EvidenceVisibilityHeadConfig(
+            **teacher_checkpoint["config"]["model"]
+        )
+        teacher = RegionEvidenceVisibilityHead(teacher_config)
+        teacher.load_state_dict(teacher_checkpoint["model_state_dict"])
+        model = ProtectedEvidenceResidual(teacher, model).to(device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.to(device)
     loader = DataLoader(
@@ -126,7 +190,22 @@ def main() -> None:
         decode_options=decode_options(hierarchy_config),
         loss_options=vars(config.loss).copy(),
     )
-    payload = {"split": args.split, "metrics": metrics}
+    payload = {
+        "split": args.split,
+        "metrics": metrics,
+        "protected_cache_transfer": {
+            "enabled": protected_transfer,
+            "scope": (
+                "explicit_test"
+                if args.allow_protected_test_evaluation
+                else "dev_only" if protected_transfer else None
+            ),
+            "fingerprint_mismatch_explicitly_accepted": bool(
+                protected_transfer
+            ),
+            "test_accessed": args.split == "test",
+        },
+    }
     rendered = json.dumps(payload, ensure_ascii=False, indent=2)
     if args.output:
         output = resolve(args.output, root)

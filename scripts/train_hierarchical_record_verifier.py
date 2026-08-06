@@ -167,7 +167,7 @@ def _configured_dataset_paths(config) -> dict[str, str]:
         "train": config.data.train_cache,
         "dev": config.data.dev_cache,
     }
-    if config.data.test_cache:
+    if config.runtime.evaluate_test_after_training:
         paths["test"] = config.data.test_cache
     return paths
 

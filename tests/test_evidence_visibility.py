@@ -16,7 +16,10 @@ from gmner.models.evidence_visibility import (
     RegionEvidenceVisibilityHead,
     decode_evidence_visibility,
 )
-from scripts.evaluate_evidence_visibility import evaluation_cache_paths
+from scripts.evaluate_evidence_visibility import (
+    evaluation_cache_paths,
+    validate_protected_transfer_scope,
+)
 
 
 class _DataConfig:
@@ -50,6 +53,24 @@ def test_evidence_visibility_test_cache_access_is_explicit() -> None:
         formal_cache="formal-test.pt",
         expanded_cache="expanded-test.pt",
     ) == ("formal-test.pt", "expanded-test.pt")
+
+
+def test_protected_cache_transfer_is_dev_only() -> None:
+    validate_protected_transfer_scope(enabled=True, split="dev")
+    validate_protected_transfer_scope(enabled=False, split="test")
+    with pytest.raises(ValueError, match="Dev-only"):
+        validate_protected_transfer_scope(enabled=True, split="test")
+    validate_protected_transfer_scope(
+        enabled=True,
+        split="test",
+        allow_test=True,
+    )
+    with pytest.raises(ValueError, match="requires protected transfer"):
+        validate_protected_transfer_scope(
+            enabled=False,
+            split="test",
+            allow_test=True,
+        )
 
 
 def _fine_outputs(span_count: int = 2) -> dict[str, torch.Tensor]:

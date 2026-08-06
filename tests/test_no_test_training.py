@@ -83,6 +83,22 @@ def test_hierarchical_no_test_mode_omits_test_cache() -> None:
     }
 
 
+def test_hierarchical_no_test_mode_ignores_configured_test_cache() -> None:
+    config = HierarchicalRecordTrainingConfig(
+        data=HierarchicalRecordDataConfig(
+            train_cache="train.pt",
+            dev_cache="dev.pt",
+            test_cache="must_not_be_read.pt",
+        )
+    )
+    config.runtime.evaluate_test_after_training = False
+
+    assert _configured_dataset_paths(config) == {
+        "train": "train.pt",
+        "dev": "dev.pt",
+    }
+
+
 def test_hierarchical_test_mode_requires_test_cache() -> None:
     config = HierarchicalRecordTrainingConfig(
         data=HierarchicalRecordDataConfig(

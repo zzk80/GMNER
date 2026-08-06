@@ -1,0 +1,72 @@
+{
+  "kind": "tp_j3_r1_full_fit_downstream_result",
+  "status": "METHOD_NO_GO_TEST_GENERALIZATION",
+  "training_regime": "full_fit_train_dev_selection_no_oof",
+  "stage1_seed": 43,
+  "formal_baseline": "M3.3A",
+  "dev": {
+    "formal_m3_3a": {
+      "span_f1": 0.8728300363342755,
+      "mner_f1": 0.8167137666532096,
+      "eeg_f1": 0.6608800968914009,
+      "gmner_f1": 0.6213161081953977
+    },
+    "j3_r1_full_chain": {
+      "span_f1": 0.8747466558573166,
+      "mner_f1": 0.8204296716659911,
+      "eeg_f1": 0.6672071341710579,
+      "gmner_f1": 0.6295095257397648
+    },
+    "delta": {
+      "span_f1": 0.0019166195230411,
+      "mner_f1": 0.0037159050127815,
+      "eeg_f1": 0.006327037279657,
+      "gmner_f1": 0.0081934175443671
+    },
+    "chain_gmner": {
+      "stage1": 0.6198263678578639,
+      "hierarchical": 0.6218078638021888,
+      "fine": 0.6278881232265909,
+      "evidence": 0.6295095257397648
+    }
+  },
+  "test": {
+    "formal_m3_3a": {
+      "span_f1": 0.8698039216,
+      "mner_f1": 0.8184313725,
+      "eeg_f1": 0.6521568627,
+      "gmner_f1": 0.6152941176,
+      "stage1_gmner_f1": 0.5916813122,
+      "fine_baseline_gmner_f1": 0.6133333333
+    },
+    "j3_r1_full_chain": {
+      "span_f1": 0.8707456227,
+      "mner_f1": 0.8184143223,
+      "eeg_f1": 0.6460751525,
+      "gmner_f1": 0.6086956522,
+      "stage1_gmner_f1": 0.5936520376,
+      "fine_baseline_gmner_f1": 0.6059413732,
+      "evidence_gmner_delta": 0.002754279,
+      "evidence_gmner_net_correction": 7,
+      "evidence_eeg_net_correction": 8
+    },
+    "delta": {
+      "span_f1": 0.0009417011,
+      "mner_f1": -0.0000170502,
+      "eeg_f1": -0.0060817102,
+      "gmner_f1": -0.0065984654,
+      "stage1_gmner_f1": 0.0019707254,
+      "fine_baseline_gmner_f1": -0.0073919601
+    },
+    "metrics_artifact_sha256": "7b1b0bd27f7c972eb2481a4cab83e9d140d699716fc46114719fe07d6ad616c0",
+    "single_formal_evaluation": true,
+    "test_accessed": true,
+    "test_used_for_selection": false,
+    "retune_or_rerun_allowed": false
+  },
+  "decision": {
+    "replace_formal_m3_3a": false,
+    "formal_test_gmner_remains": 0.6152941176,
+    "primary_failure": "retrained_intermediate_grounding_chain_test_generalization"
+  }
+}

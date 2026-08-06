@@ -11,6 +11,8 @@ __all__ = [
     "PairedRecordCandidateCollator",
     "sha256_file",
     "stable_id_digest",
+    "ClipR16Cache",
+    "validate_clip_r16_manifest",
     "encode_words_with_alignment",
     "infer_model_input_limit",
     "load_word_aligned_tokenizer",
@@ -61,6 +63,13 @@ def __getattr__(name):
         return {
             "sha256_file": sha256_file,
             "stable_id_digest": stable_id_digest,
+        }[name]
+    if name in {"ClipR16Cache", "validate_clip_r16_manifest"}:
+        from .clip_r16_cache import ClipR16Cache, validate_clip_r16_manifest
+
+        return {
+            "ClipR16Cache": ClipR16Cache,
+            "validate_clip_r16_manifest": validate_clip_r16_manifest,
         }[name]
     if name in {
         "encode_words_with_alignment",

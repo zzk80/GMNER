@@ -12,6 +12,9 @@ __all__ = [
     "CorrectionPreservationGroundingAdapter",
     "EvidenceVisibilityHeadConfig",
     "RegionEvidenceVisibilityHead",
+    "TypedBIOVisualResidualConfig",
+    "TypedBIOVisualResidual",
+    "ProtectedTypedBIOVisualStage1",
 ]
 
 
@@ -74,5 +77,21 @@ def __getattr__(name):
         return {
             "EvidenceVisibilityHeadConfig": EvidenceVisibilityHeadConfig,
             "RegionEvidenceVisibilityHead": RegionEvidenceVisibilityHead,
+        }[name]
+    if name in {
+        "TypedBIOVisualResidualConfig",
+        "TypedBIOVisualResidual",
+        "ProtectedTypedBIOVisualStage1",
+    }:
+        from .typed_bio_visual_residual import (
+            ProtectedTypedBIOVisualStage1,
+            TypedBIOVisualResidual,
+            TypedBIOVisualResidualConfig,
+        )
+
+        return {
+            "TypedBIOVisualResidualConfig": TypedBIOVisualResidualConfig,
+            "TypedBIOVisualResidual": TypedBIOVisualResidual,
+            "ProtectedTypedBIOVisualStage1": ProtectedTypedBIOVisualStage1,
         }[name]
     raise AttributeError(name)

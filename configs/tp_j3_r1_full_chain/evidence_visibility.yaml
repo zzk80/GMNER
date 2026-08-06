@@ -1,0 +1,54 @@
+data:
+  formal_train_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_train_hierarchical.pt
+  expanded_train_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_train_hierarchical_r36.pt
+  formal_dev_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_dev_hierarchical.pt
+  expanded_dev_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_dev_hierarchical_r36.pt
+  num_workers: 0
+  require_oof_train_cache: false
+
+frozen:
+  fine_config: configs/tp_j3_r1_full_chain/fine_grounding_adapter.yaml
+  fine_checkpoint: outputs/tp_j3_r1_seed43_fine_grounding_adapter/best_model.pt
+
+model:
+  input_size: 256
+  hidden_size: 256
+  num_candidate_sources: 4
+  source_embedding_size: 32
+  dropout: 0.2
+  residual_scale: 4.0
+
+loss:
+  lambda_bce: 1.0
+  lambda_visible_correction: 1.0
+  lambda_null_preservation: 1.0
+  lambda_keep: 0.5
+  lambda_residual: 0.05
+  visible_correction_group_weight: 0.35
+  visible_preservation_group_weight: 0.15
+  null_correction_group_weight: 0.20
+  null_preservation_group_weight: 0.30
+  visible_margin_gamma: 1.0
+  uncertainty_entropy_threshold: 0.65
+  uncertainty_margin_threshold: 0.08
+
+optim:
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 10
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: outputs/tp_j3_r1_seed43_evidence_visibility
+  save_best_metric: gmner_score
+  save_best_tie_breakers:
+    - null_correct_preservation_rate
+    - visibility_net_correction
+  early_stop_patience: 3
+  log_every_steps: 50

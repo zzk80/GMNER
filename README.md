@@ -13,6 +13,18 @@ not part of the runnable primary surface. Their final P4/S3/D1 code remains
 recoverable from Git history and the
 `archive/m33a-r0b-oof-20260730` tag.
 
+The TP-CLIP/J3 continuation is archived and is not an active formal branch.
+Its strongest Dev results did not generalize to the frozen Test evaluation:
+the independently rebuilt J3-r1 chain reached Test GMNER `0.608696`, while
+the protected R1/R2 variants reached `0.610815 +/- 0.000910` and
+`0.611341 +/- 0.000821`. All remain below formal M3.3A `0.615294`.
+No TP/J3 checkpoint replaces Model-G, and no Test-driven retuning, additional
+verifier, or downstream rebuild is authorized. Protocol and archived results:
+[`docs/experiments/TP_CLIP_MNER_EXECUTION.md`](docs/experiments/TP_CLIP_MNER_EXECUTION.md),
+[`docs/experiments/TP_J3_GROUNDING_PROTECTED_PROTOCOL.md`](docs/experiments/TP_J3_GROUNDING_PROTECTED_PROTOCOL.md),
+and
+[`docs/experiments/TP_J3_R2_PROTECTED_DOWNSTREAM_RESULT.md`](docs/experiments/TP_J3_R2_PROTECTED_DOWNSTREAM_RESULT.md).
+
 ## Formal Results
 
 | Split | Span F1 | MNER F1 | Fine MNER F1 | EEG F1 | GMNER F1 | FMNERG F1 |
@@ -22,6 +34,7 @@ recoverable from Git history and the
 
 The F3 values are means and standard deviations over the preregistered seeds
 41, 42, and 43. Test was not used for checkpoint or threshold selection.
+The frozen formal systems remain M3.3A for GMNER and F3 for FMNERG.
 
 ## Model-G: M3.3A
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import math
 import sys
@@ -33,7 +34,19 @@ from gmner.fine_grounding_adapter_config import (
     load_fine_grounding_adapter_config,
 )
 from gmner.losses.evidence_visibility_loss import evidence_visibility_loss
-from gmner.models.evidence_visibility import RegionEvidenceVisibilityHead
+from gmner.models.evidence_visibility import (
+    EvidenceVisibilityHeadConfig,
+    RegionEvidenceVisibilityHead,
+    decode_evidence_visibility,
+)
+from gmner.models.protected_downstream import (
+    ProtectedEvidenceResidual,
+    ProtectedFineResidual,
+)
+from gmner.models.fine_grounding_adapter import (
+    CorrectionPreservationGroundingAdapter,
+    FineGroundingAdapterConfig,
+)
 from gmner.utils.logging import create_logger
 from gmner.utils.seed import set_seed
 from scripts.train_fine_grounding_adapter import (
@@ -53,6 +66,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-epochs", type=int, default=None)
     parser.add_argument("--max-train-records", type=int, default=None)
     parser.add_argument("--max-dev-records", type=int, default=None)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--fine-checkpoint", default=None)
+    parser.add_argument("--protected-teacher-checkpoint", default=None)
+    parser.add_argument("--allow-protected-cache-transfer", action="store_true")
     return parser.parse_args()
 
 
@@ -81,6 +98,15 @@ def load_frozen_chain(config, root: Path, device: torch.device):
     ) = load_frozen_models(fine_config, root, device)
     fine_checkpoint_path = resolve(config.frozen.fine_checkpoint, root)
     fine_checkpoint = torch.load(fine_checkpoint_path, map_location="cpu")
+    if fine_checkpoint.get("kind") == "protected_fine_residual":
+        teacher_config = FineGroundingAdapterConfig(
+            **fine_checkpoint["protected_teacher_config"]["model"]
+        )
+        fine_teacher = CorrectionPreservationGroundingAdapter(
+            teacher_config,
+            copy.deepcopy(fine_model.coarse_selector),
+        )
+        fine_model = ProtectedFineResidual(fine_teacher, fine_model)
     fine_model.load_state_dict(fine_checkpoint["model_state_dict"])
     fine_model.to(device).eval()
     hierarchy.to(device).eval()
@@ -126,6 +152,10 @@ def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
     config = load_evidence_visibility_config(args.config)
+    if args.seed is not None:
+        config.runtime.seed = int(args.seed)
+    if args.fine_checkpoint is not None:
+        config.frozen.fine_checkpoint = args.fine_checkpoint
     if args.output_dir:
         config.runtime.output_dir = args.output_dir
     if args.num_epochs is not None:
@@ -159,15 +189,33 @@ def main() -> None:
         coarse_checkpoint,
         fine_checkpoint,
     ) = load_frozen_chain(config, root, device)
-    for split in ("train", "dev"):
-        validate_fingerprints(
-            datasets[split],
-            hierarchy_checkpoint=hierarchy_checkpoint,
-            coarse_checkpoint=coarse_checkpoint,
-            require_oof=(
-                config.data.require_oof_train_cache and split == "train"
-            ),
+    protected_mode = args.protected_teacher_checkpoint is not None
+    if protected_mode != bool(args.allow_protected_cache_transfer):
+        raise ValueError(
+            "Protected Evidence training requires both "
+            "--protected-teacher-checkpoint and "
+            "--allow-protected-cache-transfer."
         )
+    if protected_mode:
+        teacher_checkpoint = torch.load(
+            resolve(args.protected_teacher_checkpoint, root), map_location="cpu"
+        )
+        teacher_config = EvidenceVisibilityHeadConfig(
+            **teacher_checkpoint["config"]["model"]
+        )
+        teacher = RegionEvidenceVisibilityHead(teacher_config)
+        teacher.load_state_dict(teacher_checkpoint["model_state_dict"])
+        model = ProtectedEvidenceResidual(teacher, model).to(device)
+    else:
+        for split in ("train", "dev"):
+            validate_fingerprints(
+                datasets[split],
+                hierarchy_checkpoint=hierarchy_checkpoint,
+                coarse_checkpoint=coarse_checkpoint,
+                require_oof=(
+                    config.data.require_oof_train_cache and split == "train"
+                ),
+            )
     if args.max_train_records is not None:
         datasets["train"] = Subset(
             datasets["train"],
@@ -252,6 +300,12 @@ def main() -> None:
             "expanded_candidate_config_sha256": coarse_checkpoint.get(
                 "candidate_config_sha256"
             ),
+            "kind": (
+                "protected_evidence_residual"
+                if protected_mode
+                else "evidence_visibility"
+            ),
+            "protected_cache_transfer": protected_mode,
         }
 
     atomic_save(checkpoint_payload(0, initial), best_path)
@@ -309,12 +363,43 @@ def main() -> None:
                     baseline_visible_mask=baseline_visible,
                     base_is_null_mask=decoded["base_is_null"],
                 )
+                training_baseline_visible = baseline_visible
+                reference_probability = outputs.get(
+                    "protected_reference_visibility_probability"
+                )
+                if reference_probability is not None:
+                    has_null = expanded["region_is_null"].bool().any(
+                        dim=-1
+                    )[:, None].expand_as(baseline_visible)
+                    training_baseline_visible = decode_evidence_visibility(
+                        reference_probability,
+                        base_is_null=decoded["base_is_null"].bool(),
+                        baseline_visible=baseline_visible,
+                        has_real_candidate=outputs["fine_has_real_candidate"],
+                        has_null_region=has_null,
+                        span_mask=expanded["span_mask"],
+                        visible_from_null_threshold=float(
+                            evaluation_options["decode_options"].get(
+                                "visible_from_null_threshold", 0.8
+                            )
+                        ),
+                        null_from_visible_threshold=float(
+                            evaluation_options["decode_options"].get(
+                                "null_from_visible_threshold", 0.2
+                            )
+                        ),
+                        enabled=bool(
+                            evaluation_options["decode_options"].get(
+                                "enable_visibility_correction", True
+                            )
+                        ),
+                    )
                 losses = evidence_visibility_loss(
                     outputs,
                     fine_outputs,
                     hierarchy_outputs,
                     expanded,
-                    baseline_visible_mask=baseline_visible,
+                    baseline_visible_mask=training_baseline_visible,
                     **loss_options,
                 )
                 loss = losses["loss"] / accumulation

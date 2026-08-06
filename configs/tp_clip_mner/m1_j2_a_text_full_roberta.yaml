@@ -1,0 +1,34 @@
+stage: M1_JOINT_EXPLORATORY
+test_accessed: false
+data:
+  base_config: configs/fmnerg_twitter10000_stage1.yaml
+  base_checkpoint: outputs/fmnerg_stage1_roberta128/best_model.pt
+  train_clip_cache: knowledge/tp_clip_r16/train
+  dev_clip_cache: knowledge/tp_clip_r16/dev
+  m0_5_report: outputs/tp_clip_mner/m0_5_report.json
+model:
+  variant: a_text
+  hidden_size: 768
+  attention_heads: 8
+  ffn_intermediate_size: 1536
+  dropout: 0.1
+optim:
+  residual_learning_rate: 0.0001
+  backbone_learning_rate: 0.000003
+  fusion_learning_rate: 0.00001
+  unfreeze_last_n_layers: 12
+  weight_decay: 0.01
+  batch_size: 8
+  epochs: 15
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  fp16: false
+  amp_dtype: bfloat16
+loss:
+  lambda_preserve: 1.0
+  lambda_residual: 0.01
+  distillation_temperature: 1.0
+runtime:
+  seed: 42
+  eeg_preservation_tolerance: 0.001
+  output_dir: outputs/tp_clip_mner/m1_j2_a_text_full_roberta_seed42

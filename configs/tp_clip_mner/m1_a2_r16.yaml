@@ -1,0 +1,30 @@
+stage: M1
+test_accessed: false
+data:
+  base_config: configs/fmnerg_twitter10000_stage1.yaml
+  base_checkpoint: outputs/fmnerg_stage1_roberta128/best_model.pt
+  train_clip_cache: knowledge/tp_clip_r16/train
+  dev_clip_cache: knowledge/tp_clip_r16/dev
+  m0_5_report: outputs/tp_clip_mner/m0_5_report.json
+model:
+  variant: a2_r16
+  hidden_size: 768
+  attention_heads: 8
+  ffn_intermediate_size: 1536
+  dropout: 0.1
+optim:
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  batch_size: 8
+  epochs: 15
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  fp16: true
+loss:
+  lambda_preserve: 1.0
+  lambda_residual: 0.01
+  distillation_temperature: 1.0
+runtime:
+  seed: 42
+  eeg_preservation_tolerance: 0.001
+  output_dir: outputs/tp_clip_mner/m1_a2_r16_seed42

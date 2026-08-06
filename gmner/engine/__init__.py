@@ -7,6 +7,7 @@ __all__ = [
     "evaluate_coarse_region_selector",
     "evaluate_fine_grounding_adapter",
     "evaluate_evidence_visibility",
+    "evaluate_tp_visual_stage1",
 ]
 
 
@@ -43,4 +44,8 @@ def __getattr__(name):
         )
 
         return evaluate_evidence_visibility
+    if name == "evaluate_tp_visual_stage1":
+        from .tp_visual_residual_evaluator import evaluate_tp_visual_stage1
+
+        return evaluate_tp_visual_stage1
     raise AttributeError(name)

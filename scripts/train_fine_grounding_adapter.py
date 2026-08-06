@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import math
 import sys
@@ -41,8 +42,10 @@ from gmner.models.coarse_region_selector import (
 )
 from gmner.models.fine_grounding_adapter import (
     CorrectionPreservationGroundingAdapter,
+    FineGroundingAdapterConfig,
 )
 from gmner.models.hierarchical_record_verifier import HierarchicalRecordVerifier
+from gmner.models.protected_downstream import ProtectedFineResidual
 from gmner.utils.logging import create_logger
 from gmner.utils.seed import set_seed
 
@@ -54,6 +57,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-epochs", type=int, default=None)
     parser.add_argument("--max-train-records", type=int, default=None)
     parser.add_argument("--max-dev-records", type=int, default=None)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--protected-teacher-checkpoint", default=None)
+    parser.add_argument("--allow-protected-cache-transfer", action="store_true")
     return parser.parse_args()
 
 
@@ -222,6 +228,8 @@ def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
     config = load_fine_grounding_adapter_config(args.config)
+    if args.seed is not None:
+        config.runtime.seed = int(args.seed)
     if args.output_dir:
         config.runtime.output_dir = args.output_dir
     if args.num_epochs is not None:
@@ -252,18 +260,39 @@ def main() -> None:
         hierarchy_checkpoint,
         coarse_checkpoint,
     ) = load_frozen_models(config, root, device)
-    validate_fingerprints(
-        datasets["train"],
-        hierarchy_checkpoint=hierarchy_checkpoint,
-        coarse_checkpoint=coarse_checkpoint,
-        require_oof=config.data.require_oof_train_cache,
-    )
-    validate_fingerprints(
-        datasets["dev"],
-        hierarchy_checkpoint=hierarchy_checkpoint,
-        coarse_checkpoint=coarse_checkpoint,
-        require_oof=False,
-    )
+    protected_mode = args.protected_teacher_checkpoint is not None
+    teacher_checkpoint = None
+    if protected_mode != bool(args.allow_protected_cache_transfer):
+        raise ValueError(
+            "Protected Fine training requires both --protected-teacher-checkpoint "
+            "and --allow-protected-cache-transfer."
+        )
+    if protected_mode:
+        teacher_checkpoint = torch.load(
+            resolve(args.protected_teacher_checkpoint, root), map_location="cpu"
+        )
+        teacher_config = FineGroundingAdapterConfig(
+            **teacher_checkpoint["config"]["model"]
+        )
+        teacher = CorrectionPreservationGroundingAdapter(
+            teacher_config,
+            copy.deepcopy(model.coarse_selector),
+        )
+        teacher.load_state_dict(teacher_checkpoint["model_state_dict"])
+        model = ProtectedFineResidual(teacher, model).to(device)
+    else:
+        validate_fingerprints(
+            datasets["train"],
+            hierarchy_checkpoint=hierarchy_checkpoint,
+            coarse_checkpoint=coarse_checkpoint,
+            require_oof=config.data.require_oof_train_cache,
+        )
+        validate_fingerprints(
+            datasets["dev"],
+            hierarchy_checkpoint=hierarchy_checkpoint,
+            coarse_checkpoint=coarse_checkpoint,
+            require_oof=False,
+        )
     if args.max_train_records is not None:
         datasets["train"] = Subset(
             datasets["train"],
@@ -327,6 +356,11 @@ def main() -> None:
     initial = evaluate_fine_grounding_adapter(
         model, hierarchy, loaders["dev"], device, **evaluation_options
     )
+    if protected_mode and abs(float(initial["gmner_delta"])) > 1e-12:
+        raise RuntimeError(
+            "Zero-initialized protected Fine residual must reproduce its "
+            f"Teacher; observed delta={initial['gmner_delta']}."
+        )
     best_selection = selection_key(initial, primary, ties)
     best_epoch = 0
     history.append({"epoch": 0, "dev": initial})
@@ -344,6 +378,13 @@ def main() -> None:
             ),
             "expanded_candidate_config_sha256": coarse_checkpoint.get(
                 "candidate_config_sha256"
+            ),
+            "kind": (
+                "protected_fine_residual" if protected_mode else "fine_grounding_adapter"
+            ),
+            "protected_cache_transfer": protected_mode,
+            "protected_teacher_config": (
+                teacher_checkpoint.get("config") if teacher_checkpoint else None
             ),
         },
         best_path,
@@ -393,10 +434,13 @@ def main() -> None:
                 enabled=amp_enabled,
             ):
                 outputs = model(expanded)
+                training_baseline_indices = outputs.get(
+                    "protected_reference_region_index", baseline_indices
+                ).long()
                 losses = fine_grounding_adapter_loss(
                     outputs,
                     expanded,
-                    baseline_region_indices=baseline_indices,
+                    baseline_region_indices=training_baseline_indices,
                     baseline_visible_mask=baseline_visible,
                     **loss_options,
                 )
@@ -455,6 +499,17 @@ def main() -> None:
                     ),
                     "expanded_candidate_config_sha256": coarse_checkpoint.get(
                         "candidate_config_sha256"
+                    ),
+                    "kind": (
+                        "protected_fine_residual"
+                        if protected_mode
+                        else "fine_grounding_adapter"
+                    ),
+                    "protected_cache_transfer": protected_mode,
+                    "protected_teacher_config": (
+                        teacher_checkpoint.get("config")
+                        if teacher_checkpoint
+                        else None
                     ),
                 },
                 best_path,

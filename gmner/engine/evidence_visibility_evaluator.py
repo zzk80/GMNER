@@ -87,6 +87,22 @@ def evaluate_evidence_visibility(
         )
         has_null = expanded["region_is_null"].bool().any(dim=-1)[:, None]
         has_null = has_null.expand_as(baseline_visible)
+        reference_probability = outputs.get(
+            "protected_reference_visibility_probability"
+        )
+        reference_visible = baseline_visible
+        if reference_probability is not None:
+            reference_visible = decode_evidence_visibility(
+                reference_probability,
+                base_is_null=base_is_null,
+                baseline_visible=baseline_visible,
+                has_real_candidate=outputs["fine_has_real_candidate"],
+                has_null_region=has_null,
+                span_mask=expanded["span_mask"],
+                visible_from_null_threshold=visible_threshold,
+                null_from_visible_threshold=null_threshold,
+                enabled=visibility_enabled,
+            )
         final_visible = decode_evidence_visibility(
             outputs["final_visibility_probability"],
             base_is_null=base_is_null,
@@ -103,7 +119,7 @@ def evaluate_evidence_visibility(
             fine_outputs,
             hierarchy_outputs,
             expanded,
-            baseline_visible_mask=baseline_visible,
+            baseline_visible_mask=reference_visible,
             **loss_options,
         )
         batch_size = len(formal["metadata"])
@@ -152,7 +168,7 @@ def evaluate_evidence_visibility(
         )[:, None]
         expanded_null = expanded_null.expand_as(fine_indices)
         baseline_indices = torch.where(
-            baseline_visible, fine_indices, expanded_null
+            reference_visible, fine_indices, expanded_null
         )
         final_indices = torch.where(final_visible, fine_indices, expanded_null)
 
@@ -192,7 +208,7 @@ def evaluate_evidence_visibility(
                         ),
                     }
                 )
-                old_visible = bool(baseline_visible[row, span_index].item())
+                old_visible = bool(reference_visible[row, span_index].item())
                 new_visible = bool(final_visible[row, span_index].item())
                 counts["null_to_visible_switch_count"] += int(
                     not old_visible and new_visible
@@ -239,7 +255,7 @@ def evaluate_evidence_visibility(
                 selected_span = span_index in selected_set
                 target_visible = bool(target.get("visible", False))
                 old_visible = bool(
-                    baseline_visible[row, span_index].item()
+                    reference_visible[row, span_index].item()
                 )
                 new_visible = bool(final_visible[row, span_index].item())
                 old_eeg = gold_index in matches["baseline"]["eeg"]

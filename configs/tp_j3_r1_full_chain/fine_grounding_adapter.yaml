@@ -1,0 +1,63 @@
+data:
+  formal_train_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_train_hierarchical.pt
+  expanded_train_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_train_hierarchical_r36.pt
+  formal_dev_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_dev_hierarchical.pt
+  expanded_dev_cache: knowledge/record_candidates/tp_j3_r1_seed43/fmnerg_dev_hierarchical_r36.pt
+  num_workers: 0
+  require_oof_train_cache: false
+
+frozen:
+  hierarchical_config: configs/tp_j3_r1_full_chain/hierarchical_record_verifier.yaml
+  hierarchical_checkpoint: outputs/tp_j3_r1_seed43_hierarchical_record_verifier/best_model.pt
+  coarse_checkpoint: outputs/tp_j3_r1_seed43_coarse_selector/best_model.pt
+
+model:
+  input_size: 768
+  hidden_size: 256
+  num_types: 4
+  num_candidate_sources: 4
+  dropout: 0.2
+  final_budget: 16
+  base_keep: 8
+  detector_reference_budget: 16
+  base_temperature: 1.0
+  coarse_temperature: 1.0
+  base_prior_weight: 1.0
+  coarse_prior_weight: 0.5
+  residual_scale: 2.0
+
+loss:
+  lambda_multi_positive: 1.0
+  lambda_iou: 0.2
+  lambda_correction_margin: 1.0
+  lambda_preservation_margin: 0.5
+  lambda_residual: 0.05
+  correction_margin: 0.5
+  preservation_margin: 0.2
+  iou_temperature: 0.1
+  correction_group_weight: 0.4
+  preservation_group_weight: 0.4
+  other_group_weight: 0.2
+  promoted_correction_fraction: 0.5
+
+optim:
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  num_epochs: 10
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 1
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: outputs/tp_j3_r1_seed43_fine_grounding_adapter
+  save_best_metric: gmner_score
+  save_best_tie_breakers:
+    - visible_net_correction
+    - base_correct_preservation_rate
+    - promoted_gold_recovery_rate
+  early_stop_patience: 3
+  log_every_steps: 50

@@ -56,6 +56,13 @@ from gmner.fmnerg.taxonomy import (
 )
 from gmner.knowledge.region_compatibility import compatibility_score
 from gmner.models import GMNERModel
+from gmner.models.typed_bio_visual_residual import (
+    TypedBIOVisualResidual,
+    TypedBIOVisualResidualConfig,
+    restore_joint_student_state,
+)
+from gmner.tp.config import TPJointM1Config, load_tp_training_config
+from gmner.tp.interfaces import extract_tp_stage1_interfaces
 from gmner.utils.candidate_decoding import (
     bio_constraint_masks,
     build_span_candidates,
@@ -76,6 +83,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
     parser.add_argument("--checkpoint", required=True)
+    parser.add_argument(
+        "--tp-experiment-config",
+        default=None,
+        help=(
+            "Explicit TP experiment config used to replay a TP joint checkpoint. "
+            "Only the frozen A-text formal-emission residual is supported."
+        ),
+    )
     parser.add_argument("--split", choices=["train", "dev", "test"], required=True)
     parser.add_argument(
         "--input-file",
@@ -438,16 +453,68 @@ def build(args: argparse.Namespace) -> dict:
 
     model = GMNERModel(config=config, num_labels=len(DEFAULT_LABEL2ID))
     checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    tp_residual: TypedBIOVisualResidual | None = None
+    tp_provenance: dict[str, str] | None = None
     if taxonomy is not None:
         validate_taxonomy_fingerprint(
             dict(checkpoint.get("model_metadata") or {}),
             taxonomy,
             artifact_name="Stage1-F checkpoint",
         )
-    model.load_state_dict(
-        checkpoint["model_state_dict"],
-        strict=taxonomy is not None,
-    )
+    if checkpoint.get("kind") == "tp_typed_bio_visual_residual":
+        if taxonomy is not None:
+            raise ValueError("TP replay is not supported for fine_hierarchical caches.")
+        if not args.tp_experiment_config:
+            raise ValueError("TP checkpoint replay requires --tp-experiment-config.")
+        tp_config_path = resolve_path(args.tp_experiment_config, root)
+        tp_config = load_tp_training_config(tp_config_path)
+        if not isinstance(tp_config, TPJointM1Config):
+            raise ValueError("TP candidate replay requires a joint TP experiment.")
+        if tp_config.variant != "a_text" or tp_config.train_residual:
+            raise ValueError(
+                "Full-fit downstream replay is restricted to frozen-residual A-text."
+            )
+        if checkpoint.get("training_mode") != "joint":
+            raise ValueError("TP candidate checkpoint is not a joint Student checkpoint.")
+        if checkpoint.get("variant") != tp_config.variant:
+            raise ValueError("TP checkpoint/config variant mismatch.")
+        if checkpoint.get("test_accessed") is not False:
+            raise ValueError("TP checkpoint does not prove test_accessed=false.")
+        if checkpoint.get("experiment_config_sha256") != sha256_file(tp_config_path):
+            raise ValueError("TP experiment config fingerprint mismatch.")
+        base_config_path = resolve_path(tp_config.base_config, root)
+        if base_config_path.resolve() != resolve_path(args.config, root).resolve():
+            raise ValueError("TP experiment and candidate builder use different base configs.")
+        if checkpoint.get("base_config_sha256") != sha256_file(base_config_path):
+            raise ValueError("TP base config fingerprint mismatch.")
+        base_checkpoint_path = resolve_path(tp_config.base_checkpoint, root)
+        if checkpoint.get("base_checkpoint_sha256") != sha256_file(base_checkpoint_path):
+            raise ValueError("TP base checkpoint fingerprint mismatch.")
+        base_checkpoint = torch.load(base_checkpoint_path, map_location="cpu")
+        model.load_state_dict(base_checkpoint["model_state_dict"])
+        restore_joint_student_state(
+            model, checkpoint.get("student_trainable_state_dict") or {}
+        )
+        residual_config = TypedBIOVisualResidualConfig(**checkpoint["residual_config"])
+        tp_residual = TypedBIOVisualResidual(residual_config)
+        tp_residual.load_state_dict(checkpoint["residual_state_dict"])
+        tp_residual.to(device).eval()
+        tp_provenance = {
+            "formal_emission_adapter": "tp_a_text_frozen_residual",
+            "tp_experiment_config": str(tp_config_path.resolve()),
+            "tp_experiment_config_sha256": sha256_file(tp_config_path),
+            "tp_base_checkpoint": str(base_checkpoint_path.resolve()),
+            "tp_base_checkpoint_sha256": sha256_file(base_checkpoint_path),
+        }
+    else:
+        if args.tp_experiment_config:
+            raise ValueError(
+                "--tp-experiment-config cannot be used with a standard Stage1 checkpoint."
+            )
+        model.load_state_dict(
+            checkpoint["model_state_dict"],
+            strict=taxonomy is not None,
+        )
     model.to(device).eval()
 
     id2label = {value: key for key, value in DEFAULT_LABEL2ID.items()}
@@ -489,6 +556,7 @@ def build(args: argparse.Namespace) -> dict:
             if taxonomy is not None
             else {}
         ),
+        **(tp_provenance or {}),
     }
     stage1_checkpoint_sha256 = sha256_file(checkpoint_path)
     data_source_sha256 = sha256_file(source_path)
@@ -521,9 +589,17 @@ def build(args: argparse.Namespace) -> dict:
     for batch in tqdm(loader, desc=f"Caching {args.split} records"):
         batch = move_batch_to_device(batch, device)
         outputs = model(batch)
+        formal_emissions = outputs["ner_logits"]
+        if tp_residual is not None:
+            interfaces = extract_tp_stage1_interfaces(outputs)
+            residual_outputs = tp_residual.forward_text_only(
+                base_tokens=interfaces.mner_base_tokens,
+                attention_mask=batch["attention_mask"],
+            )
+            formal_emissions = formal_emissions + residual_outputs["delta_emissions"]
         labels = batch["ner_labels"]
         decoded = model.ner_head.decode(
-            outputs["ner_logits"],
+            formal_emissions,
             batch["attention_mask"],
             valid_mask=labels != IGNORE_INDEX,
         )
@@ -1079,6 +1155,7 @@ def build(args: argparse.Namespace) -> dict:
         "hidden_size": int(config.model.hidden_size),
         "num_types": 4,
         "summary": summary,
+        **(tp_provenance or {}),
         **(
             {
                 "label_schema": FINE_CANDIDATE_SCHEMA,

@@ -175,17 +175,20 @@ def evaluate_fine_grounding_adapter(
         baseline_visible = baseline["visible_mask"]
         assert isinstance(baseline_indices, torch.Tensor)
         assert isinstance(baseline_visible, torch.Tensor)
+        reference_indices = outputs.get(
+            "protected_reference_region_index", baseline_indices
+        ).long()
         losses = fine_grounding_adapter_loss(
             outputs,
             expanded,
-            baseline_region_indices=baseline_indices,
+            baseline_region_indices=reference_indices,
             baseline_visible_mask=baseline_visible,
             **loss_options,
         )
         supervision = fine_grounding_supervision(
             outputs,
             expanded,
-            baseline_region_indices=baseline_indices,
+            baseline_region_indices=reference_indices,
             baseline_visible_mask=baseline_visible,
             detector_reference_budget=int(
                 loss_options.get("detector_reference_budget", 16)
@@ -248,6 +251,11 @@ def evaluate_fine_grounding_adapter(
             fine_indices,
             expanded_null.expand_as(fine_indices),
         )
+        reference_final_indices = torch.where(
+            baseline_visible,
+            reference_indices,
+            expanded_null.expand_as(reference_indices),
+        )
         prior_final_indices = torch.where(
             baseline_visible,
             prior_indices,
@@ -291,7 +299,7 @@ def evaluate_fine_grounding_adapter(
                     {
                         **shared,
                         "region_index": int(
-                            baseline_indices[row, span_index].item()
+                            reference_final_indices[row, span_index].item()
                         ),
                     }
                 )
@@ -315,11 +323,11 @@ def evaluate_fine_grounding_adapter(
                     counts["deployed_visible_predictions"] += 1
                     counts["prior_region_changed"] += int(
                         int(prior_final_indices[row, span_index].item())
-                        != int(baseline_indices[row, span_index].item())
+                        != int(reference_final_indices[row, span_index].item())
                     )
                     counts["fine_region_changed"] += int(
                         int(final_indices[row, span_index].item())
-                        != int(baseline_indices[row, span_index].item())
+                        != int(reference_final_indices[row, span_index].item())
                     )
             gold = list(metadata.get("gold_entities") or [])
             matches = {
@@ -409,7 +417,7 @@ def evaluate_fine_grounding_adapter(
                 if not candidate_positive:
                     continue
                 baseline_index = int(
-                    baseline_indices[row, span_index].item()
+                    reference_indices[row, span_index].item()
                 )
                 prior_index = int(prior_indices[row, span_index].item())
                 fine_index = int(fine_indices[row, span_index].item())
