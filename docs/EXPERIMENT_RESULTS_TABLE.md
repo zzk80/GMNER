@@ -106,6 +106,9 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 | M3.6A-r2 NULL Release | Train strict 10-fold OOF features | Dev full-fit frozen chain | Best epoch 仍为 0，完全 KEEP | **NO_GO** | 不读 Test |
 | M3.6A-r1 | Train in-sample/full-fit cache | Dev engineering-only | Dev GMNER 0.623738，净修正 +6 | **ENGINEERING_ONLY** | 仅工程信号，不作为正式提升 |
 | 早期 OOF Evidence Graph | 5-fold Stage1 evidence OOF（非整链） | Test | MNER 0.78593；EEG 0.62542；GMNER 0.58035 | **ENGINEERING_HISTORY** | 低于 mBERT Stage1 |
+| **Final-chain OOF population** | 10 个完整 fold-specific M3.3A 链 | 7000 held-out Train records | 10259 exact-span；875 base-wrong；39063 raw replacement actions | **VALID_AUDIT** | 五阶段 held-out exclusion、replay、Schema、ID 与 finite Gate 全通过；Dev/Test 未访问 |
+| **B1-T0 text-only type correction** | folds 0-7 开发并冻结阈值 | folds 8-9 一次锁定评价 | 三 seed 均 0 action，MNER delta 0 | **NO_GO / SEALED** | 有中等排序信号，但无稳定高精度动作尾部 |
+| **A1-T0 observable grouped replacement** | strict `286 / 31138`；folds 0-7 LOO 开发 | folds 8-9 一次锁定评价 | `passing_seeds=0/3`；三 seed 均 0 action | **NO_GO / SEALED** | source-aware AUPRC 高于消融，但无满足联合 Gate 的效用前缀；observable post-hoc correction 关闭 |
 
 ### 关键说明
 

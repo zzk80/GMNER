@@ -756,58 +756,52 @@ PY
   但净增仅 7 个正确 typed spans，不进入下游重建；
 - DVH/TQ-DV 均未访问 Test。
 
-### 8.1 B1/A1 动作可分性准备
+### 8.1 Final-chain OOF 与 B1/A1 封存状态
 
-最终 M3.3A Dev 只读审计已固定下一阶段的两个窄假设：
-
-```text
-B1：最终链 exact-span coarse-type correction
-A1：保持预测数不变的一换一 boundary replacement
-```
-
-当前只允许生成 Dev 人工语义审阅队列：
-
-```bash
-cd ~/gmner
-PYTHONPATH=. $PY scripts/prepare_m33a_action_review_queues.py
-```
-
-固定输出为：
+完整十折 final-chain OOF 已完成并通过合并 Gate：
 
 ```text
-outputs/final_m33a_action_review/type_semantic_union_111.csv
-outputs/final_m33a_action_review/boundary_replacement_positive_55.csv
-outputs/final_m33a_action_review/boundary_promotion_positive_61.csv
-outputs/final_m33a_action_review/review_manifest.json
+records / unique IDs             7000 / 7000
+all five stages heldout-excluded true
+all folds sealed                 true
+all replay digests exact         true
+NaN / Inf                        0
+Dev / Test accessed              false
 ```
 
-其中 111 条类型审阅并集由 `21 text+visual + 4 visual-only + 86
-text-only` 构成；另有 28 条 neither，不进入首轮人工队列。这些 Dev 行只用于解释
-Oracle 正动作，不得用于训练、校准、特征选择或阈值选择。B1/A1 正式训练必须先取得
-完整最终链 OOF 的全部正负动作总体；当前不生成 OOF、不训练、不访问 Test。正式约束见
-`docs/experiments/B1_A1_ACTION_SEPARABILITY_PROTOCOL.md`。
-
-历史 OOF 来源只读库存审计：
-
-```bash
-cd ~/gmner
-PYTHONPATH=. $PY scripts/audit_final_chain_oof_source_feasibility.py
-```
-
-冻结结果为：
+保留母集：
 
 ```text
-compact NULL Release full-chain OOF  INCOMPLETE
-D1 strict Stage1 OOF                 INCOMPLETE
-P4 R0-B regenerated OOF              SEMANTICALLY_INVALID
-other complete full-chain source     MISSING
-VALID sources                        0
+knowledge/final_chain_oof/ten_fold_population/gold_free_rows.jsonl
+knowledge/final_chain_oof/ten_fold_population/supervision_sidecar.jsonl
+knowledge/final_chain_oof/ten_fold_population/merge_manifest.json
+knowledge/final_chain_oof/ten_fold_population/distribution_gate.json
 ```
 
-因此不得直接启动十折重训。唯一可继续的来源步骤是按
-`docs/experiments/FINAL_CHAIN_OOF_DRY_RUN_PROTOCOL.md` 新建 fold 0 完整链 dry
-run；该运行目前仅完成预注册，尚未执行。folds 1-9、B1/A1 训练、Dev 和 Test
-继续锁定。
+B1-T0 和 A1-T0 均已完成 folds 0-7 开发与 folds 8-9 一次性锁定评价：
+
+```text
+B1-T0 text-only type correction       NO_GO / SEALED
+A1-T0 observable boundary correction  NO_GO / SEALED
+Observable post-hoc correction        TERMINATED
+```
+
+两项实验的正式策略均为零动作，MNER 增量为 0；这来自开发折未找到满足
+precision、preservation 和跨折覆盖 Gate 的合法阈值，不允许在锁定折重扫。
+
+阶段总结：
+
+```text
+docs/experiments/FINAL_CHAIN_OOF_POSTHOC_PHASE_SUMMARY.md
+```
+
+下一候选方案仅为未授权路线：
+
+```text
+docs/experiments/CANDIDATE_CONDITIONED_STRUCTURED_DECODER_ROADMAP.md
+```
+
+任何 J0、潜表示重物化、训练、Dev 或 Test 访问都需要新的独立授权。
 
 ## 9. 产物目录速查
 

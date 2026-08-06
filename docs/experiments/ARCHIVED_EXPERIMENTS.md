@@ -67,3 +67,38 @@ The latest final-chain remapping and corrected denominators are documented in
 The three-chain comparison, DVH frozen-CLIP protocol, TQ-DV method description,
 and fixed-span replay result remain active documentation because their code and
 checkpoints are intentionally retained for comparison.
+
+## Final-Chain OOF Post-Hoc Correction
+
+A new strict ten-fold final-chain OOF population covered exactly 7000 unique
+Train records. All five supervised M3.3A stages excluded each held-out record,
+all discrete replay digests matched, and Dev/Test were not accessed. It
+contained 10,259 exact-span B1 rows with 875 base-wrong types, plus 39,063 raw
+replacement actions.
+
+**B1-T0 text-only type correction:** all three seeds learned moderate ranking
+and target-type signals, but folds 0-7 could not freeze a stable action
+threshold satisfying precision and preservation. Folds 8-9 therefore executed
+zero actions. Status: `NO_GO / SEALED`.
+
+**A1-T0 observable-tabular boundary correction:** after the gold-free strict
+type/region-preserving filter, the formal population was 31,138 actions with
+286 FIX, 4,128 NEUTRAL, and 26,724 DAMAGE labels. Candidate source improved
+diagnostic AUPRC, but no seed found a development utility prefix satisfying all
+Gates. The one-time locked evaluation executed zero actions for all seeds.
+Status: `NO_GO / SEALED`.
+
+Together these results close observable post-hoc correction. The OOF mother
+set is retained only as potential training-time risk supervision for a
+separately authorized candidate-conditioned structured decoder. See
+`FINAL_CHAIN_OOF_POSTHOC_PHASE_SUMMARY.md`.
+
+## TP/J3 Grounding Branch
+
+The independently trained TP/J3 chain improved Dev GMNER from `0.621316` to
+`0.629510`, but its one-time Test GMNER was `0.608696`, below formal M3.3A
+`0.615294`. Protected downstream residuals reduced the gap but the strongest
+Test mean remained `0.611341`. Status: `METHOD_NO_GO_TEST_GENERALIZATION`.
+The implementation is retained by `archive/tp-clip-j3-20260806` rather than an
+active branch. The related PA1 implementation is retained by
+`archive/protected-region-mner-pa1-20260806`.
