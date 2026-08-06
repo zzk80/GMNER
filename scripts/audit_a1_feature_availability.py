@@ -414,8 +414,10 @@ def main() -> None:
     output_json = resolve(root, authorization["output_contract"]["json"])
     output_md = resolve(root, authorization["output_contract"]["markdown"])
     output_json.parent.mkdir(parents=True, exist_ok=True)
-    output_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    output_md.write_text(markdown(report), encoding="utf-8")
+    output_json.write_bytes(
+        (json.dumps(report, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    )
+    output_md.write_bytes(markdown(report).encode("utf-8"))
     print(json.dumps(report, indent=2, sort_keys=True))
     if not passed:
         raise SystemExit(1)
