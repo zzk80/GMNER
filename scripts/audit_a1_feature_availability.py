@@ -363,7 +363,7 @@ def main() -> None:
         "kind": "a1_0_feature_availability_audit",
         "format_version": 1,
         "status": "PASS_OBSERVABLE_TABULAR_A1_T0_READY_FOR_SEPARATE_AUTHORIZATION" if passed else "BLOCKED",
-        "authorization": str(authorization_path),
+        "authorization": str(authorization_path.relative_to(root)).replace("\\", "/"),
         "authorization_sha256": sha256_file(authorization_path),
         "inputs": {
             "gold_free_rows_sha256": sha256_file(rows_path),
