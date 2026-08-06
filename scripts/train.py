@@ -64,7 +64,7 @@ TRAINABLE_MODULE_ALIASES = {
     "ner": ("ner_head",),
     "ner_head": ("ner_head",),
     "text": ("text_encoder", "text_projector", "text_graph_encoder"),
-    "image": ("image_encoder", "region_projector", "region_norm", "image_graph_encoder"),
+    "image": ("region_projector", "region_norm", "image_graph_encoder"),
     "aligner": ("aligner",),
     "all": ("",),
 }

@@ -1,4 +1,4 @@
-"""Auditable contracts shared by full-chain OOF pipelines."""
+"""Auditable contracts for the full-chain NULL Release OOF pipeline."""
 
 from __future__ import annotations
 
@@ -14,6 +14,26 @@ from gmner.utils.io import read_jsonl
 FULL_CHAIN_FOLD_MANIFEST_KIND = "full_chain_oof_fold_manifest"
 LEGACY_FULL_CHAIN_FOLD_MANIFEST_KIND = "null_release_full_chain_fold_manifest"
 FULL_CHAIN_FOLD_MANIFEST_VERSION = 1
+FULL_CHAIN_PIPELINE_KIND = "null_release_full_chain_fold_pipeline"
+FULL_CHAIN_PIPELINE_VERSION = 1
+SUPERVISED_PIPELINE_STAGES = (
+    "stage1",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+    "reliability",
+)
+REQUIRED_PIPELINE_STAGES = (
+    "stage1",
+    "candidate_caches",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+    "siglip2_caches",
+    "reliability",
+)
 
 
 def record_id(record: dict) -> str:
@@ -152,3 +172,77 @@ def fold_from_manifest(manifest: dict, fold_id: int) -> dict:
     if len(matches) != 1:
         raise ValueError(f"Fold manifest has no unique fold {fold_id}.")
     return matches[0]
+
+
+def validate_pipeline_manifest(
+    path: str | Path,
+    *,
+    fold_manifest: dict,
+    fold_id: int,
+    required_stages: Iterable[str] | None = None,
+    supervised_stages: Iterable[str] | None = None,
+) -> dict:
+    pipeline_path = Path(path).resolve()
+    pipeline = json.loads(pipeline_path.read_text(encoding="utf-8"))
+    if pipeline.get("kind") != FULL_CHAIN_PIPELINE_KIND:
+        raise ValueError("Not a NULL Release full-chain pipeline manifest.")
+    if int(pipeline.get("format_version", -1)) != FULL_CHAIN_PIPELINE_VERSION:
+        raise ValueError("Unsupported full-chain pipeline manifest version.")
+    if int(pipeline.get("fold_id", -1)) != int(fold_id):
+        raise ValueError("Pipeline manifest fold id does not match the proof.")
+    if pipeline.get("test_accessed") is not False:
+        raise ValueError("Formal OOF pipeline must assert test_accessed=false.")
+    if pipeline.get("source_tree_sha256") != fold_manifest.get(
+        "source_tree_sha256"
+    ):
+        raise ValueError("Pipeline source-tree fingerprint differs from the fold manifest.")
+    fold = fold_from_manifest(fold_manifest, fold_id)
+    expected_train_digest = fold["train_record_ids_sha256"]
+    expected_heldout_digest = fold["heldout_record_ids_sha256"]
+    if pipeline.get("train_record_ids_sha256") != expected_train_digest:
+        raise ValueError("Pipeline training-id digest does not match the fold.")
+    if pipeline.get("heldout_record_ids_sha256") != expected_heldout_digest:
+        raise ValueError("Pipeline heldout-id digest does not match the fold.")
+    stages = dict(pipeline.get("stages") or {})
+    required = tuple(required_stages or REQUIRED_PIPELINE_STAGES)
+    supervised = tuple(supervised_stages or SUPERVISED_PIPELINE_STAGES)
+    if not set(supervised).issubset(required):
+        raise ValueError("Supervised pipeline stages must be required stages.")
+    for name in required:
+        stage = dict(stages.get(name) or {})
+        if stage.get("status") != "complete":
+            raise ValueError(f"Required OOF stage {name!r} is not complete.")
+        if stage.get("test_accessed") is not False:
+            raise ValueError(f"Required OOF stage {name!r} accessed test data.")
+        for group in ("inputs", "outputs"):
+            artifacts = list(stage.get(group) or [])
+            if not artifacts:
+                raise ValueError(f"Required OOF stage {name!r} has no {group} proof.")
+            for artifact in artifacts:
+                artifact_path = Path(str(artifact.get("path", "")))
+                if not artifact_path.is_file():
+                    raise FileNotFoundError(
+                        f"Missing {name} {group} artifact: {artifact_path}"
+                    )
+                if sha256_file(artifact_path) != artifact.get("sha256"):
+                    raise ValueError(f"{name} {group} artifact hash changed.")
+    for name in supervised:
+        stage = dict(stages.get(name) or {})
+        if stage.get("status") != "complete":
+            raise ValueError(f"Supervised OOF stage {name!r} is not complete.")
+        if stage.get("test_accessed") is not False:
+            raise ValueError(f"Supervised OOF stage {name!r} accessed test data.")
+        if stage.get("heldout_excluded") is not True:
+            raise ValueError(f"Supervised OOF stage {name!r} lacks heldout exclusion.")
+        if stage.get("train_record_ids_sha256") != expected_train_digest:
+            raise ValueError(f"Supervised OOF stage {name!r} used another train split.")
+        for role in ("config", "checkpoint"):
+            artifact = dict(stage.get(role) or {})
+            artifact_path = Path(str(artifact.get("path", "")))
+            if not artifact_path.exists():
+                raise FileNotFoundError(
+                    f"Missing {name} {role} artifact: {artifact_path}"
+                )
+            if sha256_file(artifact_path) != artifact.get("sha256"):
+                raise ValueError(f"{name} {role} artifact hash changed.")
+    return pipeline

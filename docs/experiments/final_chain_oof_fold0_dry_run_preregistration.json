@@ -1,0 +1,132 @@
+{
+  "kind": "final_chain_oof_fold0_dry_run_preregistration",
+  "format_version": 1,
+  "status": "AUTHORIZED_NOT_STARTED",
+  "experiment_id": "final_chain_oof_fold0_dry_run_v1",
+  "fold_id": 0,
+  "records": {
+    "train": 6300,
+    "heldout": 700,
+    "source_total": 7000
+  },
+  "formal_chain": [
+    "stage1",
+    "r16_r36_candidates",
+    "hierarchical",
+    "coarse",
+    "fine",
+    "evidence",
+    "final_decode",
+    "gold_free_action_enumeration"
+  ],
+  "excluded_modules": [
+    "siglip2",
+    "reliability",
+    "null_release",
+    "clip",
+    "fmnerg_subtype"
+  ],
+  "semantic_contract": {
+    "coarse_type_order": ["LOC", "PER", "ORG", "OTHER"],
+    "coarse_type_ids": {"LOC": 0, "PER": 1, "ORG": 2, "OTHER": 3},
+    "type_logits_order": ["LOC", "PER", "ORG", "OTHER"],
+    "type_logits_semantics": "anchored_formal_stage1_span_type_logits",
+    "type_logits_pooling": "mean(0.5*(B_type_emission+I_type_emission))_over_span_subwords",
+    "formal_type_anchor": "formal_type_logit=max(current,max_all+1e-4)",
+    "formal_region_index_namespace": "expanded_r36_local_index",
+    "formal_null_index": "r36_candidates.null_region_index",
+    "stable_region_identity": "record_id+image_id+vinvl_source_index_or_NULL",
+    "id_hash": "sha256",
+    "id_serialization": "utf8_canonical_json_sorted_keys_compact",
+    "id_float_inputs_forbidden": true,
+    "runtime_row_indices_forbidden_in_ids": true,
+    "discrete_replay": "exact",
+    "continuous_atol": 0.00003,
+    "continuous_rtol": 0.000001,
+    "digest_includes_raw_float_bytes": false,
+    "nan_or_inf": "hard_stop"
+  },
+  "resource_budget": {
+    "gpu_free_gate_gib": 10,
+    "preferred_free_disk_gib": 10,
+    "hard_free_disk_floor_gib": 6,
+    "transient_fold_budget_gib": 5,
+    "sealed_retained_target_mib": 500,
+    "execution": "single_sequential_gpu_process"
+  },
+  "source_contract": {
+    "num_folds": 10,
+    "outer_seed": 42,
+    "seed": 42,
+    "inner_selection_seed": 1042,
+    "outer_train_records": 6300,
+    "inner_fit_records": 5600,
+    "inner_selection_records": 700,
+    "heldout_records": 700,
+    "official_dev_access": false,
+    "test_access": false
+  },
+  "selection_contract": {
+    "kind": "deterministic_nested_train_selection",
+    "fit_records": 5600,
+    "selection_records": 700,
+    "selection_source": "fold0_outer_train_only",
+    "heldout_excluded": true,
+    "official_dev_forbidden": true
+  },
+  "chain_contract": {
+    "identity": "M3.3A_FORMAL_BEST_CHAIN",
+    "siglip2": false,
+    "fusion_reliability": false,
+    "null_release": false,
+    "clip": false,
+    "fmnerg_subtype": false
+  },
+  "storage_contract": {
+    "work_root": "knowledge/final_chain_oof/fold0_dry_run",
+    "output_root": "outputs/final_chain_oof/fold0_dry_run",
+    "legacy_evidence_root": "knowledge/null_release_oof/roberta128"
+  },
+  "required_gates": {
+    "heldout_exclusion_all_supervised_stages": true,
+    "minimum_row_schema_coverage": 1.0,
+    "word_space_final_span_validity": 1.0,
+    "formal_prediction_identity_coverage": 1.0,
+    "all_stage_hashes_present": true,
+    "candidate_generation_gold_free": true,
+    "action_enumeration_deterministic": true,
+    "double_run_formal_digest_exact": true,
+    "double_run_action_digest_exact": true,
+    "folds_1_9_accessed": false,
+    "dev_accessed": false,
+    "test_accessed": false
+  },
+  "hard_stop_conditions": [
+    "heldout_leakage",
+    "full_fit_fold_specific_artifact_mixing",
+    "missing_word_space_coordinates",
+    "missing_final_type_logits",
+    "formal_digest_nondeterminism",
+    "action_digest_nondeterminism",
+    "gold_used_before_action_seal",
+    "unstable_candidate_identity_or_tie_break",
+    "schema_field_reconstructed_after_materialization",
+    "test_artifact_access",
+    "resource_budget_exceeded"
+  ],
+  "authorization": {
+    "source_inventory_audit": true,
+    "fold0_execution": true,
+    "folds_1_9_execution": false,
+    "b1_a1_population_training": false,
+    "dev_execution": false,
+    "test_execution": false
+  },
+  "access": {
+    "training_run": false,
+    "oof_generated": false,
+    "oracle_computed": false,
+    "dev_accessed": false,
+    "test_accessed": false
+  }
+}

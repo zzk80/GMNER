@@ -398,7 +398,7 @@ curves; exact GMNER for every prefix; and OOF/full-fit Dev unlabeled feature
 drift.
 
 The complete frozen contract is:
-[`experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
+[`experiments/ARCHIVED_EXPERIMENTS.md`](experiments/ARCHIVED_EXPERIMENTS.md).
 
 P4.1 selector training is not authorized until P4.0 passes.
 

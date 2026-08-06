@@ -1,0 +1,194 @@
+{
+  "access": {
+    "b1_a1_training_run": false,
+    "dev_accessed": false,
+    "folds_8_9_accessed": false,
+    "oracle_computed": false,
+    "payloads_deserialized": false,
+    "test_accessed": false,
+    "training_data_loaded": false
+  },
+  "format_version": 1,
+  "historical_evidence_commit": "107ad60",
+  "kind": "final_chain_oof_source_inventory",
+  "next_authorized_step": null,
+  "next_required_decision": "explicitly_authorize_new_single_fold_dry_run",
+  "registry_sha256": "b64da2a80f957c817bb5b270dcbecb1460efc5490f16b3d8dac46987ce87f28d",
+  "required_capabilities": [
+    "record_id",
+    "word_space_final_spans",
+    "final_m33a_prediction_identity",
+    "final_coarse_type_logits",
+    "final_region_null_decision",
+    "stage1_span_type_identity",
+    "r16_candidate_identity_scores",
+    "r36_candidate_identity_scores",
+    "hierarchical_state",
+    "coarse_selector_state",
+    "fine_grounding_state",
+    "evidence_visibility_state",
+    "fold_checkpoint_hashes",
+    "fold_config_hashes",
+    "source_dataset_hash",
+    "heldout_exclusion_proof",
+    "test_access_false",
+    "deterministic_action_enumeration"
+  ],
+  "schema_sha256": "67bcbae4b4bdc8618494343c795313e38fb0beefd9bafe4f5c4643d7b33a9e78",
+  "scope": "historical_train_oof_sources_only",
+  "source_gate_passed": false,
+  "sources": [
+    {
+      "artifact_state": "ARCHIVED_EVIDENCE_ONLY",
+      "available_capabilities": [
+        "coarse_selector_state",
+        "evidence_visibility_state",
+        "final_region_null_decision",
+        "fine_grounding_state",
+        "fold_checkpoint_hashes",
+        "fold_config_hashes",
+        "heldout_exclusion_proof",
+        "hierarchical_state",
+        "r16_candidate_identity_scores",
+        "r36_candidate_identity_scores",
+        "record_id",
+        "source_dataset_hash",
+        "test_access_false"
+      ],
+      "description": "Historical compact held-out features from the NULL Release full-chain OOF run.",
+      "evidence": [
+        "docs/experiments/p4_0_source_preparation_report.json@107ad60",
+        "docs/experiments/P4_0_SOURCE_PREPARATION_REPORT.md@107ad60"
+      ],
+      "failed_folds": [],
+      "missing_capabilities": [
+        "word_space_final_spans",
+        "final_m33a_prediction_identity",
+        "final_coarse_type_logits",
+        "stage1_span_type_identity",
+        "deterministic_action_enumeration"
+      ],
+      "provenance_valid": true,
+      "semantic_valid": true,
+      "source_id": "compact_null_release_full_chain_oof",
+      "status": "INCOMPLETE"
+    },
+    {
+      "artifact_state": "COMPACT_ARCHIVE_RETAINED",
+      "available_capabilities": [
+        "fold_checkpoint_hashes",
+        "fold_config_hashes",
+        "heldout_exclusion_proof",
+        "r16_candidate_identity_scores",
+        "record_id",
+        "source_dataset_hash",
+        "stage1_span_type_identity",
+        "test_access_false",
+        "word_space_final_spans"
+      ],
+      "description": "Strict ten-fold Stage1 candidate-selector OOF cache.",
+      "evidence": [
+        "docs/experiments/ARCHIVED_EXPERIMENTS.md",
+        "docs/experiments/stage1_candidate_selector_seed42_summary.json@107ad60"
+      ],
+      "failed_folds": [],
+      "missing_capabilities": [
+        "final_m33a_prediction_identity",
+        "final_coarse_type_logits",
+        "final_region_null_decision",
+        "r36_candidate_identity_scores",
+        "hierarchical_state",
+        "coarse_selector_state",
+        "fine_grounding_state",
+        "evidence_visibility_state",
+        "deterministic_action_enumeration"
+      ],
+      "provenance_valid": true,
+      "semantic_valid": true,
+      "source_id": "d1_strict_stage1_oof",
+      "status": "INCOMPLETE"
+    },
+    {
+      "artifact_state": "SEALED_THEN_CLEANED",
+      "available_capabilities": [
+        "coarse_selector_state",
+        "evidence_visibility_state",
+        "final_m33a_prediction_identity",
+        "final_region_null_decision",
+        "fine_grounding_state",
+        "fold_checkpoint_hashes",
+        "fold_config_hashes",
+        "heldout_exclusion_proof",
+        "hierarchical_state",
+        "r16_candidate_identity_scores",
+        "r36_candidate_identity_scores",
+        "record_id",
+        "source_dataset_hash",
+        "stage1_span_type_identity",
+        "test_access_false",
+        "word_space_final_spans"
+      ],
+      "description": "Regenerated full-chain folds 0-7 with formal coordinates.",
+      "evidence": [
+        "docs/experiments/p4_r0_b_regeneration_aggregate_report.json@107ad60",
+        "docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md@107ad60"
+      ],
+      "failed_folds": [
+        2,
+        4,
+        5,
+        7
+      ],
+      "missing_capabilities": [
+        "final_coarse_type_logits",
+        "deterministic_action_enumeration"
+      ],
+      "provenance_valid": true,
+      "semantic_valid": false,
+      "source_id": "p4_r0b_regenerated_full_chain_oof",
+      "status": "SEMANTICALLY_INVALID"
+    },
+    {
+      "artifact_state": "NOT_FOUND",
+      "available_capabilities": [],
+      "description": "Any other complete full-chain held-out artifact set in the retained workspace.",
+      "evidence": [
+        "docs/experiments/ARCHIVED_EXPERIMENTS.md"
+      ],
+      "failed_folds": [],
+      "missing_capabilities": [
+        "record_id",
+        "word_space_final_spans",
+        "final_m33a_prediction_identity",
+        "final_coarse_type_logits",
+        "final_region_null_decision",
+        "stage1_span_type_identity",
+        "r16_candidate_identity_scores",
+        "r36_candidate_identity_scores",
+        "hierarchical_state",
+        "coarse_selector_state",
+        "fine_grounding_state",
+        "evidence_visibility_state",
+        "fold_checkpoint_hashes",
+        "fold_config_hashes",
+        "source_dataset_hash",
+        "heldout_exclusion_proof",
+        "test_access_false",
+        "deterministic_action_enumeration"
+      ],
+      "provenance_valid": false,
+      "semantic_valid": false,
+      "source_id": "other_full_chain_fold_artifacts",
+      "status": "MISSING"
+    }
+  ],
+  "status": "BLOCKED_NO_VALID_SOURCE",
+  "status_counts": {
+    "INCOMPLETE": 2,
+    "MISSING": 1,
+    "PROVENANCE_INVALID": 0,
+    "SEMANTICALLY_INVALID": 1,
+    "VALID": 0
+  },
+  "valid_sources": []
+}

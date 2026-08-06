@@ -1,0 +1,197 @@
+{
+  "kind": "a1_t0_observable_tabular_preregistration",
+  "format_version": 1,
+  "status": "PREREGISTERED_TRAINING_NOT_AUTHORIZED",
+  "experiment_name": "Observable-Tabular Grouped A1-T0 Separability",
+  "evidence_contract": {
+    "feature_audit": "knowledge/final_chain_oof/a1_0/a1_feature_availability_audit.json",
+    "feature_audit_sha256": "0896cfb5a435df24453eabdf3739e1ca7ef4712f64f2c5a3f56922bb69acce80",
+    "gold_free_rows_sha256": "d9ffcc53d71e64b5b6ceb3a043e579fce363779564710b9d2aebf65d9b934d4b",
+    "supervision_sidecar_sha256": "a0487a5a529d8f46ce28a8aaf4008d693d6aa3edb06551515d2f1eedafdb6ee6",
+    "actions": 31138,
+    "base_prediction_groups": 10595,
+    "labels": {
+      "FIX": 286,
+      "NEUTRAL": 4128,
+      "DAMAGE": 26724
+    },
+    "fix_rate": 0.009184918748795684,
+    "development_fix": 238,
+    "locked_evaluation_fix": 48,
+    "legacy_366_of_39063_population_forbidden": true
+  },
+  "action_space": {
+    "operation": "one_for_one_word_boundary_replacement",
+    "group_key": "base_prediction_id",
+    "maximum_actions_per_group": 1,
+    "keep_is_explicit": true,
+    "keep_utility": 0.0,
+    "candidate_type_must_equal_base_type": true,
+    "candidate_region_identity_must_equal_base_region_identity": true,
+    "null_visibility_must_remain_unchanged": true,
+    "prediction_count_must_remain_unchanged": true,
+    "non_executed_predictions_must_remain_exact": true
+  },
+  "partition_contract": {
+    "development_folds": [0, 1, 2, 3, 4, 5, 6, 7],
+    "locked_evaluation_folds": [8, 9],
+    "internal_validation": "leave_one_fold_out_by_fold_id",
+    "split_unit": "base_prediction_id_group",
+    "random_action_split_forbidden": true,
+    "locked_evaluation_runs": 1
+  },
+  "feature_contract": {
+    "registry_source": "A1-0 features with authorized_for_a1=true",
+    "directly_available_count": 19,
+    "derivable_gold_free_count": 16,
+    "total_model_inputs": 35,
+    "candidate_source_included": true,
+    "source_representation": "one_hot_kbest_perturbation_viterbi",
+    "numeric_preprocessing": "training_fold_mean_std_with_std_floor_1e-6",
+    "missing_value_imputation": "forbidden_all_selected_features_require_coverage_1",
+    "forbidden": [
+      "raw text or tokens",
+      "z_b or z_c",
+      "RoBERTa pooled states",
+      "record contextual embeddings",
+      "candidate-conditioned latent states",
+      "unstable chain_state arrays",
+      "gold sidecar fields as inputs",
+      "Dev manual annotations"
+    ]
+  },
+  "model_contract": {
+    "formal_model": "shared_source_aware_three_class_mlp",
+    "input_projection_size": 128,
+    "hidden_size": 64,
+    "dropout": 0.1,
+    "outputs": ["FIX", "NEUTRAL", "DAMAGE"],
+    "loss": "unweighted_three_class_cross_entropy_on_all_strict_actions",
+    "negative_downsampling": false,
+    "source_matched_negatives": "all_NEUTRAL_and_DAMAGE_actions_from_each_source_are_retained",
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 512,
+    "epochs": 30,
+    "gradient_clip_norm": 1.0,
+    "checkpoint_selection": "fixed_epoch_no_locked_fold_selection",
+    "seeds": [41, 42, 43]
+  },
+  "calibration_contract": {
+    "predictions": "pooled_leave_one_fold_out_logits_from_folds_0_7",
+    "method": "one_global_positive_scalar_temperature_minimizing_three_class_NLL",
+    "temperature_bounds": [0.05, 20.0],
+    "source_specific_calibration": false,
+    "locked_fold_calibration": false
+  },
+  "utility_contract": {
+    "formula": "P(FIX)-lambda_damage*P(DAMAGE)-lambda_neutral*P(NEUTRAL)",
+    "lambda_damage_candidates": [1.0, 2.0, 4.0, 8.0],
+    "lambda_neutral_candidates": [0.0, 0.25, 0.5, 1.0],
+    "valid_pair_rule": "lambda_damage > lambda_neutral",
+    "delta_quantiles_of_group_max_utility": [
+      0.9,
+      0.925,
+      0.95,
+      0.96,
+      0.97,
+      0.975,
+      0.98,
+      0.985,
+      0.99,
+      0.9925,
+      0.995,
+      0.9975,
+      0.999
+    ],
+    "include_delta_zero": true,
+    "execute_rule": "group_argmax_utility_strictly_greater_than_delta",
+    "tie_break": [
+      "higher_utility",
+      "higher_P_FIX",
+      "lower_P_DAMAGE",
+      "higher_candidate_score",
+      "lexicographically_smaller_action_id"
+    ],
+    "selection_data": "folds_0_7_pooled_leave_one_fold_out_predictions_only",
+    "selection_objective": [
+      "more_development_folds_with_positive_net",
+      "larger_pooled_net",
+      "higher_action_precision",
+      "fewer_actions",
+      "higher_delta",
+      "smaller_lambda_damage",
+      "smaller_lambda_neutral"
+    ]
+  },
+  "development_feasibility_gate": {
+    "minimum_pooled_actions": 20,
+    "minimum_folds_with_actions": 6,
+    "minimum_folds_with_positive_net": 6,
+    "pooled_corrected_greater_than_damaged": true,
+    "minimum_pooled_action_precision": 0.75,
+    "minimum_formal_correct_preservation": 0.99,
+    "pooled_net_must_be_positive": true,
+    "zero_action_or_single_action_prefix": "FAIL"
+  },
+  "locked_evaluation_gate_per_seed": {
+    "minimum_pooled_actions": 10,
+    "minimum_actions_per_locked_fold": 3,
+    "both_locked_folds_net_must_be_positive": true,
+    "pooled_corrected_greater_than_damaged": true,
+    "minimum_pooled_action_precision": 0.75,
+    "minimum_formal_correct_preservation": 0.99,
+    "pooled_net_must_be_positive": true,
+    "mner_delta_must_be_positive": true,
+    "zero_actions": "FAIL",
+    "single_action_or_extremely_narrow_prefix": "FAIL"
+  },
+  "final_gate": {
+    "passing_seed_requirement": "3_of_3",
+    "mean_net_must_be_positive": true,
+    "mean_mner_delta_must_be_positive": true,
+    "threshold_or_gate_relaxation_after_locked_evaluation": false
+  },
+  "source_reporting": {
+    "required_slices": ["kbest", "perturbation", "viterbi"],
+    "metrics": ["actions", "corrected", "neutral", "damaged", "net", "action_precision"],
+    "source_specific_thresholds": false,
+    "source_specific_utility_weights": false,
+    "viterbi_is_diagnostic_only": true
+  },
+  "ablation_contract": {
+    "name": "remove_candidate_source",
+    "all_other_features_and_training_settings_identical": true,
+    "formal_model_selection_using_ablation": false,
+    "formal_gate_uses_source_aware_model_only": true,
+    "locked_fold_ablation_report_required": true
+  },
+  "locked_metrics": [
+    "base_predictions_considered",
+    "executed_actions",
+    "corrected",
+    "neutral",
+    "damaged",
+    "net",
+    "action_precision",
+    "formal_correct_preservation",
+    "prediction_count_identity",
+    "type_identity",
+    "region_null_identity",
+    "record_conflict_count",
+    "MNER_correct_delta",
+    "MNER_F1_delta",
+    "AUPRC",
+    "precision_at_k"
+  ],
+  "access_and_authorization": {
+    "a1_t0_training_authorized": false,
+    "a1_t0_locked_evaluation_authorized": false,
+    "latent_feature_rematerialization_authorized": false,
+    "b1_tv_authorized": false,
+    "dev_access_authorized": false,
+    "test_access_authorized": false
+  },
+  "termination_rule": "If the preregistered source-aware A1-T0 fails the locked 3-of-3 gate, observable post-hoc correction is NO_GO. OOF labels may only be reused as training-time risk supervision for a separately authorized candidate-conditioned joint decoder."
+}

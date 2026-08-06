@@ -24,7 +24,6 @@ data:
 
 model:
   text_model_name: /home/zzk/gmner/roberta-base
-  image_backbone: resnet50
   hidden_size: 768
   projection_dim: 768
   dropout: 0.1
@@ -32,7 +31,6 @@ model:
   graph_dropout: 0.1
   cross_attention_heads: 8
   use_crf: true
-  use_pretrained_vision: true
   region_feature_dim: 2048
   grounding_null_prior_weight: 1.0
   grounding_null_logit_bias: 0.0

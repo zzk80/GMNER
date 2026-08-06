@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Dict
+from collections import OrderedDict
+from typing import Dict, Mapping
 
 import torch
 import torch.nn as nn
@@ -40,7 +41,6 @@ from gmner.models.external_knowledge import ExternalKnowledgePrototypeBank
 from gmner.models.graph_encoder import StackedGraphEncoder
 from gmner.models.grounding_reranker import PrototypeAwareGroundingReranker
 from gmner.models.heads import GroundingHead, GroundingResidualAdapter, TokenClassificationHead
-from gmner.models.image_encoder import ImageEncoder
 from gmner.models.joint_type_region_verifier import (
     JointEntityAdapter,
     JointTypeRegionVerifier,
@@ -241,11 +241,6 @@ class GMNERModel(nn.Module):
                 classifier.weight.copy_(self.subtype_contrastive_prototypes)
                 classifier.bias.zero_()
 
-        self.image_encoder = ImageEncoder(
-            backbone_name=config.model.image_backbone,
-            output_dim=hidden_size,
-            pretrained=config.model.use_pretrained_vision,
-        )
         self.region_projector = nn.Linear(config.model.region_feature_dim, hidden_size)
         self.region_norm = nn.LayerNorm(hidden_size)
 
@@ -418,6 +413,7 @@ class GMNERModel(nn.Module):
         self.lambda_external_knowledge_arbiter = float(
             getattr(config.loss, "lambda_external_knowledge_arbiter", 0.0)
         )
+
         self.lambda_external_knowledge_fusion = float(
             getattr(config.loss, "lambda_external_knowledge_fusion", 0.0)
         )
@@ -493,6 +489,26 @@ class GMNERModel(nn.Module):
             float(getattr(config.loss, "joint_null_sample_weight", 1.0)),
         )
         self.label_smoothing = config.loss.label_smoothing
+
+    def load_state_dict(
+        self,
+        state_dict: Mapping[str, torch.Tensor],
+        strict: bool = True,
+        assign: bool = False,
+    ):
+        """Load current checkpoints while discarding the removed ResNet branch."""
+
+        if any(key.startswith("image_encoder.") for key in state_dict):
+            filtered = OrderedDict(
+                (key, value)
+                for key, value in state_dict.items()
+                if not key.startswith("image_encoder.")
+            )
+            metadata = getattr(state_dict, "_metadata", None)
+            if metadata is not None:
+                filtered._metadata = metadata
+            state_dict = filtered
+        return super().load_state_dict(state_dict, strict=strict, assign=assign)
 
     @staticmethod
     def _load_subtype_contrastive_prototypes(
@@ -1253,10 +1269,16 @@ class GMNERModel(nn.Module):
         attention_mask = batch["attention_mask"]
         token_type_ids = batch.get("token_type_ids")
         adjacency = batch["adjacency"]
-        images = batch.get("images")
         region_features = batch.get("region_features")
         region_mask = batch.get("region_mask")
         region_boxes = batch.get("region_boxes")
+
+        if region_features is None:
+            raise ValueError(
+                "GMNERModel requires precomputed region_features. The legacy "
+                "ResNet raw-image fallback was removed; use VinVL features or "
+                "a separately configured CLIP feature source."
+            )
 
         text_nodes, _ = self.text_encoder(
             input_ids=input_ids,
@@ -1267,20 +1289,12 @@ class GMNERModel(nn.Module):
         base_text_nodes = text_nodes
         text_nodes = self.text_graph_encoder(text_nodes, adjacency)
 
-        if region_features is not None:
-            image_nodes = self.region_norm(self.region_projector(region_features))
-            image_mask = region_mask if region_mask is not None else torch.ones(
+        image_nodes = self.region_norm(self.region_projector(region_features))
+        image_mask = region_mask if region_mask is not None else torch.ones(
                 (image_nodes.size(0), image_nodes.size(1)),
                 dtype=torch.float32,
                 device=image_nodes.device,
-            )
-        else:
-            _, image_nodes = self.image_encoder(images)
-            image_mask = torch.ones(
-                (image_nodes.size(0), image_nodes.size(1)),
-                dtype=torch.float32,
-                device=image_nodes.device,
-            )
+        )
 
         image_adjacency = build_image_adjacency(
             batch_size=image_nodes.size(0),

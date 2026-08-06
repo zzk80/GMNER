@@ -106,6 +106,9 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 | M3.6A-r2 NULL Release | Train strict 10-fold OOF features | Dev full-fit frozen chain | Best epoch 仍为 0，完全 KEEP | **NO_GO** | 不读 Test |
 | M3.6A-r1 | Train in-sample/full-fit cache | Dev engineering-only | Dev GMNER 0.623738，净修正 +6 | **ENGINEERING_ONLY** | 仅工程信号，不作为正式提升 |
 | 早期 OOF Evidence Graph | 5-fold Stage1 evidence OOF（非整链） | Test | MNER 0.78593；EEG 0.62542；GMNER 0.58035 | **ENGINEERING_HISTORY** | 低于 mBERT Stage1 |
+| **Final-chain OOF population** | 10 个完整 fold-specific M3.3A 链 | 7000 held-out Train records | 10259 exact-span；875 base-wrong；39063 raw replacement actions | **VALID_AUDIT** | 五阶段 held-out exclusion、replay、Schema、ID 与 finite Gate 全通过；Dev/Test 未访问 |
+| **B1-T0 text-only type correction** | folds 0-7 开发并冻结阈值 | folds 8-9 一次锁定评价 | 三 seed 均 0 action，MNER delta 0 | **NO_GO / SEALED** | 有中等排序信号，但无稳定高精度动作尾部 |
+| **A1-T0 observable grouped replacement** | strict `286 / 31138`；folds 0-7 LOO 开发 | folds 8-9 一次锁定评价 | `passing_seeds=0/3`；三 seed 均 0 action | **NO_GO / SEALED** | source-aware AUPRC 高于消融，但无满足联合 Gate 的效用前缀；observable post-hoc correction 关闭 |
 
 ### 关键说明
 
@@ -203,7 +206,7 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 | **D0 Stage1 Gradient Conflict Audit** | 固定 Train-only 128-record probe；正式 Stage1 checkpoint；FP32；0 updates | 不访问 Dev/Test；层 0/5/11，58 batches | 9 个 layer/pair 均未满足强负相关与同尺度联合 Gate；`recommend_d2=false` | **VALID_AUDIT** | 不运行 progressive loss schedule，进入 D1 |
 | **P2 Span Recovery Gold Oracle** | N/A（gold analysis） | Dev full-fit | R36 GMNER-compatible 218；S1a/S1b/S1c = 134/113/41；理论 ceiling +0.08801* | **ORACLE** | 理论空间大 |
 | **P2 Observable Post-processing** | N/A | Dev full-fit | 未通过 Gate | **NO_GO** | 后处理规则关闭 |
-| **P2/D1 Learned Selector Seed42** | Train strict 10-fold Stage1-only OOF；旧 NULL Release OOF 特征未复用 | 同候选契约的 full-fit Dev Stage1 cache | Span/MNER/EEG/Stage1-GMNER delta `+0.00430/+0.00570/+0.00166/+0.00256`；formal gold preservation `0.98381`；promoted precision `0.71429` | **NO_GO** | Span 未达 `+0.005` 且保护率低于 `0.99`；不运行 Seeds 41/43、下游重建或 Test；见 [`experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md`](experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md) |
+| **P2/D1 Learned Selector Seed42** | Train strict 10-fold Stage1-only OOF；旧 NULL Release OOF 特征未复用 | 同候选契约的 full-fit Dev Stage1 cache | Span/MNER/EEG/Stage1-GMNER delta `+0.00430/+0.00570/+0.00166/+0.00256`；formal gold preservation `0.98381`；promoted precision `0.71429` | **NO_GO** | Span 未达 `+0.005` 且保护率低于 `0.99`；不运行 Seeds 41/43、下游重建或 Test；见 [`experiments/ARCHIVED_EXPERIMENTS.md`](experiments/ARCHIVED_EXPERIMENTS.md) |
 | **P3 Same-Type Assignment Oracle** | N/A（gold analysis） | Dev full-fit | 24 个唯一可恢复实体；理论上限 +0.00969 | **ORACLE** | Oracle Gate 通过，进入 MVP |
 | **P3 C1 Resolver MVP** | Train strict 10-fold OOF features | 同一 full-fit Dev 主链，Resolver disabled/enabled 配对 | Dev 仍 0.621316；0 override、0 corrected、0 damaged | **NO_GO** | 对当前工程链无增益，C2 不运行 |
 | SigLIP2 Reliability | N/A | Dev full-fit | VinVL/SigLIP2/Fusion AUROC：0.5773/0.5759/0.6003；Fusion risk +9 | **NO_GO** | |
@@ -229,8 +232,8 @@ Base Top-8 + Learned Top-8 conditional recall = 0.90769
 
 - **Gold Oracle:** 空间大（+0.08801 ceiling）
 - **Observable post-processing:** no-go（未通过 Gate）
-- **Learned gold-free selector:** 实施协议已冻结但尚未训练；需要重新生成
-  Stage1-only strict OOF candidate cache，旧 NULL Release OOF 特征字段不足
+- **Learned gold-free selector:** Seed42 已完成并判定 `NO_GO`；Seeds 41/43
+  与下游重建未运行，紧凑结论见归档索引
 
 ---
 
@@ -291,7 +294,7 @@ P3 Same-Type Assignment: +0.00969 (24 entities)
 - **正式结果来源:** [README.md](../README.md)
 - **M3.3A 链路:** [HIERARCHICAL_RECORD_VERIFIER.md](HIERARCHICAL_RECORD_VERIFIER.md)
 - **FMNERG F2/F3:** [sidecars/fmnerg_subtype/README.md](../sidecars/fmnerg_subtype/README.md)
-- **D1 OOF 协议:** [STAGE1_OOF_CANDIDATE_SELECTOR.md](experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md)
+- **已关闭实验归档:** [ARCHIVED_EXPERIMENTS.md](experiments/ARCHIVED_EXPERIMENTS.md)
 - **实验选择规则:** [EXPERIMENT_ACCEPTANCE_CRITERIA.md](EXPERIMENT_ACCEPTANCE_CRITERIA.md)
 
 ---

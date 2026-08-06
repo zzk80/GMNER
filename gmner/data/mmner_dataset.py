@@ -338,7 +338,16 @@ class MMNERJsonDataset(Dataset):
     def _load_region_features(
         self,
         image_id: str,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, List[str], List[str], np.ndarray]:
+    ) -> Tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        List[str],
+        List[str],
+        np.ndarray,
+        np.ndarray,
+    ]:
         features = np.zeros((self.max_regions, self.region_feature_dim), dtype=np.float32)
         boxes = np.zeros((self.max_regions, 4), dtype=np.float32)
         mask = np.zeros((self.max_regions,), dtype=np.float32)
@@ -346,6 +355,7 @@ class MMNERJsonDataset(Dataset):
         object_labels = [""] * self.max_regions
         object_attributes = [""] * self.max_regions
         image_size = np.zeros((2,), dtype=np.float32)
+        source_indices = np.full((self.max_regions,), -1, dtype=np.int64)
 
         if self.image_feature_dir:
             npz_path = self.image_feature_dir / f"{image_id}.jpg.npz"
@@ -358,6 +368,7 @@ class MMNERJsonDataset(Dataset):
                 selected_indices = np.flatnonzero(raw_scores[:num_boxes] >= self.region_min_score)
                 selected_indices = selected_indices[: self.max_regions]
                 final_num = len(selected_indices)
+                source_indices[:final_num] = selected_indices
                 if "box_features" in data:
                     features[:final_num] = data["box_features"][selected_indices]
                 if "bounding_boxes" in data:
@@ -378,8 +389,20 @@ class MMNERJsonDataset(Dataset):
             scores = np.concatenate([scores, np.ones((1,), dtype=np.float32)], axis=0)
             object_labels.append("NULL")
             object_attributes.append("")
+            source_indices = np.concatenate(
+                [source_indices, np.asarray([-1], dtype=np.int64)], axis=0
+            )
 
-        return features, boxes, mask, scores, object_labels, object_attributes, image_size
+        return (
+            features,
+            boxes,
+            mask,
+            scores,
+            object_labels,
+            object_attributes,
+            image_size,
+            source_indices,
+        )
 
     def _select_region_label(
         self,
@@ -569,6 +592,7 @@ class MMNERJsonDataset(Dataset):
                 region_object_labels,
                 region_object_attributes,
                 image_size,
+                region_source_indices,
             ) = self._load_region_features(image_id)
             boxes_by_name = self._read_xml_boxes(image_id)
             has_evidence_entities = isinstance(record.get("evidence_entities"), list)
@@ -610,6 +634,7 @@ class MMNERJsonDataset(Dataset):
                 sample["grounding_null_prior"] = 1.0 - 1e-4
                 sample["region_object_labels"] = region_object_labels
                 sample["region_object_attributes"] = region_object_attributes
+                sample["region_source_indices"] = region_source_indices
                 samples.append(sample)
                 continue
 
@@ -694,6 +719,7 @@ class MMNERJsonDataset(Dataset):
                 sample["image_size"] = image_size
                 sample["region_object_labels"] = region_object_labels
                 sample["region_object_attributes"] = region_object_attributes
+                sample["region_source_indices"] = region_source_indices
                 sample["gt_boxes_by_name"] = boxes_by_name
                 samples.append(sample)
 

@@ -45,6 +45,12 @@ ASSIGNMENT_MECHANISMS = (
     "A1_RECOVERABLE_PERMUTATION",
     "A2_HARMFUL_COLLISION",
 )
+SPAN_SOURCE_NAMES = {
+    0: "stage1",
+    1: "viterbi",
+    2: "kbest",
+    3: "perturbation",
+}
 
 
 def count_bucket(count: int) -> str:
@@ -1215,23 +1221,103 @@ def collect_m33a_error_records(
                             ].item()
                         ),
                         "candidate_region_indices": candidate_regions,
+                        "base_is_null": bool(
+                            base_is_null[row, span_index].item()
+                        ),
+                    }
+                )
+            candidate_bank: list[dict] = []
+            selected_set = {int(value) for value in selected}
+            formal_metadata = formal["metadata"][row]
+            metadata_sources = list(
+                formal_metadata.get("candidate_sources") or []
+            )
+            for span_index in range(span_count):
+                candidate_regions = [
+                    region_index
+                    for region_index in range(int(expanded_budget))
+                    if bool(
+                        fine_outputs["candidate_mask"][
+                            row, span_index, region_index
+                        ].item()
+                    )
+                ]
+                source_id = int(
+                    formal["span_source_ids"][row, span_index].item()
+                )
+                source_name = (
+                    str(metadata_sources[span_index])
+                    if span_index < len(metadata_sources)
+                    else SPAN_SOURCE_NAMES.get(source_id, f"source_{source_id}")
+                )
+                type_count = int(formal["type_mask"][row, span_index].sum().item())
+                candidate_bank.append(
+                    {
+                        "candidate_index": int(span_index),
+                        "span": list(map(int, spans[span_index])),
+                        "candidate_source_id": source_id,
+                        "candidate_source": source_name,
+                        "candidate_score": float(
+                            formal["span_base_scores"][row, span_index].item()
+                        ),
+                        "candidate_rank": int(span_index + 1),
+                        "type_candidate_ids": [
+                            int(value)
+                            for value in formal[
+                                "type_candidates"
+                            ][row, span_index, :type_count].tolist()
+                        ],
+                        "type_candidate_scores": [
+                            float(value)
+                            for value in formal[
+                                "type_base_scores"
+                            ][row, span_index, :type_count].tolist()
+                        ],
+                        "fixed_type_id": int(
+                            hierarchy_outputs["fixed_type_ids"][
+                                row, span_index
+                            ].item()
+                        ),
+                        "base_is_null": bool(
+                            base_is_null[row, span_index].item()
+                        ),
+                        "baseline_visible": bool(
+                            baseline_visible[row, span_index].item()
+                        ),
+                        "final_visible": bool(
+                            final_visible[row, span_index].item()
+                        ),
+                        "fine_top1_region_index": int(
+                            fine_indices[row, span_index].item()
+                        ),
+                        "final_region_index": int(
+                            final_indices[row, span_index].item()
+                        ),
+                        "candidate_region_indices": candidate_regions,
+                        "selected_formal": span_index in selected_set,
+                        "valid_in_expanded": bool(
+                            expanded["span_mask"][row, span_index].item()
+                        ),
                     }
                 )
             records.append(
-                analyze_record_error_taxonomy(
-                    record_id=str(metadata.get("record_id", "")),
-                    text=str(metadata.get("text", "")),
-                    gold_entities=list(
-                        metadata.get("gold_entities") or []
+                {
+                    **analyze_record_error_taxonomy(
+                        record_id=str(metadata.get("record_id", "")),
+                        text=str(metadata.get("text", "")),
+                        gold_entities=list(
+                            metadata.get("gold_entities") or []
+                        ),
+                        predictions=predictions,
+                        stage1_spans=stage1_spans,
+                        formal_budget=formal_budget,
+                        expanded_budget=expanded_budget,
+                        null_region_index=int(
+                            metadata.get("null_region_index", -1)
+                        ),
                     ),
-                    predictions=predictions,
-                    stage1_spans=stage1_spans,
-                    formal_budget=formal_budget,
-                    expanded_budget=expanded_budget,
-                    null_region_index=int(
-                        metadata.get("null_region_index", -1)
-                    ),
-                )
+                    "candidate_bank": candidate_bank,
+                }
             )
     return records
 

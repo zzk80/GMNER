@@ -2,48 +2,22 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Dict, List
 
 import torch
-from PIL import Image
-from torchvision import transforms
 from transformers import PreTrainedTokenizerBase
 
-from gmner.constants import DEFAULT_IMAGE_SIZE, IGNORE_INDEX
+from gmner.constants import IGNORE_INDEX
 
 
 class GMNERCollator:
-    """Pads token data and loads images into tensors."""
+    """Pad token and precomputed region data for the formal GMNER path."""
 
     def __init__(
         self,
         tokenizer: PreTrainedTokenizerBase,
-        image_size: int = DEFAULT_IMAGE_SIZE,
     ) -> None:
         self.tokenizer = tokenizer
-        self.image_size = image_size
-        self.transform = transforms.Compose(
-            [
-                transforms.Resize((image_size, image_size)),
-                transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=(0.485, 0.456, 0.406),
-                    std=(0.229, 0.224, 0.225),
-                ),
-            ]
-        )
-
-    def _load_image(self, path: str) -> torch.Tensor:
-        image_path = Path(path)
-        if image_path.exists():
-            try:
-                with Image.open(image_path) as img:
-                    return self.transform(img.convert("RGB"))
-            except Exception:
-                pass
-
-        return torch.zeros((3, self.image_size, self.image_size), dtype=torch.float32)
 
     def __call__(self, features: List[Dict]) -> Dict[str, torch.Tensor | List[Dict]]:
         tokenizer_inputs: List[Dict] = []
@@ -74,7 +48,12 @@ class GMNERCollator:
         ner_loss_weight = torch.ones((batch_size,), dtype=torch.float32)
         num_entities_in_record = torch.ones((batch_size,), dtype=torch.long)
 
-        has_region_features = any("region_features" in feature for feature in features)
+        has_region_features = all("region_features" in feature for feature in features)
+        if not has_region_features:
+            raise ValueError(
+                "GMNERCollator requires region_features for every sample. "
+                "Raw-image ResNet collation has been removed."
+            )
         region_features = None
         region_mask = None
         region_labels = None
@@ -107,7 +86,6 @@ class GMNERCollator:
             target_subtype_ids = torch.full((batch_size,), IGNORE_INDEX, dtype=torch.long)
             grounding_null_prior = torch.full((batch_size,), 0.5, dtype=torch.float32)
 
-        images: List[torch.Tensor] = []
         metadata: List[Dict] = []
 
         for batch_idx, feature in enumerate(features):
@@ -176,10 +154,6 @@ class GMNERCollator:
                 if "grounding_null_prior" in feature:
                     grounding_null_prior[batch_idx] = float(feature["grounding_null_prior"])
 
-            if has_region_features:
-                images.append(torch.zeros((3, self.image_size, self.image_size), dtype=torch.float32))
-            else:
-                images.append(self._load_image(feature["image_path"]))
             word_ids = feature.get("word_ids")
             if word_ids is None:
                 word_ids = [None] * len(feature.get("input_ids", []))
@@ -205,6 +179,7 @@ class GMNERCollator:
                     "grounding_null_prior": feature.get("grounding_null_prior"),
                     "region_object_labels": feature.get("region_object_labels"),
                     "region_object_attributes": feature.get("region_object_attributes"),
+                    "region_source_indices": feature.get("region_source_indices"),
                     "image_size": feature.get("image_size"),
                 }
             )
@@ -214,7 +189,6 @@ class GMNERCollator:
             "attention_mask": padded["attention_mask"],
             "target_mask": target_mask,
             "adjacency": adjacency,
-            "images": torch.stack(images, dim=0),
             "metadata": metadata,
         }
 

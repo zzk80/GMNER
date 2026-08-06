@@ -1,0 +1,343 @@
+﻿component_gold_count,component_id,component_pred_count,gold_span,pred_mention,pred_span,pred_type,primary_error_class,record_id
+1,7:0,1,"[3, 6]",Gold Star,"[3, 5]",OTHER,boundary_shift,7
+1,12:0,1,"[0, 8]",Harry Potter and the Prisoner of Azkaban,"[0, 7]",OTHER,boundary_shift,12
+1,13:0,2,"[8, 11]",Calvin,"[8, 9]",PER,split,13
+1,13:0,2,,Hobbes,"[10, 11]",PER,split,13
+1,24:0,1,"[12, 15]",Chaisanit,"[14, 15]",LOC,boundary_shift,24
+0,26:0,1,,Queen Mother,"[6, 8]",PER,pure_false_positive,26
+1,28:0,1,"[5, 7]",meek,"[5, 6]",PER,boundary_shift,28
+0,32:0,1,,Pleasantville,"[7, 8]",LOC,pure_false_positive,32
+2,34:0,2,"[10, 11]",Johnny Football,"[10, 12]",ORG,complex_split_merge,34
+2,34:0,2,"[11, 13]",Browns,"[12, 13]",ORG,complex_split_merge,34
+0,37:0,1,,Rocky,"[0, 1]",ORG,pure_false_positive,37
+0,46:0,1,,Variety,"[14, 15]",ORG,pure_false_positive,46
+1,48:0,1,"[6, 14]",R . L . Quisenberry,"[9, 14]",PER,boundary_shift,48
+0,50:0,1,,Cutler,"[5, 6]",PER,pure_false_positive,50
+0,52:0,1,,NM,"[14, 15]",LOC,pure_false_positive,52
+1,60:0,1,"[4, 6]",Trump,"[5, 6]",PER,boundary_shift,60
+0,61:0,1,,RTEsoccer,"[20, 21]",ORG,pure_false_positive,61
+0,63:0,1,,Warthog,"[16, 17]",OTHER,pure_false_positive,63
+1,64:0,1,"[14, 20]",Victoria ' s Secret,"[15, 19]",OTHER,boundary_shift,64
+1,65:0,1,"[2, 4]",Ricky,"[3, 4]",PER,boundary_shift,65
+1,69:0,1,"[2, 6]",Martin Joseph Walsh,"[3, 6]",PER,boundary_shift,69
+0,70:0,1,,Gap,"[14, 15]",ORG,pure_false_positive,70
+1,78:0,1,"[10, 11]",Dorli Photography,"[10, 12]",PER,boundary_shift,78
+0,82:0,1,,Democrats,"[5, 6]",ORG,pure_false_positive,82
+0,84:0,1,,Cavs,"[12, 13]",ORG,pure_false_positive,84
+0,86:0,1,,Google,"[8, 9]",ORG,pure_false_positive,86
+1,88:0,1,"[4, 7]",Steve Adler,"[5, 7]",PER,boundary_shift,88
+0,94:0,1,,University Orchestra,"[3, 5]",ORG,pure_false_positive,94
+0,101:0,1,,Meek Mill,"[18, 20]",PER,pure_false_positive,101
+1,105:0,1,"[1, 4]",EMC,"[1, 2]",ORG,boundary_shift,105
+1,108:0,2,"[2, 6]",Kim Kardashian,"[2, 4]",PER,split,108
+1,108:0,2,,Hollywood,"[5, 6]",LOC,split,108
+1,108:1,2,"[7, 12]",Britney Spears,"[7, 9]",PER,split,108
+1,108:1,2,,American Dream,"[10, 12]",OTHER,split,108
+0,118:0,1,,Yemeni,"[11, 12]",LOC,pure_false_positive,118
+0,127:1,1,,paty,"[9, 10]",PER,pure_false_positive,127
+0,127:2,1,,patyyyy,"[12, 13]",PER,pure_false_positive,127
+1,131:0,1,"[7, 9]",Daniel,"[8, 9]",PER,boundary_shift,131
+2,136:0,1,"[4, 5]",LIAM ANDN HARRY,"[4, 7]",PER,merge,136
+0,139:0,1,,O,"[15, 16]",OTHER,pure_false_positive,139
+2,146:0,2,"[12, 14]",SBS,"[12, 13]",OTHER,complex_split_merge,146
+2,146:0,2,"[14, 17]",MTV The Show BTS,"[13, 17]",OTHER,complex_split_merge,146
+1,149:0,1,"[0, 2]",Nishani,"[1, 2]",PER,boundary_shift,149
+0,149:1,1,,Europe,"[8, 9]",LOC,pure_false_positive,149
+1,150:0,1,"[13, 15]",Chancellor Ray Wallace,"[12, 15]",PER,boundary_shift,150
+0,152:0,1,,Albemarle Sound,"[8, 10]",LOC,pure_false_positive,152
+0,152:1,1,,Scott Evers,"[18, 20]",PER,pure_false_positive,152
+1,165:1,1,"[4, 5]",Destiny ' s Child,"[4, 8]",ORG,boundary_shift,165
+0,167:0,1,,vim,"[4, 5]",OTHER,pure_false_positive,167
+2,173:0,1,"[17, 19]",Waco La Vega,"[16, 19]",LOC,merge,173
+0,173:1,1,,Sooners,"[5, 6]",ORG,pure_false_positive,173
+1,177:0,1,"[8, 10]",Sudbury,"[8, 9]",LOC,boundary_shift,177
+0,179:0,1,,NBAFinals,"[9, 10]",OTHER,pure_false_positive,179
+0,184:0,1,,blackhawks,"[17, 18]",ORG,pure_false_positive,184
+0,186:0,1,,Mayor,"[0, 1]",PER,pure_false_positive,186
+0,187:0,1,,cheltenhamchildrensfestival,"[6, 7]",OTHER,pure_false_positive,187
+0,189:0,1,,guacamole,"[9, 10]",OTHER,pure_false_positive,189
+0,191:0,1,,AFP,"[14, 15]",ORG,pure_false_positive,191
+1,194:0,1,"[4, 6]",Cavs,"[5, 6]",ORG,boundary_shift,194
+0,194:1,1,,University of Virginia,"[15, 18]",ORG,pure_false_positive,194
+1,196:0,1,"[6, 8]",Twitter,"[6, 7]",OTHER,boundary_shift,196
+1,196:1,1,"[12, 14]",Nixon,"[12, 13]",PER,boundary_shift,196
+1,197:0,2,"[22, 25]",Tupac,"[22, 23]",PER,split,197
+1,197:0,2,,Biggie,"[24, 25]",PER,split,197
+0,198:0,1,,World Cup of,"[9, 12]",OTHER,pure_false_positive,198
+0,205:0,1,,THIALF,"[4, 5]",PER,pure_false_positive,205
+1,216:0,1,"[0, 2]",Jasmine,"[1, 2]",OTHER,boundary_shift,216
+1,225:0,1,"[14, 16]",Boston,"[14, 15]",ORG,boundary_shift,225
+0,234:0,1,,Billboard,"[0, 1]",ORG,pure_false_positive,234
+2,238:0,1,"[0, 2]",Tampa Bay # Lightning,"[0, 4]",ORG,merge,238
+1,239:0,1,"[2, 4]",Rio,"[2, 3]",OTHER,boundary_shift,239
+0,239:1,1,,Paralympic Games,"[9, 11]",OTHER,pure_false_positive,239
+0,254:0,1,,Oprah,"[7, 8]",PER,pure_false_positive,254
+0,268:0,1,,The Next America Forum,"[6, 10]",ORG,pure_false_positive,268
+1,277:0,1,"[4, 5]",BLACKHAWKS HOCKEY,"[4, 6]",ORG,boundary_shift,277
+1,278:0,1,"[5, 9]",Christian Kraemer,"[5, 7]",PER,boundary_shift,278
+0,278:1,1,,Jordan,"[14, 15]",LOC,pure_false_positive,278
+0,279:0,1,,THE FALLEN SHADOWS : INTO THE LIGHT-,"[15, 22]",OTHER,pure_false_positive,279
+0,283:0,1,,Level5,"[14, 15]",ORG,pure_false_positive,283
+0,287:0,1,,Lee,"[0, 1]",PER,pure_false_positive,287
+0,310:0,1,,Birdman,"[22, 23]",PER,pure_false_positive,310
+0,311:0,1,,Wreck Em,"[12, 14]",OTHER,pure_false_positive,311
+1,324:0,1,"[5, 6]",Bletchley mail office,"[5, 8]",LOC,boundary_shift,324
+0,335:0,1,,c4news,"[14, 15]",ORG,pure_false_positive,335
+0,358:0,1,,Mean Girls,"[6, 8]",OTHER,pure_false_positive,358
+0,361:0,1,,Nordic,"[10, 11]",LOC,pure_false_positive,361
+0,363:0,1,,Republican,"[2, 3]",ORG,pure_false_positive,363
+0,365:0,1,,Doll,"[0, 1]",PER,pure_false_positive,365
+0,370:0,1,,World Week For,"[4, 7]",OTHER,pure_false_positive,370
+1,374:0,1,"[11, 16]",National and County,"[11, 14]",OTHER,boundary_shift,374
+0,377:0,1,,Kings,"[9, 10]",ORG,pure_false_positive,377
+0,380:0,1,,nbadreamteam,"[7, 8]",OTHER,pure_false_positive,380
+0,383:0,1,,Pattie,"[5, 6]",PER,pure_false_positive,383
+0,386:0,1,,Kings,"[1, 2]",ORG,pure_false_positive,386
+1,401:0,1,"[4, 10]",Senate,"[9, 10]",ORG,boundary_shift,401
+1,406:0,1,"[7, 12]",Zichy,"[11, 12]",PER,boundary_shift,406
+1,411:0,1,"[12, 14]",Guantanamo Bay naval station,"[12, 16]",LOC,boundary_shift,411
+0,416:0,1,,Shadow,"[0, 1]",OTHER,pure_false_positive,416
+1,420:0,1,"[10, 13]",Italia,"[12, 13]",ORG,boundary_shift,420
+1,426:0,1,"[5, 7]",Texas HS Football Stadium,"[5, 9]",LOC,boundary_shift,426
+0,429:0,1,,Chengdu,"[9, 10]",LOC,pure_false_positive,429
+0,430:0,1,,Cubs,"[16, 17]",ORG,pure_false_positive,430
+1,438:0,1,"[4, 10]",Metrodome,"[9, 10]",LOC,boundary_shift,438
+1,447:0,1,"[23, 24]",Carnaval Parade,"[23, 25]",OTHER,boundary_shift,447
+0,460:0,1,,ph,"[17, 18]",LOC,pure_false_positive,460
+0,463:0,1,,Bingpride,"[13, 14]",OTHER,pure_false_positive,463
+0,465:0,1,,PM,"[3, 4]",PER,pure_false_positive,465
+0,466:0,1,,OrangeNation,"[7, 8]",ORG,pure_false_positive,466
+0,467:0,1,,Charleston libraries,"[8, 10]",ORG,pure_false_positive,467
+1,468:0,1,"[10, 11]",Paris Climate Accord,"[10, 13]",OTHER,boundary_shift,468
+0,478:0,1,,Shiite mosques,"[9, 11]",LOC,pure_false_positive,478
+1,479:0,2,"[3, 9]",Pope John Paul II,"[3, 7]",PER,split,479
+1,479:0,2,,Catholic Academy,"[7, 9]",ORG,split,479
+0,479:1,1,,St . Ambrose,"[18, 21]",PER,pure_false_positive,479
+0,480:0,1,,SF,"[16, 17]",LOC,pure_false_positive,480
+0,483:0,1,,Qatari,"[2, 3]",LOC,pure_false_positive,483
+0,495:0,1,,AvayaStadium,"[11, 12]",LOC,pure_false_positive,495
+1,496:0,1,"[4, 6]",Lakers,"[5, 6]",ORG,boundary_shift,496
+0,496:2,1,,Lakers,"[2, 3]",ORG,pure_false_positive,496
+1,500:0,1,"[8, 12]",Ben Carson,"[10, 12]",PER,boundary_shift,500
+0,505:0,1,,PoppyLegion,"[9, 10]",OTHER,pure_false_positive,505
+0,511:0,1,,Tory,"[14, 15]",ORG,pure_false_positive,511
+0,512:0,1,,Latin American,"[10, 12]",LOC,pure_false_positive,512
+1,514:0,1,"[10, 11]",GOP Congress,"[10, 12]",ORG,boundary_shift,514
+0,514:1,1,,Scalise,"[15, 16]",PER,pure_false_positive,514
+0,517:0,1,,Diversey,"[6, 7]",LOC,pure_false_positive,517
+0,518:0,1,,nba,"[11, 12]",ORG,pure_false_positive,518
+1,528:0,1,"[3, 6]",Boston,"[3, 4]",ORG,boundary_shift,528
+0,528:1,1,,boscomfrogpond,"[11, 12]",LOC,pure_false_positive,528
+0,537:0,1,,ESV,"[28, 29]",OTHER,pure_false_positive,537
+1,540:0,1,"[4, 7]",Jan Leach,"[5, 7]",PER,boundary_shift,540
+1,542:0,1,"[8, 10]",Mars,"[8, 9]",LOC,boundary_shift,542
+1,548:0,1,"[3, 4]",Kirsten Sims-,"[3, 5]",PER,boundary_shift,548
+0,550:0,1,,Balinese,"[16, 17]",LOC,pure_false_positive,550
+0,550:1,1,,Bali-,"[21, 22]",LOC,pure_false_positive,550
+0,553:0,1,,Scottish,"[11, 12]",LOC,pure_false_positive,553
+1,556:0,1,"[9, 11]",Jeroen,"[10, 11]",PER,boundary_shift,556
+0,561:0,1,,Big Festival Brother,"[0, 3]",OTHER,pure_false_positive,561
+0,571:0,1,,Beach Bum Parade,"[5, 8]",OTHER,pure_false_positive,571
+1,573:0,1,"[10, 13]",Festival of Skills Conference,"[10, 14]",OTHER,boundary_shift,573
+0,574:0,1,,ODEP,"[8, 9]",ORG,pure_false_positive,574
+0,574:1,1,,Asst Sec,"[9, 11]",PER,pure_false_positive,574
+0,576:0,1,,Holocaust,"[15, 16]",OTHER,pure_false_positive,576
+1,585:0,1,"[6, 7]",Ocean Co,"[6, 8]",LOC,boundary_shift,585
+0,587:0,1,,Sixers,"[14, 15]",ORG,pure_false_positive,587
+1,593:0,1,"[4, 6]",Wallace,"[5, 6]",PER,boundary_shift,593
+1,594:0,1,"[11, 16]",Voting Rights Act,"[11, 14]",OTHER,boundary_shift,594
+0,598:0,1,,Dirty Char Steak,"[12, 15]",OTHER,pure_false_positive,598
+1,600:0,1,"[0, 4]",Pro Evolution Soccer,"[0, 3]",OTHER,boundary_shift,600
+0,603:0,1,,Bombers,"[2, 3]",ORG,pure_false_positive,603
+0,607:0,1,,Russian,"[4, 5]",LOC,pure_false_positive,607
+1,611:0,1,"[0, 1]",Bihar Package,"[0, 2]",OTHER,boundary_shift,611
+0,611:1,1,,Congress,"[13, 14]",ORG,pure_false_positive,611
+0,614:0,1,,Gross,"[13, 14]",PER,pure_false_positive,614
+0,615:0,1,,House,"[10, 11]",ORG,pure_false_positive,615
+0,618:0,1,,NBAonTNT,"[17, 18]",ORG,pure_false_positive,618
+1,627:0,1,"[5, 7]",HNLMS Van Amstel,"[4, 7]",OTHER,boundary_shift,627
+1,629:0,2,"[7, 11]",Smokehouse Burger,"[7, 9]",OTHER,split,629
+1,629:0,2,,Cambridge Common,"[10, 12]",LOC,split,629
+0,630:0,1,,X - Men,"[19, 22]",OTHER,pure_false_positive,630
+0,635:0,1,,Mathematical Service,"[3, 5]",OTHER,pure_false_positive,635
+0,636:0,1,,Brexit,"[16, 17]",ORG,pure_false_positive,636
+0,636:1,1,,EUref,"[18, 19]",ORG,pure_false_positive,636
+0,643:0,1,,Biomimicry,"[11, 12]",OTHER,pure_false_positive,643
+0,650:0,1,,WayneRooney,"[1, 2]",PER,pure_false_positive,650
+0,650:1,1,,premierleague,"[14, 15]",ORG,pure_false_positive,650
+1,660:0,1,"[21, 23]",AD Lee Yarosh,"[20, 23]",PER,boundary_shift,660
+0,661:0,1,,Fenway,"[8, 9]",LOC,pure_false_positive,661
+0,668:1,1,,Pac-12,"[4, 5]",ORG,pure_false_positive,668
+0,673:0,1,,Male Sunbaes,"[4, 6]",PER,pure_false_positive,673
+0,680:0,1,,EssendonFC,"[12, 13]",ORG,pure_false_positive,680
+1,686:0,1,"[0, 4]",St . John Paul II,"[0, 5]",PER,boundary_shift,686
+1,687:0,1,"[5, 6]",President Obama,"[4, 6]",PER,boundary_shift,687
+1,698:0,1,"[6, 8]",Damavand,"[6, 7]",LOC,boundary_shift,698
+1,704:0,1,"[8, 11]",The Katelyn,"[8, 10]",OTHER,boundary_shift,704
+0,711:0,1,,Robin Williams,"[4, 6]",PER,pure_false_positive,711
+0,714:0,1,,german shepherd,"[5, 7]",OTHER,pure_false_positive,714
+0,729:0,1,,Brockley,"[17, 18]",LOC,pure_false_positive,729
+1,732:0,1,"[6, 8]",Digital Health Live-Dubai,"[6, 9]",OTHER,boundary_shift,732
+0,746:0,1,,Insurtech News,"[0, 2]",ORG,pure_false_positive,746
+0,746:1,1,,Insurtech,"[3, 4]",ORG,pure_false_positive,746
+0,748:0,1,,Laker,"[3, 4]",ORG,pure_false_positive,748
+0,750:0,1,,HMA,"[4, 5]",ORG,pure_false_positive,750
+0,750:1,1,,UK,"[8, 9]",LOC,pure_false_positive,750
+0,751:1,1,,NCA,"[6, 7]",ORG,pure_false_positive,751
+0,762:0,1,,CliveStanden,"[2, 3]",PER,pure_false_positive,762
+0,762:1,1,,Grindadrap,"[14, 15]",OTHER,pure_false_positive,762
+0,763:0,1,,Belgian,"[0, 1]",LOC,pure_false_positive,763
+0,763:1,1,,Dutch,"[2, 3]",LOC,pure_false_positive,763
+0,768:1,1,,Green Strides,"[10, 12]",OTHER,pure_false_positive,768
+0,786:0,1,,MarcAspland,"[5, 6]",PER,pure_false_positive,786
+0,787:0,1,,Asian-American,"[10, 11]",LOC,pure_false_positive,787
+2,798:0,1,"[10, 13]",Tianjin Binhai New Area,"[9, 13]",LOC,merge,798
+1,800:0,1,"[15, 16]",Nelson # Mandela,"[15, 18]",PER,boundary_shift,800
+0,800:1,1,,Presidential Secretariat building,"[8, 11]",LOC,pure_false_positive,800
+0,806:0,1,,Paralympic,"[12, 13]",OTHER,pure_false_positive,806
+0,812:1,1,,MVP,"[16, 17]",OTHER,pure_false_positive,812
+1,818:0,1,"[8, 9]",Nintendo Wii Video,"[8, 11]",OTHER,boundary_shift,818
+2,823:2,1,"[17, 19]",RYAN VAL KILMER,"[16, 19]",PER,merge,823
+0,831:0,1,,eddieizzard,"[7, 8]",PER,pure_false_positive,831
+0,833:0,1,,TRUMP/,"[1, 2]",PER,pure_false_positive,833
+1,842:0,1,"[13, 14]",Nyiragongo volcano,"[13, 15]",LOC,boundary_shift,842
+1,842:1,1,"[18, 21]",World Day,"[19, 21]",OTHER,boundary_shift,842
+0,843:0,1,,Panenka,"[4, 5]",PER,pure_false_positive,843
+1,851:1,1,"[8, 11]",Kawhi Leonard,"[9, 11]",PER,boundary_shift,851
+0,851:2,1,,Spurs,"[19, 20]",ORG,pure_false_positive,851
+0,853:0,1,,Lakewood Project,"[4, 6]",ORG,pure_false_positive,853
+1,859:0,1,"[9, 11]",President Barack Obama,"[8, 11]",PER,boundary_shift,859
+0,862:0,1,,LaborDay cup,"[14, 16]",OTHER,pure_false_positive,862
+0,869:0,1,,Piano Concerto,"[2, 4]",OTHER,pure_false_positive,869
+1,886:0,1,"[11, 12]",St . Vincent,"[9, 12]",PER,boundary_shift,886
+0,909:0,1,,Shades of,"[4, 6]",OTHER,pure_false_positive,909
+1,910:0,1,"[11, 13]",Ol ' Dirty Bastard,"[9, 13]",PER,boundary_shift,910
+1,918:0,1,"[10, 11]",Dr . Seuss,"[8, 11]",PER,boundary_shift,918
+0,922:0,1,,007,"[18, 19]",PER,pure_false_positive,922
+1,923:0,1,"[12, 15]",Leadership Conference,"[13, 15]",OTHER,boundary_shift,923
+0,927:0,1,,WVUfootball,"[15, 16]",ORG,pure_false_positive,927
+0,927:1,1,,kwhite8,"[19, 20]",PER,pure_false_positive,927
+1,936:0,1,"[12, 14]",MosimannsLTD,"[12, 13]",LOC,boundary_shift,936
+0,940:0,1,,Fenway,"[10, 11]",LOC,pure_false_positive,940
+1,957:0,1,"[7, 8]",Symmons industries,"[7, 9]",ORG,boundary_shift,957
+0,960:0,1,,A,"[3, 4]",ORG,pure_false_positive,960
+0,967:1,1,,UE,"[26, 27]",ORG,pure_false_positive,967
+1,968:0,1,"[6, 9]",Whitsun,"[6, 7]",LOC,boundary_shift,968
+1,971:0,1,"[25, 27]",Stones,"[26, 27]",ORG,boundary_shift,971
+0,971:1,1,,97RockBuffalo,"[7, 8]",ORG,pure_false_positive,971
+1,973:0,1,"[25, 26]",1 Timothy,"[24, 26]",OTHER,boundary_shift,973
+0,974:0,1,,Pac -,"[10, 12]",ORG,pure_false_positive,974
+1,978:0,1,"[8, 14]",Genghis Khan,"[12, 14]",PER,boundary_shift,978
+0,978:1,1,,ubudwritersfest,"[20, 21]",OTHER,pure_false_positive,978
+0,983:0,1,,Patriots,"[5, 6]",ORG,pure_false_positive,983
+0,983:1,1,,Red Sox,"[8, 10]",ORG,pure_false_positive,983
+1,995:0,2,"[8, 13]",Kodak Lens Folding,"[8, 11]",OTHER,split,995
+1,995:0,2,,Glasses,"[12, 13]",OTHER,split,995
+0,995:1,1,,Optical,"[4, 5]",LOC,pure_false_positive,995
+0,997:1,1,,One Tree Hill,"[6, 9]",OTHER,pure_false_positive,997
+1,999:0,1,"[6, 8]",B KJ Harrison,"[5, 8]",PER,boundary_shift,999
+2,1015:0,1,"[7, 8]",German Scherzer,"[7, 9]",PER,merge,1015
+1,1016:0,1,"[4, 6]",Spurs,"[5, 6]",ORG,boundary_shift,1016
+1,1017:0,1,"[16, 19]",Mac Book,"[16, 18]",OTHER,boundary_shift,1017
+1,1018:0,1,"[13, 14]",Paris Climate Accord,"[13, 16]",OTHER,boundary_shift,1018
+0,1025:0,1,,MensFitness,"[0, 1]",ORG,pure_false_positive,1025
+0,1025:1,1,,NBA,"[4, 5]",ORG,pure_false_positive,1025
+0,1028:0,1,,Rolls Royce Phantom V,"[11, 15]",OTHER,pure_false_positive,1028
+0,1029:0,1,,MS,"[19, 20]",ORG,pure_false_positive,1029
+1,1034:0,1,"[4, 10]",Harry Potter,"[4, 6]",OTHER,boundary_shift,1034
+1,1037:1,1,"[6, 8]",San Francisco Street Food Festival,"[6, 11]",OTHER,boundary_shift,1037
+0,1039:0,1,,WhiteSox,"[1, 2]",ORG,pure_false_positive,1039
+1,1043:0,2,,Jack,"[0, 1]",OTHER,split,1043
+1,1043:0,2,"[0, 3]",jack,"[2, 3]",PER,split,1043
+2,1048:2,1,"[14, 16]",Cheerios Super Bowl,"[13, 16]",OTHER,merge,1048
+1,1050:0,1,"[6, 7]",vip vamps,"[5, 7]",ORG,boundary_shift,1050
+1,1059:0,1,"[4, 6]",Leah,"[4, 5]",PER,boundary_shift,1059
+0,1063:0,1,,Little One Greeting Card,"[4, 8]",OTHER,pure_false_positive,1063
+0,1066:0,1,,scotus,"[20, 21]",OTHER,pure_false_positive,1066
+0,1079:0,1,,Beat TV,"[4, 6]",ORG,pure_false_positive,1079
+0,1096:0,1,,the circle,"[9, 11]",OTHER,pure_false_positive,1096
+0,1096:1,1,,paris,"[13, 14]",LOC,pure_false_positive,1096
+0,1100:0,1,,keithcraft,"[2, 3]",PER,pure_false_positive,1100
+0,1100:1,1,,The 700 Club,"[5, 8]",LOC,pure_false_positive,1100
+0,1101:0,1,,Pleasant grove,"[0, 2]",ORG,pure_false_positive,1101
+0,1105:0,1,,Musica,"[0, 1]",ORG,pure_false_positive,1105
+1,1107:0,1,"[5, 6]",The Parthenon,"[4, 6]",OTHER,boundary_shift,1107
+0,1112:1,1,,LFC,"[5, 6]",ORG,pure_false_positive,1112
+1,1114:0,1,"[3, 8]",O . T,"[3, 6]",PER,boundary_shift,1114
+1,1116:1,1,"[10, 12]",Tommy Tutone Jenny,"[10, 13]",PER,boundary_shift,1116
+0,1121:0,1,,SportingKC,"[7, 8]",ORG,pure_false_positive,1121
+0,1121:1,1,,PV,"[25, 26]",PER,pure_false_positive,1121
+0,1124:0,1,,Little league,"[0, 2]",ORG,pure_false_positive,1124
+0,1127:1,1,,Trib,"[1, 2]",ORG,pure_false_positive,1127
+0,1127:2,1,,stacystclair,"[4, 5]",PER,pure_false_positive,1127
+0,1128:0,1,,Syrian Army,"[2, 4]",ORG,pure_false_positive,1128
+0,1130:0,1,,ArianaGrande,"[2, 3]",PER,pure_false_positive,1130
+0,1131:0,1,,CarrieLupoli,"[5, 6]",PER,pure_false_positive,1131
+0,1147:0,1,,VOD,"[18, 19]",OTHER,pure_false_positive,1147
+1,1172:0,1,"[5, 8]",Mahinda Chintana,"[5, 7]",PER,boundary_shift,1172
+0,1180:0,1,,Finish Line 500 Festival,"[6, 10]",OTHER,pure_false_positive,1180
+0,1184:1,1,,UNC,"[12, 13]",ORG,pure_false_positive,1184
+1,1186:0,1,"[6, 8]",GAGA,"[7, 8]",PER,boundary_shift,1186
+0,1203:0,1,,R01,"[12, 13]",OTHER,pure_false_positive,1203
+1,1215:0,1,"[8, 10]",Louis Vuitton Custom,"[8, 11]",OTHER,boundary_shift,1215
+0,1215:1,1,,Retro 4,"[6, 8]",OTHER,pure_false_positive,1215
+0,1220:0,1,,The Weeknd,"[4, 6]",PER,pure_false_positive,1220
+0,1220:1,1,,Empire,"[11, 12]",OTHER,pure_false_positive,1220
+1,1221:0,1,"[11, 13]",Larry,"[11, 12]",PER,boundary_shift,1221
+1,1224:0,1,"[3, 5]",Maher,"[4, 5]",PER,boundary_shift,1224
+0,1230:0,1,,Hamas,"[24, 25]",ORG,pure_false_positive,1230
+0,1235:0,1,,Keyb,"[3, 4]",OTHER,pure_false_positive,1235
+1,1255:1,1,"[10, 13]",Chicago Cubs,"[11, 13]",ORG,boundary_shift,1255
+0,1265:0,1,,MUN,"[13, 14]",ORG,pure_false_positive,1265
+0,1268:0,1,,H . R,"[7, 10]",OTHER,pure_false_positive,1268
+1,1281:0,1,"[16, 20]",Naaman,"[16, 17]",LOC,boundary_shift,1281
+1,1304:0,1,"[11, 13]",Brey,"[12, 13]",PER,boundary_shift,1304
+1,1304:1,1,"[18, 20]",NBA,"[18, 19]",ORG,boundary_shift,1304
+0,1312:0,1,,Chilean,"[0, 1]",LOC,pure_false_positive,1312
+1,1317:0,1,"[3, 6]",Katherine Valde,"[4, 6]",PER,boundary_shift,1317
+0,1318:0,1,,Hopkins,"[10, 11]",PER,pure_false_positive,1318
+1,1320:0,1,"[0, 5]",Latino Business Expo,"[2, 5]",OTHER,boundary_shift,1320
+1,1321:0,1,"[10, 11]",Chicago Bull,"[10, 12]",ORG,boundary_shift,1321
+1,1329:0,2,"[13, 15]",Southern,"[13, 14]",LOC,split,1329
+1,1329:0,2,,California,"[14, 15]",LOC,split,1329
+0,1330:0,1,,SpartanPride,"[9, 10]",OTHER,pure_false_positive,1330
+0,1335:0,1,,TIME,"[18, 19]",OTHER,pure_false_positive,1335
+0,1343:0,1,,ThatMetalShow,"[3, 4]",OTHER,pure_false_positive,1343
+0,1343:1,1,,JPetrucci,"[9, 10]",PER,pure_false_positive,1343
+1,1344:0,1,"[8, 10]",Disney,"[8, 9]",ORG,boundary_shift,1344
+1,1346:0,2,,Big,"[4, 5]",LOC,split,1346
+1,1346:0,2,"[4, 8]",Hawaii,"[7, 8]",LOC,split,1346
+0,1347:0,1,,Meiyappan,"[7, 8]",PER,pure_false_positive,1347
+0,1359:0,1,,B2B,"[1, 2]",ORG,pure_false_positive,1359
+1,1360:0,1,"[7, 8]",NHL Leadership Award,"[7, 10]",OTHER,boundary_shift,1360
+0,1363:0,1,,MCM BIONIC SERIES 61P,"[17, 21]",OTHER,pure_false_positive,1363
+0,1370:0,1,,Ms,"[8, 9]",PER,pure_false_positive,1370
+0,1378:0,1,,Dirt Art,"[5, 7]",OTHER,pure_false_positive,1378
+0,1394:0,1,,romione,"[6, 7]",ORG,pure_false_positive,1394
+0,1396:0,1,,Grammy,"[12, 13]",OTHER,pure_false_positive,1396
+0,1403:1,1,,WorldBank,"[12, 13]",ORG,pure_false_positive,1403
+0,1410:0,1,,Research in Motion,"[19, 22]",ORG,pure_false_positive,1410
+1,1413:0,1,"[8, 9]",Ferrari FXXK,"[8, 10]",OTHER,boundary_shift,1413
+1,1429:0,1,"[15, 17]",Gag,"[15, 16]",OTHER,boundary_shift,1429
+1,1431:0,1,"[15, 16]",EMC Federation,"[15, 17]",OTHER,boundary_shift,1431
+1,1433:0,1,"[3, 4]",Mocha Spoke,"[3, 5]",PER,boundary_shift,1433
+0,1435:0,1,,City Gallery,"[6, 8]",LOC,pure_false_positive,1435
+0,1435:1,1,,Celtic,"[16, 17]",LOC,pure_false_positive,1435
+0,1437:0,1,,The Wire,"[6, 8]",OTHER,pure_false_positive,1437
+0,1440:0,1,,Parks and Rec,"[1, 4]",ORG,pure_false_positive,1440
+0,1441:0,1,,ESV,"[25, 26]",OTHER,pure_false_positive,1441
+0,1447:0,1,,Dan,"[13, 14]",PER,pure_false_positive,1447
+1,1448:0,1,"[3, 4]",Dodge minivans,"[3, 5]",OTHER,boundary_shift,1448
+1,1452:0,1,"[3, 4]",Kremlin museums,"[3, 5]",LOC,boundary_shift,1452
+1,1454:0,1,"[4, 6]",Vignelli,"[4, 5]",LOC,boundary_shift,1454
+0,1455:0,1,,Riverdale,"[12, 13]",LOC,pure_false_positive,1455
+0,1456:0,1,,Genie,"[15, 16]",PER,pure_false_positive,1456
+0,1462:0,1,,MOD,"[8, 9]",OTHER,pure_false_positive,1462
+0,1473:0,1,,Srikanth,"[6, 7]",PER,pure_false_positive,1473
+0,1477:0,1,,John,"[3, 4]",PER,pure_false_positive,1477
+0,1481:0,1,,JFK,"[22, 23]",LOC,pure_false_positive,1481
+1,1484:0,1,"[0, 3]",Civil War,"[0, 2]",OTHER,boundary_shift,1484
+1,1486:0,1,"[7, 9]",Chosyu,"[7, 8]",PER,boundary_shift,1486
+0,1492:0,1,,chanbaek,"[24, 25]",PER,pure_false_positive,1492
+0,1496:1,1,,Fourth,"[1, 2]",OTHER,pure_false_positive,1496
+0,1498:0,1,,Evita,"[20, 21]",PER,pure_false_positive,1498

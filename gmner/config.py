@@ -40,12 +40,13 @@ class DataConfig:
     label_schema: str = "coarse"
     subtype_taxonomy: str = ""
     subtype_taxonomy_sha256: str = ""
+    frozen_clip_feature_dir: str = ""
+    frozen_clip_cache_kind: str = "dvh_frozen_clip_cache"
 
 
 @dataclass
 class ModelConfig:
     text_model_name: str = "bert-base-multilingual-cased"
-    image_backbone: str = "resnet50"
     hidden_size: int = 768
     projection_dim: int = 768
     dropout: float = 0.1
@@ -53,7 +54,6 @@ class ModelConfig:
     graph_dropout: float = 0.1
     cross_attention_heads: int = 8
     use_crf: bool = False
-    use_pretrained_vision: bool = True
     region_feature_dim: int = 2048
     grounding_null_prior_weight: float = 1.0
     grounding_null_logit_bias: float = 0.0
@@ -160,6 +160,31 @@ class ModelConfig:
     joint_verifier_top_r_regions: int = 0
     joint_span_perturbation_probability: float = 0.0
     joint_span_perturbation_max_words: int = 1
+    dvh_enabled: bool = False
+    dvh_use_clip: bool = True
+    dvh_use_vinvl: bool = True
+    dvh_shuffle_clip: bool = False
+    dvh_clip_feature_dim: int = 768
+    dvh_clip_patch_grid_size: int = 7
+    dvh_type_query_count: int = 4
+    dvh_gate_initial_bias: float = -2.0
+    dvh_boundary_visual: bool = True
+    dvh_type_visual: bool = True
+    dvh_grounding_visual: bool = True
+    tq_enabled: bool = False
+    tq_use_clip: bool = True
+    tq_use_vinvl: bool = True
+    tq_shuffle_clip: bool = False
+    tq_visual_dim: int = 256
+    tq_clip_feature_dim: int = 768
+    tq_type_count: int = 4
+    tq_gate_initial_bias: float = -2.0
+    tq_max_span_length: int = 10
+    tq_decode_top_k_per_type: int = 32
+    tq_existence_threshold: float = 0.5
+    tq_span_score_threshold: float = 0.0
+    tq_existence_score_weight: float = 0.5
+    tq_visual_warmup_epochs: int = 3
 
 
 @dataclass
@@ -231,6 +256,18 @@ class LossConfig:
     lambda_joint_representation: float = 0.0
     joint_visible_sample_weight: float = 1.0
     joint_null_sample_weight: float = 1.0
+    lambda_boundary: float = 1.0
+    lambda_type: float = 1.0
+    lambda_gate_regularization: float = 0.01
+    lambda_tq_existence: float = 0.5
+    lambda_tq_start: float = 1.0
+    lambda_tq_end: float = 1.0
+    lambda_tq_span_match: float = 1.0
+    lambda_tq_visual_alignment: float = 0.1
+    lambda_tq_gate_regularization: float = 0.01
+    tq_start_positive_weight: float = 5.0
+    tq_end_positive_weight: float = 5.0
+    tq_span_positive_weight: float = 20.0
 
 
 @dataclass

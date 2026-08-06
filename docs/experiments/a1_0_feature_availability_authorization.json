@@ -1,0 +1,69 @@
+{
+  "kind": "a1_0_feature_availability_authorization",
+  "format_version": 1,
+  "status": "AUTHORIZED_READ_ONLY",
+  "input_contract": {
+    "gold_free_rows": "knowledge/final_chain_oof/ten_fold_population/gold_free_rows.jsonl",
+    "gold_free_rows_sha256": "d9ffcc53d71e64b5b6ceb3a043e579fce363779564710b9d2aebf65d9b934d4b",
+    "supervision_sidecar": "knowledge/final_chain_oof/ten_fold_population/supervision_sidecar.jsonl",
+    "supervision_sidecar_sha256": "a0487a5a529d8f46ce28a8aaf4008d693d6aa3edb06551515d2f1eedafdb6ee6",
+    "records": 7000,
+    "folds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  "a1_scope": {
+    "operation": "one_for_one_boundary_replacement",
+    "prediction_count_unchanged": true,
+    "type_id_unchanged": true,
+    "region_identity_unchanged": true,
+    "null_visibility_unchanged": true,
+    "maximum_actions_per_base_prediction": 1,
+    "keep_utility": 0.0
+  },
+  "utility_contract": {
+    "formula": "P(FIX)-lambda_damage*P(DAMAGE)-lambda_neutral*P(NEUTRAL)",
+    "execute": "group_argmax_utility_greater_than_delta",
+    "lambda_damage_greater_than_lambda_neutral": true,
+    "lambda_damage": "NOT_SELECTED",
+    "lambda_neutral": "NOT_SELECTED",
+    "delta": "NOT_SELECTED",
+    "calibration": "NOT_SELECTED",
+    "tie_break": "NOT_SELECTED"
+  },
+  "audit_contract": {
+    "selected_feature_coverage_required": 1.0,
+    "finite_rate_required": 1.0,
+    "feature_selection_using_labels": false,
+    "feature_selection_using_folds_8_9": false,
+    "auroc_or_threshold_computation": false,
+    "gold_sidecar_use": "labels_and_identity_coverage_only",
+    "statuses": [
+      "DIRECTLY_AVAILABLE",
+      "DERIVABLE_GOLD_FREE",
+      "REQUIRES_REMATERIALIZATION",
+      "FORBIDDEN",
+      "MISSING",
+      "SEMANTICALLY_UNSTABLE"
+    ]
+  },
+  "output_contract": {
+    "json": "knowledge/final_chain_oof/a1_0/a1_feature_availability_audit.json",
+    "markdown": "knowledge/final_chain_oof/a1_0/a1_feature_availability_audit.md"
+  },
+  "allowed": {
+    "read_sealed_gold_free_rows": true,
+    "verify_sidecar_label_linkage": true,
+    "report_descriptive_label_counts": true,
+    "audit_all_fold_schema_coverage": true
+  },
+  "forbidden": {
+    "a1_training": true,
+    "feature_selection_from_labels": true,
+    "threshold_selection": true,
+    "utility_parameter_selection": true,
+    "b1_tv": true,
+    "dev_access": true,
+    "test_access": true,
+    "model_replay": true,
+    "latent_feature_rematerialization": true
+  }
+}

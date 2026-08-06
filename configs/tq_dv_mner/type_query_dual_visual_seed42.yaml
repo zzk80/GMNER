@@ -1,0 +1,84 @@
+data:
+  task_type: multimodal_ner
+  dataset_name: twitter10000_tq_dv_mner
+  train_file: GMNER-main/Twitter10000_v2.0/txt_fine/train.txt
+  dev_file: GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt
+  test_file: ""
+  image_dir: GMNER-main/Twitter10000_v2.0/images
+  image_feature_dir: GMNER-main/Twitter10000_v2.0/VinVL
+  image_annotation_dir: GMNER-main/Twitter10000_v2.0/xml
+  frozen_clip_feature_dir: knowledge/dvh_frozen_clip
+  frozen_clip_cache_kind: dvh_frozen_clip_cache
+  max_length: 160
+  num_workers: 0
+  use_dependency_graph: true
+  dependency_backend: spacy
+  dependency_model: en_core_web_sm
+  graph_window_size: 2
+  max_regions: 16
+  grounding_iou_threshold: 0.5
+  add_null_region: true
+  grounding_enabled: true
+  expand_entities_for_grounding: true
+  groundability_type_priors: ""
+  groundability_mention_priors: ""
+  region_min_score: 0.0
+
+model:
+  text_model_name: /home/zzk/gmner/roberta-base
+  hidden_size: 768
+  projection_dim: 768
+  dropout: 0.1
+  graph_layers: 3
+  graph_dropout: 0.1
+  cross_attention_heads: 8
+  region_feature_dim: 2048
+  tq_enabled: true
+  tq_use_clip: true
+  tq_use_vinvl: true
+  tq_shuffle_clip: false
+  tq_visual_dim: 256
+  tq_clip_feature_dim: 768
+  tq_type_count: 4
+  tq_gate_initial_bias: -2.0
+  tq_max_span_length: 10
+  tq_decode_top_k_per_type: 32
+  tq_existence_threshold: 0.5
+  tq_span_score_threshold: 0.0
+  tq_existence_score_weight: 0.5
+  tq_visual_warmup_epochs: 3
+
+optim:
+  batch_size: 4
+  learning_rate: 2e-5
+  new_module_learning_rate: 1e-4
+  high_level_learning_rate: 1e-5
+  backbone_learning_rate: 3e-6
+  weight_decay: 0.01
+  num_epochs: 20
+  warmup_ratio: 0.1
+  gradient_clip_norm: 1.0
+  gradient_accumulation_steps: 2
+
+loss:
+  lambda_tq_existence: 0.5
+  lambda_tq_start: 1.0
+  lambda_tq_end: 1.0
+  lambda_tq_span_match: 1.0
+  lambda_tq_visual_alignment: 0.1
+  lambda_tq_gate_regularization: 0.01
+  tq_start_positive_weight: 5.0
+  tq_end_positive_weight: 5.0
+  tq_span_positive_weight: 20.0
+
+runtime:
+  seed: 42
+  device: cuda
+  fp16: true
+  output_dir: outputs/tq_dv_mner/type_query_dual_visual_seed42
+  init_checkpoint: ""
+  trainable_modules: all
+  save_best_metric: mner_score
+  save_latest_checkpoint: false
+  early_stopping_patience: 3
+  log_every_steps: 20

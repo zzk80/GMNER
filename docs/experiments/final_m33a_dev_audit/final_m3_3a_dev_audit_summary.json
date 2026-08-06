@@ -1,0 +1,161 @@
+{
+  "access_log": {
+    "clip_accessed": false,
+    "oof_generated": false,
+    "test_accessed": false,
+    "threshold_selected": false,
+    "training_run": false
+  },
+  "artifacts": {
+    "dev_source": {
+      "path": "/home/zzk/gmner/GMNER-main/Twitter10000_v2.0/txt_fine/dev.txt",
+      "sha256": "3ff31ebca3c858926ec6c98694820fda39c0f9718645174c00069ee5bcffab69"
+    },
+    "formal": {
+      "path": "/home/zzk/gmner/knowledge/fmnerg_subtype_sidecar/roberta128/dev_formal_predictions.json",
+      "sha256": "f1373962e07546419a699df303e7bc31bf1ccf22c4ef8f915e318764d6879fdd"
+    },
+    "r16": {
+      "path": "/home/zzk/gmner/knowledge/record_candidates/roberta128/fmnerg_dev_hierarchical.pt",
+      "sha256": "1e9f64d173c53d8691c4bf8cc82e9a2117b4d52e452a9240ccda2630de928620"
+    },
+    "r36": {
+      "path": "/home/zzk/gmner/knowledge/record_candidates/roberta128/fmnerg_dev_hierarchical_r36.pt",
+      "sha256": "25ba4162bf3be5fb81188b1276a3bf765f1e8c98019fab8eb046f02ec42ce567"
+    },
+    "selector": {
+      "path": "/home/zzk/gmner/knowledge/span_sparse_visual_type/seed42/dev.pt",
+      "sha256": "b57dfd0d823d165a12f95e02e7e6ebf269b44aebfcadd05908a2893fd14c9623"
+    }
+  },
+  "audited_oracles": {
+    "text_only": "PENDING_MANUAL_AUDIT",
+    "text_plus_visual": "PENDING_MANUAL_AUDIT",
+    "unrepairable": "PENDING_MANUAL_AUDIT",
+    "visual": "PENDING_MANUAL_AUDIT"
+  },
+  "format_version": 1,
+  "historical_retracted_contract": {
+    "provenance": "non-frozen Evidence Visibility experimental chain",
+    "span_correct": 2158,
+    "span_errors": 292,
+    "span_f1": 0.8712151746498827,
+    "type_errors": 135
+  },
+  "kind": "final_m33a_dev_read_only_audit",
+  "locked_contract": {
+    "gold": 2450,
+    "mner_correct": 2023,
+    "mner_f1": 0.8167137666532096,
+    "predicted": 2504,
+    "span_correct": 2162,
+    "span_errors": 288,
+    "span_f1": 0.8728300363342755,
+    "type_errors": 139
+  },
+  "objective_oracles": {
+    "frozen_stage1_top3_visual_prepool": 23,
+    "safe_promotion": 61,
+    "safe_replacement": 55,
+    "split_merge_reconstruction": 6,
+    "text_candidate_gold_rank_2": 107,
+    "total_boundary_actionable": 122,
+    "visual_candidate_pool": "PENDING_TRAINED_SELECTOR_REMAP"
+  },
+  "phase0_checks": {
+    "gold": true,
+    "mner_correct": true,
+    "mner_f1": true,
+    "predicted": true,
+    "span_correct": true,
+    "span_errors": true,
+    "span_f1": true,
+    "type_errors": true
+  },
+  "phase0_gate_passed": true,
+  "records": 1500,
+  "scope": "dev_only_read_only",
+  "span_audit": {
+    "gold_side_classes": {
+      "boundary_shift": 106,
+      "complex_split_merge": 4,
+      "merge": 14,
+      "pure_miss": 154,
+      "split": 10
+    },
+    "gold_side_rows": 288,
+    "prediction_side_classes": {
+      "boundary_shift": 106,
+      "complex_split_merge": 4,
+      "merge": 7,
+      "pure_false_positive": 205,
+      "split": 20
+    },
+    "prediction_side_rows": 342
+  },
+  "status": "OBJECTIVE_AUDIT_COMPLETE_MANUAL_SEMANTIC_AUDIT_PENDING",
+  "target_0_83": {
+    "ideal_type_error_coverage": 0.23741007194244604,
+    "pure_promotions_expected_precision": [
+      {
+        "minimum_actions": 57,
+        "precision": 1.0
+      },
+      {
+        "minimum_actions": 68,
+        "precision": 0.9
+      },
+      {
+        "minimum_actions": 86,
+        "precision": 0.8
+      },
+      {
+        "minimum_actions": 99,
+        "precision": 0.75
+      },
+      {
+        "minimum_actions": 116,
+        "precision": 0.7
+      }
+    ],
+    "replacement_or_type_actions": [
+      {
+        "minimum_actions": 33,
+        "precision": 1.0,
+        "type_error_coverage": 0.23741007194244604
+      },
+      {
+        "minimum_actions": 42,
+        "precision": 0.9,
+        "type_error_coverage": 0.302158273381295
+      },
+      {
+        "minimum_actions": 55,
+        "precision": 0.8,
+        "type_error_coverage": 0.39568345323741005
+      },
+      {
+        "minimum_actions": 66,
+        "precision": 0.75,
+        "type_error_coverage": 0.4748201438848921
+      },
+      {
+        "minimum_actions": 83,
+        "precision": 0.7,
+        "type_error_coverage": 0.5971223021582733
+      }
+    ],
+    "required_net_gain": 33,
+    "safe_false_positive_deletions_required": 80,
+    "target_correct_fixed_prediction_count": 2056,
+    "target_f1": 0.83
+  },
+  "type_audit": {
+    "frozen_stage1_top3_visual_prepool_count": 23,
+    "rows": 139,
+    "selector_population_eligible_count": 25,
+    "stage1_mapped": 139,
+    "text_candidate_oracle_count": 107,
+    "visual_candidate_pool_count": "PENDING_TRAINED_SELECTOR_REMAP"
+  }
+}

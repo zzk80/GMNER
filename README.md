@@ -1,32 +1,30 @@
 # GMNER / FMNERG
 
-This repository contains the two frozen formal systems used for Twitter10000:
+This repository contains two frozen formal systems for Twitter10000:
 
 ```text
 Model-G: M3.3A -> GMNER
 Model-F: F3 subtype encoder on frozen M3.3A predictions -> FMNERG
 ```
 
-Historical no-go branches are summarized in
-[`docs/EXPERIMENT_RESULTS_TABLE.md`](docs/EXPERIMENT_RESULTS_TABLE.md) and are
-not part of the runnable primary surface. Their final P4/S3/D1 code remains
-recoverable from Git history and the
-`archive/m33a-r0b-oof-20260730` tag.
+Historical experiments are not part of the formal prediction path. Their
+terminal conclusions are indexed in
+[`docs/experiments/ARCHIVED_EXPERIMENTS.md`](docs/experiments/ARCHIVED_EXPERIMENTS.md).
 
 ## Formal Results
 
 | Split | Span F1 | MNER F1 | Fine MNER F1 | EEG F1 | GMNER F1 | FMNERG F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Dev | 0.87283 | 0.816714 | 0.68039 +/- 0.00297 | 0.660880 | 0.621316 | 0.52052 +/- 0.00219 |
-| Test | 0.86980 | 0.818431 | 0.66510 +/- 0.00160 | 0.652157 | 0.615294 | 0.50431 +/- 0.00111 |
+| Dev | 0.872830 | 0.816714 | 0.68039 +/- 0.00297 | 0.660880 | 0.621316 | 0.52052 +/- 0.00219 |
+| Test | 0.869804 | 0.818431 | 0.66510 +/- 0.00160 | 0.652157 | 0.615294 | 0.50431 +/- 0.00111 |
 
-The F3 values are means and standard deviations over the preregistered seeds
-41, 42, and 43. Test was not used for checkpoint or threshold selection.
+F3 values are mean +/- sample standard deviation over preregistered seeds
+41/42/43. Test was not used for checkpoint or threshold selection.
 
 ## Model-G: M3.3A
 
 ```text
-RoBERTa Stage1
+RoBERTa Typed-BIO Stage1
 -> R16 formal candidates
 -> R36 expanded regions
 -> Hierarchical Record Verifier
@@ -36,7 +34,7 @@ RoBERTa Stage1
 -> record-level decode
 ```
 
-Formal configuration:
+Formal configurations:
 
 ```text
 configs/fmnerg_twitter10000_stage1.yaml
@@ -56,14 +54,7 @@ outputs/fmnerg_roberta128_fine_grounding_adapter/best_model.pt
 outputs/fmnerg_roberta128_evidence_visibility/best_model.pt
 ```
 
-Candidate caches:
-
-```text
-knowledge/record_candidates/roberta128/fmnerg_{train,dev,test}_hierarchical.pt
-knowledge/record_candidates/roberta128/fmnerg_{train,dev,test}_hierarchical_r36.pt
-```
-
-Evaluate the frozen Model-G endpoint:
+Evaluate the frozen endpoint:
 
 ```bash
 PYTHONPATH=. python scripts/evaluate_evidence_visibility.py \
@@ -72,18 +63,18 @@ PYTHONPATH=. python scripts/evaluate_evidence_visibility.py \
   --split dev
 ```
 
-The method and ablation details are in
+Architecture details are in
 [`docs/HIERARCHICAL_RECORD_VERIFIER.md`](docs/HIERARCHICAL_RECORD_VERIFIER.md).
 
 ## Model-F: F3
 
-F3 adds a conditional 51-class subtype encoder to frozen Model-G predictions.
-It cannot change span, coarse type, region, NULL, ordering, EEG, or GMNER.
+F3 predicts one of 51 subtypes for each frozen Model-G entity. It cannot
+change span, coarse type, region, NULL, ordering, EEG, or GMNER.
 
 ```text
 frozen M3.3A entity
 -> start/end/mean RoBERTa span representation
--> parent-masked 51-class subtype encoder
+-> parent-masked subtype encoder
 -> Fine MNER / FMNERG
 ```
 
@@ -93,125 +84,120 @@ Winner configuration:
 sidecars/fmnerg_subtype/configs/f3_p1_lr6_lower_double.yaml
 ```
 
-Formal checkpoints:
-
-```text
-outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed41/best_model.pt
-outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed42/best_model.pt
-outputs/fmnerg_subtype_f3_p1/lr6_lower_double/seed43/best_model.pt
-```
-
 Formal protocol and commands are documented in
 [`sidecars/fmnerg_subtype/README.md`](sidecars/fmnerg_subtype/README.md).
 
-## Stage1 Research Status
+## Final-Chain OOF Research Phase
 
-D0 found no significant comparable-scale gradient conflict in Stage1. Its
-main finding was a gradient-scale imbalance, so task-adversarial training is
-not authorized by the audit.
-
-D1 evaluated a standalone span candidate selector with the required strict
-10-fold OOF Train features:
+The repository now contains the code and contracts used to generate a strict
+10-fold final-chain OOF Train population. Every record was held out from all
+five supervised M3.3A stages.
 
 ```text
-10 fold-specific Stage1 models
--> unseen 700-record candidate cache per fold
--> compact and seal each fold
--> merge exactly 7000 Train records
--> paired full-fit Dev cache
--> distribution audit
+records                         7,000
+record IDs unique               7,000
+all folds sealed                true
+all replay digests exact        true
+NaN / Inf                       0
+Dev / Test accessed             false
+
+B1 exact-span rows              10,259
+B1 base-wrong rows                 875
+raw replacement actions         39,063
+strict A1 boundary actions      31,138
+strict A1 FIX / NEUTRAL / DAMAGE
+                                286 / 4,128 / 26,724
 ```
 
-Protocol:
-[`docs/experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md`](docs/experiments/STAGE1_OOF_CANDIDATE_SELECTOR.md).
-
-D1 Phase 1 completed with a `VALID_AUDIT`: 7000 strict OOF Train records and
-1500 paired full-fit Dev records share the same v2 candidate contract. The
-preregistered Seed42 selector then reached Dev Span/MNER/EEG/Stage1-GMNER
-deltas of `+0.00430/+0.00570/+0.00166/+0.00256`, but formal-gold preservation
-fell to `0.98381`. The selector has a positive learning signal, but it reduced
-the number of correct Stage1 spans and triples while improving precision. Its
-formal deployment status is therefore `NO_GO`; Seeds 41/43 and the downstream
-M3.3A rebuild are not run. The compact OOF caches, checkpoint, protocol, and
-summary are retained as a frozen ablation. Formal metrics remain unchanged
-and Test was not accessed.
-
-The completed S3 experiment tested a phased hierarchical Stage1:
+The source mother set is retained outside Git:
 
 ```text
-shared RoBERTa / graph / cross-modal representation
-├── Boundary CRF
-├── span-level coarse type head
-├── legacy-equivalent vectorized grounding
-└── record-level alignment
+knowledge/final_chain_oof/ten_fold_population/gold_free_rows.jsonl
+knowledge/final_chain_oof/ten_fold_population/supervision_sidecar.jsonl
 ```
 
-P0 and the S3.0 forward/decode equivalence foundation are complete. The
-corrected S3.1 Seed42 run was engineering-valid but failed its method Gate.
-Relative to the frozen Stage1, Span/MNER changed by only
-`+0.00128/+0.00082`, while EEG/GMNER changed by
-`-0.00580/-0.00382`; correct GMNER triples fell by 11 and formal-gold
-preservation was `0.95292`. S3.1 is therefore `NO_GO`. Seeds 41/43, S3.2,
-and the downstream M3.3A rebuild are not run. Test was not accessed and the
-formal Model-G results remain unchanged.
+### B1-T0
 
-The formal contract and current execution commands are recorded in
-[`docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md`](docs/experiments/S3_HIERARCHICAL_JOINT_STAGE1_PROTOCOL.md)
-and
-[`docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md`](docs/experiments/S3_1_BOUNDARY_TYPE_IMPLEMENTATION.md).
-The compact result is archived in
-[`docs/experiments/s3_1_seed42_dev_summary.json`](docs/experiments/s3_1_seed42_dev_summary.json).
-
-P4 Protected Joint Promotion was preregistered as a new recovery hypothesis,
-not a continuation of D1:
+The text-only exact-span type corrector learned moderate ranking and target
+type signals, but folds 0-7 could not freeze a stable action threshold under
+the required precision and preservation Gates. All three seeds therefore
+executed zero locked actions on folds 8-9.
 
 ```text
-D1 = selective rejection of formal predictions
-P4 = preserve all frozen Model-G predictions and append at most one
-     complete GMNER triple per record
+B1-T0 = NO_GO / SEALED
 ```
 
-The P4-R0-B rebuild produced complete, sealed artifacts for 5600 OOF records,
-but failed the preregistered semantic replacement Gate. Folds 2, 4, 5, and 7
-did not exactly reproduce the archived compact formal state. The regenerated
-artifacts therefore cannot replace the missing historical R16 caches. P4.0
-remains blocked; folds 8-9, Dev, P4.1, and Test were not accessed.
+### A1-T0
 
-Protocol:
-[`docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md`](docs/experiments/P4_PROTECTED_JOINT_PROMOTION_PROTOCOL.md).
-Result:
-[`docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md`](docs/experiments/P4_R0_B_FULL_CHAIN_OOF_REGENERATION_RESULT.md).
+The observable-tabular grouped boundary selector used the strict
+`286 / 31,138` population. Candidate source improved diagnostic AUPRC, but no
+seed produced a development prefix satisfying cross-fold coverage, precision,
+positive net correction, and formal preservation. The one-time folds 8-9
+evaluation executed zero actions for all three seeds.
+
+```text
+A1-T0 = NO_GO / SEALED
+Observable post-hoc correction = CLOSED
+```
+
+The complete phase record is in
+[`docs/experiments/FINAL_CHAIN_OOF_POSTHOC_PHASE_SUMMARY.md`](docs/experiments/FINAL_CHAIN_OOF_POSTHOC_PHASE_SUMMARY.md).
+
+## Next Research Boundary
+
+The next candidate direction is not another post-hoc controller. The proposed
+architecture moves risk supervision before final decoding:
+
+```text
+Typed-BIO candidate lattice
+-> hypothesis-conditioned text evidence
+-> base-candidate counterfactual comparison
+-> risk-aware structured set decoding
+-> optional visual/region expansion only after text-only validation
+```
+
+The phased J0-J3 roadmap is documented in
+[`docs/experiments/CANDIDATE_CONDITIONED_STRUCTURED_DECODER_ROADMAP.md`](docs/experiments/CANDIDATE_CONDITIONED_STRUCTURED_DECODER_ROADMAP.md).
+It is a proposal only. J0, latent rematerialization, training, Dev, and Test are
+not authorized by this document.
+
+## Retained Visual Controls
+
+DVH and TQ-DV are archived Dev controls, not formal models. DVH reached MNER
+`0.799355`; TQ-DV reached `0.810275`. Fixed-span TQ-DV replay improved MNER by
+only seven correct typed spans (`0.814740 -> 0.817559`) and did not justify a
+downstream rebuild. Their compact method records remain under
+`docs/experiments/`.
+
+TP/J3 and PA1 implementation snapshots are retained through the immutable
+`archive/tp-clip-j3-20260806` and
+`archive/protected-region-mner-pa1-20260806` tags, not through active branches
+or the formal runtime surface.
 
 ## Repository Layout
 
 ```text
-gmner/       core models, data contracts, losses, and evaluators
-scripts/     primary training, evaluation, and cache builders
-configs/     formal Model-G configs
+gmner/       formal models plus reproducible audit components
+scripts/     training, evaluation, cache, and audit entry points
+configs/     formal Model-G and retained control configurations
 sidecars/    formal F3 subtype implementation
-tools/       formal F3 orchestration
-tests/       regression tests for the formal chains and shared infrastructure
-docs/        final results, protocols, and method documentation
+tools/       orchestration and resource monitors
+tests/       regression and protocol-contract tests
+docs/        formal results, compact archives, and research protocols
 ```
 
-## Environment
+Pretrained models, checkpoints, caches, images, and generated OOF tensors are
+excluded from Git. The formal runtime paths and result-inspection commands are
+listed in
+[`docs/experiments/CURRENT_CHAIN_RUNBOOK.md`](docs/experiments/CURRENT_CHAIN_RUNBOOK.md).
+
+## Environment And Validation
 
 ```bash
 conda activate gmner
 pip install -r requirements.txt
 export PYTHONPATH=.
-```
-
-Local model paths expected by the formal configuration:
-
-```text
-roberta-base/
-```
-
-## Validation
-
-```bash
-PYTHONPATH=. python -m pytest -q
+python -m pytest -q
 ```
 
 Formal result selection rules are recorded in

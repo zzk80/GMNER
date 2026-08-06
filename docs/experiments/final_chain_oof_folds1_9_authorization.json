@@ -1,0 +1,63 @@
+{
+  "kind": "final_chain_oof_folds1_9_population_authorization",
+  "format_version": 1,
+  "status": "AUTHORIZED",
+  "experiment_id": "final_chain_oof_population_folds1_9_v1",
+  "execution_folds": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "artifact_identity": "FINAL_CHAIN_OOF_POPULATION_FOLDS1_9",
+  "chain_contract": {
+    "identity": "M3.3A_FORMAL_BEST_CHAIN",
+    "siglip2": false,
+    "fusion_reliability": false,
+    "null_release": false,
+    "clip": false,
+    "fmnerg_subtype": false
+  },
+  "source_contract": {
+    "seed": 42,
+    "num_folds": 10,
+    "outer_train_records": 6300,
+    "heldout_records": 700,
+    "inner_fit_records": 5600,
+    "inner_selection_records": 700,
+    "inner_selection_seed_base": 1042,
+    "inner_selection_seed_formula": "base_plus_fold_id",
+    "official_dev_access": false,
+    "test_access": false
+  },
+  "fold0_gate": {
+    "status": "ENGINEERING_PASS_DATA_CONTRACT_PASS",
+    "sealed_rows_sha256": "b84e91377a44c4bd6be8c9c1122ad3394d39092f50dad3508457c46fba15d07f",
+    "supervision_sidecar_sha256": "3a1acd7440bde40fd69bd66ee78945241d3414faeef796c27c5f923b45e3a21e",
+    "method_signal_evaluated": false
+  },
+  "storage_contract": {
+    "source_fold_manifest": "knowledge/final_chain_oof/fold0_dry_run/folds/fold_summary.json",
+    "source_fold_manifest_sha256": "a072637922e4151525747e1fc51255df78fbd4ae781a8ab4a64ed9af57f676e3",
+    "work_root": "knowledge/final_chain_oof/population_folds1_9",
+    "output_root": "outputs/final_chain_oof/population_folds1_9",
+    "legacy_evidence_root": "knowledge/null_release_oof/roberta128"
+  },
+  "resource_budget": {
+    "gpu_free_gate_gib": 10,
+    "preferred_free_disk_gib": 10,
+    "hard_free_disk_floor_gib": 6,
+    "transient_fold_budget_gib": 5,
+    "sealed_retained_target_mib": 500,
+    "sample_interval_seconds": 5
+  },
+  "allowed": {
+    "generate_gold_free_rows": true,
+    "deterministic_replay": true,
+    "postseal_supervision_sidecar": true,
+    "descriptive_distribution_summary": true,
+    "sequential_fold_cleanup": true
+  },
+  "forbidden": {
+    "b1_a1_training": true,
+    "auroc_feature_selection": true,
+    "threshold_or_calibration": true,
+    "dev_access": true,
+    "test_access": true
+  }
+}

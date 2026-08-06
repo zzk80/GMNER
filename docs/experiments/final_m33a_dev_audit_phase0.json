@@ -1,0 +1,47 @@
+{
+  "audit_tables": "GENERATED",
+  "audited_semantic_oracles": "PENDING_MANUAL_AUDIT",
+  "format_version": 2,
+  "hard_checks": {
+    "gold": true,
+    "mner_correct": true,
+    "mner_f1": true,
+    "predicted": true,
+    "span_correct": true,
+    "span_errors": true,
+    "span_f1": true,
+    "type_errors": true
+  },
+  "historical_retracted_contract": {
+    "provenance": "non-frozen Evidence Visibility experimental chain",
+    "span_correct": 2158,
+    "span_errors": 292,
+    "span_f1": 0.8712151746498827,
+    "type_errors": 135
+  },
+  "independent_recomputation": {
+    "gold": 2450,
+    "mner_correct": 2023,
+    "mner_f1": 0.8167137666532095,
+    "predicted": 2504,
+    "span_correct": 2162,
+    "span_errors": 288,
+    "span_f1": 0.8728300363342754,
+    "type_errors": 139
+  },
+  "kind": "final_m33a_dev_audit_phase0",
+  "locked_formal_m33a_contract": {
+    "gold": 2450,
+    "mner_correct": 2023,
+    "mner_f1": 0.8167137666532096,
+    "predicted": 2504,
+    "span_correct": 2162,
+    "span_errors": 288,
+    "span_f1": 0.8728300363342755,
+    "type_errors": 139
+  },
+  "objective_oracles": "GENERATED",
+  "scope": "dev_only_read_only",
+  "status": "PHASE0_GATE_PASSED",
+  "test_accessed": false
+}
