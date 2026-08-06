@@ -1,0 +1,102 @@
+{
+  "kind": "b1_t0_oof_separability_authorization",
+  "format_version": 1,
+  "status": "AUTHORIZED",
+  "experiment_id": "b1_t0_text_only_oof_separability_v1",
+  "input_contract": {
+    "gold_free_rows": "knowledge/final_chain_oof/ten_fold_population/gold_free_rows.jsonl",
+    "gold_free_rows_sha256": "d9ffcc53d71e64b5b6ceb3a043e579fce363779564710b9d2aebf65d9b934d4b",
+    "supervision_sidecar": "knowledge/final_chain_oof/ten_fold_population/supervision_sidecar.jsonl",
+    "supervision_sidecar_sha256": "a0487a5a529d8f46ce28a8aaf4008d693d6aa3edb06551515d2f1eedafdb6ee6",
+    "fold_manifest": "knowledge/final_chain_oof/population_folds1_9/folds/fold_summary.json",
+    "population": "all exact-span formal predictions",
+    "base_wrong_label": "correction positive",
+    "base_correct_label": "preservation negative"
+  },
+  "partition_contract": {
+    "development_folds": [0, 1, 2, 3, 4, 5, 6, 7],
+    "locked_evaluation_folds": [8, 9],
+    "internal_validation": "leave_one_fold_out_within_development_folds",
+    "random_entity_split_forbidden": true
+  },
+  "feature_contract": {
+    "text_encoder": "frozen_roberta_base_without_task_supervision",
+    "text_encoder_path": "/home/zzk/gmner/roberta-base",
+    "span_pooling": ["first_subword", "last_subword", "mean_subword"],
+    "task_evidence": [
+      "four_final_type_logits",
+      "top1_type_identity",
+      "top2_type_identity",
+      "confidence",
+      "margin",
+      "entropy",
+      "span_base_score"
+    ],
+    "lexical_evidence": [
+      "span_word_length",
+      "span_character_length",
+      "uppercase_ratio",
+      "digit_ratio",
+      "mention_frequency_from_training_partition_only"
+    ],
+    "visual_features": false,
+    "region_features": false,
+    "clip": false
+  },
+  "model_contract": {
+    "decision": "two_head_change_gate_and_target_type",
+    "text_projection_size": 128,
+    "scalar_projection_size": 64,
+    "shared_hidden_size": 128,
+    "dropout": 0.1,
+    "epochs": 25,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "seeds": [41, 42, 43],
+    "all_exact_span_rows_used": true,
+    "negative_downsampling": false,
+    "checkpoint_selection": "fixed_epoch_no_locked_fold_selection"
+  },
+  "threshold_contract": {
+    "source": "pooled_leave_one_fold_out_predictions_on_folds_0_7_only",
+    "objective": "maximize_net_then_precision_then_fewer_actions_then_higher_threshold",
+    "minimum_action_precision": 0.75,
+    "target_action_precision": 0.8,
+    "minimum_base_correct_preservation": 0.99,
+    "require_corrected_greater_than_damaged": true,
+    "locked_folds_threshold_scan": false
+  },
+  "locked_gate": {
+    "minimum_passing_seeds": 2,
+    "require_mean_net_positive": true,
+    "require_mean_mner_delta_positive": true
+  },
+  "output_contract": {
+    "root": "knowledge/final_chain_oof/b1_t0",
+    "feature_manifest": "features/feature_manifest.json",
+    "development_freeze": "development/development_freeze.json",
+    "locked_evaluation": "locked_evaluation.json"
+  },
+  "allowed": {
+    "build_frozen_text_features": true,
+    "train_on_folds_0_7": true,
+    "internal_fold_cross_validation": true,
+    "freeze_threshold_on_folds_0_7": true,
+    "one_locked_folds_8_9_evaluation": true,
+    "diagnostic_auroc_auprc": true
+  },
+  "forbidden": {
+    "a1_training": true,
+    "b1_tv": true,
+    "visual_features": true,
+    "clip": true,
+    "dev_access": true,
+    "test_access": true,
+    "locked_fold_feature_selection": true,
+    "locked_fold_threshold_selection": true,
+    "span_change": true,
+    "prediction_count_change": true,
+    "region_or_visibility_change": true
+  }
+}
