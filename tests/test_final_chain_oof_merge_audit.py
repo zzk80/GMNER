@@ -48,6 +48,26 @@ class FinalChainOOFMergeAuditTest(unittest.TestCase):
         self.assertEqual(report["count"], 3)
         self.assertEqual(report["median"], 2.0)
 
+    def test_fold0_historical_completion_key_is_explicitly_supported(self) -> None:
+        self.assertTrue(
+            MODULE.completion_heldout_excluded(
+                {
+                    "all_five_supervised_stages_complete_and_heldout_excluded": True
+                },
+                0,
+            )
+        )
+        self.assertFalse(
+            MODULE.completion_heldout_excluded(
+                {"all_five_supervised_stages_heldout_excluded": True}, 0
+            )
+        )
+        self.assertTrue(
+            MODULE.completion_heldout_excluded(
+                {"all_five_supervised_stages_heldout_excluded": True}, 1
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

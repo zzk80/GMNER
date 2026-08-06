@@ -138,6 +138,17 @@ def validate_authorization(payload: dict[str, Any]) -> None:
         raise PermissionError("A merge-stage method/access lock is disabled.")
 
 
+def completion_heldout_excluded(payload: dict[str, Any], fold_id: int) -> bool:
+    if fold_id == 0:
+        return (
+            payload.get(
+                "all_five_supervised_stages_complete_and_heldout_excluded"
+            )
+            is True
+        )
+    return payload.get("all_five_supervised_stages_heldout_excluded") is True
+
+
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -222,7 +233,7 @@ def main() -> None:
             or completion.get("word_space_span_validity") != 1.0
             or completion.get("formal_prediction_identity_coverage") != 1.0
             or completion.get("action_reference_coverage") != 1.0
-            or completion.get("all_five_supervised_stages_heldout_excluded") is not True
+            or not completion_heldout_excluded(completion, fold_id)
             or completion.get("pipeline_sealed") is not True
             or completion.get("dev_accessed") is not False
             or completion.get("test_accessed") is not False
