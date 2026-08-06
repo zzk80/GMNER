@@ -6,6 +6,7 @@ PYTHON_BIN="${PYTHON_BIN:-/home/zzk/miniconda3/envs/gmner/bin/python}"
 DEVICE="${DEVICE:-cuda}"
 MIN_FREE_MIB="${MIN_FREE_MIB:-5120}"
 LOG="${LOG:-$ROOT/b1_t0_oof.log}"
+export CUBLAS_WORKSPACE_CONFIG="${CUBLAS_WORKSPACE_CONFIG:-:4096:8}"
 
 cd "$ROOT"
 
