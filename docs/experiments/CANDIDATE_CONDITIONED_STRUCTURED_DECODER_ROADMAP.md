@@ -648,8 +648,9 @@ R16/R36 union          = 禁止
 
 Windows/Linux 独立重放还发现两个派生分数存在最大 `4.44e-16` 的 `libm` 末位差异，
 但离散 digest、排序和全部 Oracle 指标完全一致。正式 artifact 因此只将派生的
-`type_log_probability` 与 `typed_score` 固定为小数点后 12 位；原始 logits 和输入
-score 不改。该规范用于保证跨平台完整文件 SHA256 一致。
+`type_log_probability` 与 `typed_score` 使用 precision 50 的 `Decimal` 计算并按
+`ROUND_HALF_EVEN` 固定为小数点后 12 位；原始 logits 和输入 score 不改。该规范
+用于保证跨平台完整文件 SHA256 一致。
 
 ### J0-B：潜表示物化可行性
 

@@ -49,7 +49,8 @@
     "formula": "typed_score = span_base_score + log_softmax(type_logits)[type_id]",
     "weights": "none",
     "selection_uses_gold": false,
-    "derived_float_serialization_decimals": 12
+    "derived_float_serialization_decimals": 12,
+    "derived_float_backend": "Python Decimal precision=50 ROUND_HALF_EVEN"
   },
   "pre_supervision_amendments": [
     {
@@ -65,7 +66,7 @@
       "amendment": "CROSS_PLATFORM_DERIVED_FLOAT_SERIALIZATION",
       "original_behavior": "serialize full Python libm output precision",
       "observed_after_independent_platform_replay": "max absolute difference 4.440892098500626e-16 with exact discrete digest and Oracle metrics",
-      "revised_contract": "round only derived type_log_probability and typed_score to 12 decimal places before sealing",
+      "revised_contract": "compute log-softmax with Decimal precision 50 and quantize only derived type_log_probability and typed_score to 12 decimal places using ROUND_HALF_EVEN",
       "candidate_identity_changed": false,
       "candidate_ranking_changed": false,
       "oracle_metrics_changed": false,

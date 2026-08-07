@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal, ROUND_HALF_EVEN, localcontext
 from functools import lru_cache
 import hashlib
 import json
@@ -95,16 +96,28 @@ def overlaps(left: tuple[int, int], right: tuple[int, int]) -> bool:
     return min(left[1], right[1]) > max(left[0], right[0])
 
 
-def _log_softmax(values: list[float]) -> list[float]:
+@lru_cache(maxsize=131072)
+def _log_softmax_cached(values: tuple[float, ...]) -> tuple[float, ...]:
     if len(values) != len(TYPE_ORDER):
         raise ValueError("Typed-span evidence must contain four logits.")
     if any(not math.isfinite(float(value)) for value in values):
         raise ValueError("Non-finite type logit.")
-    maximum = max(float(value) for value in values)
-    denominator = maximum + math.log(
-        sum(math.exp(float(value) - maximum) for value in values)
-    )
-    return [float(value) - denominator for value in values]
+    with localcontext() as context:
+        context.prec = 50
+        decimal_values = [Decimal(repr(float(value))) for value in values]
+        maximum = max(decimal_values)
+        denominator = maximum + sum(
+            (value - maximum).exp() for value in decimal_values
+        ).ln()
+        quantum = Decimal(1).scaleb(-DERIVED_FLOAT_DECIMALS)
+        return tuple(
+            float((value - denominator).quantize(quantum, rounding=ROUND_HALF_EVEN))
+            for value in decimal_values
+        )
+
+
+def _log_softmax(values: list[float]) -> list[float]:
+    return list(_log_softmax_cached(tuple(float(value) for value in values)))
 
 
 def _semantic_candidate_key(candidate: dict[str, Any]) -> tuple[Any, ...]:
@@ -193,14 +206,16 @@ def _raw_hypothesis(
     type_id: int,
     origin: dict[str, Any],
 ) -> dict[str, Any]:
-    log_probability = round(
-        _log_softmax(origin["type_logits"])[int(type_id)],
-        DERIVED_FLOAT_DECIMALS,
-    )
-    typed_score = round(
-        float(origin["span_base_score"]) + log_probability,
-        DERIVED_FLOAT_DECIMALS,
-    )
+    log_probability = _log_softmax(origin["type_logits"])[int(type_id)]
+    with localcontext() as context:
+        context.prec = 50
+        quantum = Decimal(1).scaleb(-DERIVED_FLOAT_DECIMALS)
+        typed_score = float(
+            (
+                Decimal(repr(float(origin["span_base_score"])))
+                + Decimal(repr(log_probability))
+            ).quantize(quantum, rounding=ROUND_HALF_EVEN)
+        )
     source = str(origin["candidate_source"])
     return {
         "hypothesis_id": stable_identity(
