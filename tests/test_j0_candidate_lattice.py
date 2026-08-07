@@ -106,6 +106,11 @@ def test_lattice_contains_type_and_joint_boundary_hypotheses() -> None:
     assert (0, 2, 0) in typed
     assert (0, 2, 3) in typed
     assert (0, 1, 1) not in typed
+    for item in replacement["alternatives"]:
+        assert item["typed_score"] == round(item["typed_score"], 12)
+        assert item["type_log_probability"] == round(
+            item["type_log_probability"], 12
+        )
 
 
 def test_constrained_oracle_can_replace_and_add_without_overlap() -> None:

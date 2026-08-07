@@ -48,7 +48,8 @@
   "score_contract": {
     "formula": "typed_score = span_base_score + log_softmax(type_logits)[type_id]",
     "weights": "none",
-    "selection_uses_gold": false
+    "selection_uses_gold": false,
+    "derived_float_serialization_decimals": 12
   },
   "pre_supervision_amendments": [
     {
@@ -57,6 +58,17 @@
       "observed_before_gold_access": "local perturbation proposals differ under the two fixed candidate budgets",
       "revised_contract": "use sealed R36 proposals only; count R16/R36 differences descriptively; never union them",
       "gold_accessed_before_amendment": false,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "amendment": "CROSS_PLATFORM_DERIVED_FLOAT_SERIALIZATION",
+      "original_behavior": "serialize full Python libm output precision",
+      "observed_after_independent_platform_replay": "max absolute difference 4.440892098500626e-16 with exact discrete digest and Oracle metrics",
+      "revised_contract": "round only derived type_log_probability and typed_score to 12 decimal places before sealing",
+      "candidate_identity_changed": false,
+      "candidate_ranking_changed": false,
+      "oracle_metrics_changed": false,
       "dev_accessed": false,
       "test_accessed": false
     }

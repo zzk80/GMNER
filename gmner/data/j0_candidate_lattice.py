@@ -18,6 +18,7 @@ SOURCE_PRIORITY = {
     "perturbation": 4,
     "unknown": 9,
 }
+DERIVED_FLOAT_DECIMALS = 12
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -192,8 +193,14 @@ def _raw_hypothesis(
     type_id: int,
     origin: dict[str, Any],
 ) -> dict[str, Any]:
-    log_probability = _log_softmax(origin["type_logits"])[int(type_id)]
-    typed_score = float(origin["span_base_score"]) + log_probability
+    log_probability = round(
+        _log_softmax(origin["type_logits"])[int(type_id)],
+        DERIVED_FLOAT_DECIMALS,
+    )
+    typed_score = round(
+        float(origin["span_base_score"]) + log_probability,
+        DERIVED_FLOAT_DECIMALS,
+    )
     source = str(origin["candidate_source"])
     return {
         "hypothesis_id": stable_identity(
@@ -444,6 +451,7 @@ def build_lattice_record(row: dict[str, Any]) -> dict[str, Any]:
         "test_accessed": False,
         "source_row_sha256": canonical_sha256(row),
         "type_order": list(TYPE_ORDER),
+        "derived_float_decimals": DERIVED_FLOAT_DECIMALS,
         "candidate_source_audit": source_audit,
         "groups": groups,
         "counts": {

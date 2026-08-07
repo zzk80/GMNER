@@ -11,13 +11,21 @@
   },
   "gold_free_seal": {
     "records": 7000,
-    "lattice_sha256": "b939f3a9ea50038f7efe0bc5d4ef5bd6d9facb66c7478c607102c159f3feab18",
+    "lattice_sha256": "701840b49dd18ccd7d84dfdee8da74da2f7053a12732b84a5269af494a4ee4fd",
     "discrete_digest_sha256": "6868822050603e22d89c8e9e9f2bbe2acbdbe3d866d8404947f51047cfd30e75",
-    "oracle_supervision_sha256": "617b88c0d7f06960c9280df3cff077639aa05b3742f41b5bdb0657a15192455c",
+    "oracle_supervision_sha256": "a2a3c77a5aa05bf8eeaacdd916d70560ac27665415bc020e37acb6273e1990c3",
     "double_build_file_digest_exact": true,
     "double_build_discrete_digest_exact": true,
     "lattice_unchanged_after_supervision": true,
     "gold_supervision_absent_before_seal": true
+  },
+  "numeric_portability": {
+    "derived_float_serialization_decimals": 12,
+    "pre_amendment_cross_platform_max_abs_error": 4.440892098500626e-16,
+    "pre_amendment_discrete_digest_exact": true,
+    "pre_amendment_oracle_metrics_exact": true,
+    "candidate_ranking_changed": false,
+    "oracle_metrics_changed": false
   },
   "candidate_namespace": {
     "selected": "sealed_r36_span_candidates",

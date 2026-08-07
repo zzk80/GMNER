@@ -646,6 +646,11 @@ R16/R36 union          = 禁止
 原因是 formal predictions 与最终下游状态均锚定 R36。完整机器结果见
 `j0_a_candidate_lattice_oracle_result.json`。
 
+Windows/Linux 独立重放还发现两个派生分数存在最大 `4.44e-16` 的 `libm` 末位差异，
+但离散 digest、排序和全部 Oracle 指标完全一致。正式 artifact 因此只将派生的
+`type_log_probability` 与 `typed_score` 固定为小数点后 12 位；原始 logits 和输入
+score 不改。该规范用于保证跨平台完整文件 SHA256 一致。
+
 ### J0-B：潜表示物化可行性
 
 仅在 J0-A 通过后验证：
