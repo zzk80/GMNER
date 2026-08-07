@@ -4,11 +4,14 @@
 
 ```text
 性质：后续候选研究方案
-当前状态：仅完成方法收敛，未授权实现或训练
+版本：1.2
+修订日期：2026-08-07
+当前状态：J0-A PASSED；J0-B / J1 未授权
 正式主链：M3.3A 保持不变
 B1-T0：NO_GO / SEALED
 A1-T0：NO_GO / SEALED
 Observable post-hoc correction：TERMINATED
+近期唯一方法闸门：J0-B feasibility -> J1
 Dev / Test：LOCKED
 ```
 
@@ -54,6 +57,16 @@ final-chain 输出
 ```
 
 这使候选条件化联合解码成为合理的新方向，但不代表它已经获得方法成功证据。
+
+当前投入重点不是一次性实现完整多模态框架，而是验证两个前置命题：
+
+```text
+J0：受约束 typed-span lattice 是否有足够的完整净 Oracle 空间；
+J1：潜表示、候选条件化证据和反事实比较是否产生可迁移的净收益。
+```
+
+J1 是近期唯一的方法闸门。视觉、动态 region、record GNN 和完整 set decoder
+都只是条件分支，不能与 J1 同时开发并用联合结果反推其中某个机制有效。
 
 ---
 
@@ -219,6 +232,29 @@ record 冲突约束后 oracle
 ```
 
 不能只报告未受预算限制的理论候选上限。
+
+当前正式 MNER 从 `0.816714` 达到 `0.83` 约需净增加 33 个正确实体。模型不可能
+无损兑现全部 Oracle，因此 J0 不能只证明候选空间略高于 `+33`。本路线建议：
+
+```text
+最终预算与 record 约束后的净 Oracle（每 1500 records 等效）：
+继续 J1 的建议下限     >= +66
+更有说服力的目标区间   +70 到 +100
+```
+
+J0 使用 7000 条 Train OOF records，因此正式 Gate 按 record 数归一化：
+
+```text
+最低 OOF 净增 = ceil(66 * 7000 / 1500) = 308
+优选 OOF 区间 = 327 到 467
+```
+
+不能直接在 7000 条 OOF 总体上使用未缩放的 `+66`，否则只相当于约 14 个 Dev
+实体，低于正式目标所需的 33 个净正确实体。
+
+若 raw Oracle 很高，但去重、Top-K 和冲突约束后只剩约 `+33` 到 `+45`，应停止，
+不以“理论上仍超过目标”作为训练 J1 的理由。精确数值仍须在 J0 独立预注册中冻结；
+这里给出的是投入决策基准，不构成 J0 执行授权。
 
 ---
 
@@ -512,6 +548,19 @@ full-fit Train/Dev deployment latent distribution
 
 因为一个共享 reranker 最终需要从十个 fold 模型的表示迁移到 full-fit 正式模型。若表示漂移严重，应先使用归一化或共享冻结投影解决，不能在 Dev 上事后调阈值。
 
+跨 fold 稳定化的优先顺序固定为：
+
+```text
+1. 对各类 latent 做同口径 LayerNorm
+2. 使用所有 fold 共享且冻结的 projection
+3. 优先使用 candidate - base、绝对差和逐元素乘积等相对表示
+4. 绝对 candidate latent 仅作为消融，不作为默认唯一输入
+```
+
+其中 `Z_candidate - Z_base` 直接描述同一 checkpoint、同一 record 内的反事实变化，
+通常比跨 checkpoint 的绝对向量更稳定。必须分别报告绝对表示和相对表示的跨 fold
+漂移，不能只报告合并后的总体均值。
+
 ---
 
 # 十二、分阶段实验路线
@@ -524,17 +573,97 @@ full-fit Train/Dev deployment latent distribution
 Dev/Test：锁定
 ```
 
-必须回答：
+J0 分成两个顺序固定的只读子阶段。
+
+### J0-A：受约束候选 Oracle
+
+先完成 gold-free lattice 封存和 post-seal Oracle，只回答：
 
 ```text
 typed-span 正候选覆盖率是多少？
 KEEP/NONE 加入后的约束集合 Oracle 是多少？
 不同 Top-K 预算损失多少 Oracle？
 联合边界+类型候选是否仍有达到目标的净空间？
-fold-specific latent states 能否合法、确定性物化？
 ```
 
-若受约束 Oracle 本身不足，立即停止，不进入 J1。
+若最终预算下的受约束 Oracle 未达到预注册投入门槛，立即停止，不物化 latent，
+也不进入 J1。
+
+#### J0-A 正式结果
+
+J0-A 已于 2026-08-07 按独立预注册执行完成：
+
+```text
+数据范围                    10-fold final-chain OOF Train only
+records                     7000
+formal KEEP groups          11951
+NONE/ADD groups              7558
+raw alternatives           337996
+deduplicated alternatives  278241
+
+OOF baseline MNER F1       0.790898
+Top-1 Oracle net correct       +578
+Top-2 Oracle net correct       +687
+Top-4 Oracle net correct      +1001
+record-constrained Top-4       +988
+final-budget constrained       +973
+final Oracle MNER F1         0.860002
+1500-record equivalent gain   +208.5
+```
+
+最终预算固定为：
+
+```text
+每组 Top-4
+每 record 最多 32 个非控制候选
+span 不允许重叠
+每 record 最多 ADD 1 个实体
+KEEP / NONE 永不裁剪
+```
+
+最终 `+973` 精确分解为：
+
+```text
+replacement corrected   617
+replacement damaged       0
+correct ADD              356
+net                      973
+```
+
+十折均为正净增，gold-free lattice 在 supervision 前后 SHA256 完全不变，Dev/Test
+均未访问。因此 J0-A 的候选容量 Gate 通过。该结果只证明**受约束候选空间足够**，
+不证明 latent 可合法物化，也不证明 J1 reranker 可学习。
+
+执行前发现 R16 与 R36 的 perturbation span proposal 在 1183 条记录上不完全相同。
+该差异在读取 gold 前被记录并修订为：
+
+```text
+J0 唯一候选命名空间 = sealed R36 span candidates
+R16                    = 仅做描述性身份审计
+R16/R36 union          = 禁止
+```
+
+原因是 formal predictions 与最终下游状态均锚定 R36。完整机器结果见
+`j0_a_candidate_lattice_oracle_result.json`。
+
+Windows/Linux 独立重放还发现两个派生分数存在最大 `4.44e-16` 的 `libm` 末位差异，
+但离散 digest、排序和全部 Oracle 指标完全一致。正式 artifact 因此只将派生的
+`type_log_probability` 与 `typed_score` 使用 precision 50 的 `Decimal` 计算并按
+`ROUND_HALF_EVEN` 固定为小数点后 12 位；原始 logits 和输入 score 不改。该规范
+用于保证跨平台完整文件 SHA256 一致。
+
+### J0-B：潜表示物化可行性
+
+仅在 J0-A 通过后验证：
+
+```text
+fold-specific latent states 能否合法、确定性物化？
+candidate/base identity 能否与 sealed lattice 一一对应？
+绝对与相对 latent 的跨 fold 漂移是否可控？
+full-fit deployment latent 是否落在 OOF 可支持范围内？
+```
+
+J0-B 仍然不训练 reranker，也不访问 Dev/Test。
 
 ## J1：Frozen Text-Only Candidate Reranker
 
@@ -554,7 +683,27 @@ C3：+ base-candidate counterfactual comparison
 C4：+ FIX/DAMAGE risk supervision
 ```
 
-只有 C2/C3/C4 在锁定 OOF 上形成稳定净收益，才能证明新机制优于普通 latent MLP。
+J1 必须针对同一候选状态联合回答：
+
+```text
+候选是否比 KEEP/NONE 获得更多证据？
+执行该候选是否会损坏当前正确决策？
+```
+
+不能把一个独立 evidence 排序器和另一个 risk 分类器的总体指标相乘后声称动作安全。
+正式动作必须来自同一候选的 advantage 与 DAMAGE risk 联合分数。
+
+只有锁定 OOF 上出现稳定的：
+
+```text
+C1 static pooling
+< C2 conditioned evidence
+< C3 counterfactual comparison
+< C4 risk-aware scoring
+```
+
+并且 C3/C4 的 corrected 明显高于 damaged，才能证明新机制优于普通 latent MLP。
+若 C3/C4 仍无稳定净收益，候选纠错主线直接停止，不再用视觉或 GNN 补救。
 
 ## J2：Typed-Span-Conditioned Visual Evidence
 
@@ -567,6 +716,17 @@ text-only natural fallback
 ```
 
 先验证视觉是否降低 DAMAGE、提高候选精度，而不是只提高 AUROC。
+
+J2 的正式目标不是 visual coarse-type accuracy，而是：
+
+```text
+降低 text-only 候选的 DAMAGE
+提高正确候选相对 KEEP/NONE 的 margin
+视觉缺失时严格退化为冻结的 J1 text-only 行为
+```
+
+若视觉只提高 AUROC 或 region recall，却不改善动作 precision、net correction 和
+KEEP preservation，则 J2 判为无效，不进入动态 region 或 record-level 解码。
 
 ## J3：Dynamic Region 与 Record-Level Joint Decoder
 
@@ -667,4 +827,17 @@ J0 受约束联合候选 Oracle
 
 只有 J1 在严格 OOF 锁定评估中获得稳定 typed-span 净收益，完整多模态联合架构才值得继续投入。
 
-当前文档只固定宏观路线，不构成 J0、潜表示重物化、训练、Dev 或 Test 的授权。
+从论文方法角度，只有消融能够证明 conditioned evidence、counterfactual comparison
+和 risk-aware decoding 分别带来递增且可迁移的净收益，才能形成完整创新主张。若最终
+实现退化为 `CRF candidates -> MLP reranker`，则工程上可以作为基线，但不足以支撑
+本路线声称的方法贡献。
+
+当前授权边界为：
+
+```text
+J0-A gold-free lattice + post-seal Oracle  COMPLETE / PASSED
+J0-B latent rematerialization              NOT AUTHORIZED
+J1 training                                NOT AUTHORIZED
+J2/J3                                      LOCKED
+Dev/Test                                   LOCKED
+```

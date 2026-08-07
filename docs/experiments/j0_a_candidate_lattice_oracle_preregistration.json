@@ -1,0 +1,125 @@
+{
+  "kind": "j0_a_candidate_lattice_oracle_preregistration",
+  "format_version": 1,
+  "experiment_id": "J0-A_GOLD_FREE_TYPED_SPAN_LATTICE_ORACLE",
+  "status": "AUTHORIZED_J0_A_ONLY",
+  "date": "2026-08-07",
+  "inputs": {
+    "gold_free_rows": "knowledge/final_chain_oof/ten_fold_population/gold_free_rows.jsonl",
+    "gold_free_rows_sha256": "d9ffcc53d71e64b5b6ceb3a043e579fce363779564710b9d2aebf65d9b934d4b",
+    "merge_manifest": "knowledge/final_chain_oof/ten_fold_population/merge_manifest.json",
+    "merge_manifest_sha256": "6480053ce530f4a649c67ece24d4b09681eaaf15e01443ea072f14ea17d9ca4f",
+    "train_source": "GMNER-main/Twitter10000_v2.0/txt_fine/train.txt",
+    "train_source_sha256": "b067446640d71ffad116e67c359f095f99c9d5ca2d0f2a1bc103909ebc8505e9"
+  },
+  "baseline_contract": {
+    "scope": "strict_10_fold_final_chain_oof_train",
+    "records": 7000,
+    "predicted": 11951,
+    "gold": 11779,
+    "span_correct": 10259,
+    "mner_correct": 9384
+  },
+  "lattice_contract": {
+    "type_order": ["LOC", "PER", "ORG", "OTHER"],
+    "candidate_source": "sealed_r36_span_candidates_only",
+    "candidate_namespace_reason": "formal predictions and downstream final-chain states are indexed on R36",
+    "r16_policy": "descriptive_identity_audit_only",
+    "r16_r36_union": false,
+    "candidate_generation_gold_free": true,
+    "formal_group_control": "KEEP",
+    "addition_group_control": "NONE",
+    "replacement_assignment": "proposal_span_overlaps_formal_span",
+    "addition_assignment": "proposal_span_overlaps_no_formal_span",
+    "addition_grouping": "deterministic_overlap_connected_components",
+    "expand_all_four_types": true,
+    "deduplication_key": ["group_id", "word_span_start", "word_span_end", "type_id"],
+    "source_priority": ["formal", "stage1", "viterbi", "kbest", "perturbation", "unknown"],
+    "tie_break": [
+      "typed_score_desc",
+      "source_priority_asc",
+      "span_start_asc",
+      "span_end_asc",
+      "type_id_asc",
+      "hypothesis_id_asc"
+    ],
+    "identity_inputs_contain_floats": false
+  },
+  "score_contract": {
+    "formula": "typed_score = span_base_score + log_softmax(type_logits)[type_id]",
+    "weights": "none",
+    "selection_uses_gold": false,
+    "derived_float_serialization_decimals": 12,
+    "derived_float_backend": "Python Decimal precision=50 ROUND_HALF_EVEN"
+  },
+  "pre_supervision_amendments": [
+    {
+      "amendment": "R16_R36_TYPED_SPAN_IDENTITY",
+      "original_assumption": "R16 and R36 typed-span proposal identities are exact",
+      "observed_before_gold_access": "local perturbation proposals differ under the two fixed candidate budgets",
+      "revised_contract": "use sealed R36 proposals only; count R16/R36 differences descriptively; never union them",
+      "gold_accessed_before_amendment": false,
+      "dev_accessed": false,
+      "test_accessed": false
+    },
+    {
+      "amendment": "CROSS_PLATFORM_DERIVED_FLOAT_SERIALIZATION",
+      "original_behavior": "serialize full Python libm output precision",
+      "observed_after_independent_platform_replay": "max absolute difference 4.440892098500626e-16 with exact discrete digest and Oracle metrics",
+      "revised_contract": "compute log-softmax with Decimal precision 50 and quantize only derived type_log_probability and typed_score to 12 decimal places using ROUND_HALF_EVEN",
+      "candidate_identity_changed": false,
+      "candidate_ranking_changed": false,
+      "oracle_metrics_changed": false,
+      "dev_accessed": false,
+      "test_accessed": false
+    }
+  ],
+  "budgets": {
+    "reported_per_group_top_k": [1, 2, 4, 8],
+    "final_per_group_top_k": 4,
+    "max_noncontrol_hypotheses_per_record": 32,
+    "max_additions_per_record": 1,
+    "formal_replacement_count_change": 0,
+    "controls_never_pruned": true,
+    "record_span_overlap_allowed": false
+  },
+  "oracle_contract": {
+    "gold_attached_only_after_lattice_sha256_seal": true,
+    "metric": "exact_span_plus_coarse_type_MNER",
+    "objective": "maximize_exact_correct_then_minimize_additions",
+    "raw_duplicate_semantics": "duplicates_collapse_without_oracle_loss",
+    "stages": [
+      "raw_semantic_oracle",
+      "deduplicated_oracle",
+      "top_k_1_oracle",
+      "top_k_2_oracle",
+      "top_k_4_oracle",
+      "top_k_8_oracle",
+      "record_constrained_oracle",
+      "final_budget_constrained_oracle"
+    ],
+    "all_10_oof_folds_are_descriptive_only": true,
+    "threshold_or_model_selection": false
+  },
+  "continuation_gate": {
+    "formal_dev_required_net_correct_gain": 33,
+    "safety_multiplier": 2.0,
+    "minimum_dev_1500_equivalent_net_correct_gain": 66,
+    "minimum_oof_net_correct_gain": 308,
+    "normalization_formula": "ceil(66 * 7000 / 1500) = 308",
+    "preferred_dev_1500_equivalent_range": [70, 100],
+    "preferred_oof_net_correct_range": [327, 467],
+    "every_fold_positive_net_gain": true,
+    "all_contract_checks": true
+  },
+  "authorization": {
+    "j0_a_gold_free_build": true,
+    "j0_a_postseal_oracle": true,
+    "j0_b_latent_rematerialization": false,
+    "j1_training": false,
+    "j2_visual": false,
+    "j3_structured_decoder": false,
+    "dev_access": false,
+    "test_access": false
+  }
+}

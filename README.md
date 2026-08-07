@@ -158,8 +158,25 @@ Typed-BIO candidate lattice
 
 The phased J0-J3 roadmap is documented in
 [`docs/experiments/CANDIDATE_CONDITIONED_STRUCTURED_DECODER_ROADMAP.md`](docs/experiments/CANDIDATE_CONDITIONED_STRUCTURED_DECODER_ROADMAP.md).
-It is a proposal only. J0, latent rematerialization, training, Dev, and Test are
-not authorized by this document.
+
+J0-A is now complete. A gold-free R36 typed-span lattice was sealed before
+Train supervision was attached. Under the frozen final budget (Top-4 per
+group, 32 non-control hypotheses per record, non-overlap, at most one ADD),
+the exact OOF Oracle gained 973 correct MNER entities, equivalent to 208.5 per
+1500 records. The preregistered continuation floor was 308 OOF gains, or 66
+per 1500 records.
+
+```text
+J0-A candidate capacity       PASSED
+J0-B latent rematerialization NOT AUTHORIZED
+J1 training                   NOT AUTHORIZED
+Dev / Test                    LOCKED
+```
+
+The compact result is in
+[`docs/experiments/j0_a_candidate_lattice_oracle_result.json`](docs/experiments/j0_a_candidate_lattice_oracle_result.json).
+Generated lattice and supervision rows remain outside Git under
+`knowledge/candidate_conditioned_decoder/j0_a/`.
 
 ## Retained Visual Controls
 

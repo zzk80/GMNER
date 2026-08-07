@@ -32,6 +32,7 @@ knowledge/siglip2_region_cache/
 knowledge/grounding/
 knowledge/fmnerg_subtype_sidecar/
 knowledge/final_chain_oof/
+knowledge/candidate_conditioned_decoder/
 knowledge/null_release_oof/roberta128/folds/
 knowledge/span_sparse_visual_type/
 knowledge/stage1_candidate_selector_oof/
