@@ -795,13 +795,71 @@ precision、preservation 和跨折覆盖 Gate 的合法阈值，不允许在锁�
 docs/experiments/FINAL_CHAIN_OOF_POSTHOC_PHASE_SUMMARY.md
 ```
 
-下一候选方案仅为未授权路线：
+候选条件化路线的 J0-A 已完成：
 
 ```text
 docs/experiments/CANDIDATE_CONDITIONED_STRUCTURED_DECODER_ROADMAP.md
+docs/experiments/j0_a_candidate_lattice_oracle_preregistration.json
+docs/experiments/j0_a_candidate_lattice_oracle_result.json
 ```
 
-任何 J0、潜表示重物化、训练、Dev 或 Test 访问都需要新的独立授权。
+结果边界：
+
+```text
+J0-A candidate capacity       PASSED
+J0-B latent rematerialization NOT AUTHORIZED
+J1 training                   NOT AUTHORIZED
+Dev / Test                    LOCKED
+```
+
+### 8.2 J0-A 可复现命令
+
+先生成并封存 gold-free lattice：
+
+```bash
+PYTHONPATH=. $PY scripts/build_j0_candidate_lattice.py \
+  --authorization docs/experiments/j0_a_candidate_lattice_oracle_preregistration.json \
+  --rows knowledge/final_chain_oof/ten_fold_population/gold_free_rows.jsonl \
+  --merge-manifest knowledge/final_chain_oof/ten_fold_population/merge_manifest.json \
+  --output knowledge/candidate_conditioned_decoder/j0_a/gold_free_lattice.jsonl \
+  --manifest-output knowledge/candidate_conditioned_decoder/j0_a/lattice_manifest.json
+```
+
+只有 seal 通过后才允许附加 Train supervision：
+
+```bash
+PYTHONPATH=. $PY scripts/audit_j0_candidate_lattice_oracle.py \
+  --authorization docs/experiments/j0_a_candidate_lattice_oracle_preregistration.json \
+  --lattice knowledge/candidate_conditioned_decoder/j0_a/gold_free_lattice.jsonl \
+  --lattice-manifest knowledge/candidate_conditioned_decoder/j0_a/lattice_manifest.json \
+  --train-source GMNER-main/Twitter10000_v2.0/txt_fine/train.txt \
+  --output-sidecar knowledge/candidate_conditioned_decoder/j0_a/oracle_supervision.jsonl \
+  --output-report knowledge/candidate_conditioned_decoder/j0_a/oracle_report.json
+```
+
+查看关键结果：
+
+```bash
+$PY - <<'PY'
+import json
+
+p = json.load(open(
+    "knowledge/candidate_conditioned_decoder/j0_a/oracle_report.json",
+    encoding="utf-8",
+))
+final = p["oracle_stages"]["final_budget_constrained_oracle"]
+print({
+    "status": p["status"],
+    "net_correct_gain": final["net_correct_gain"],
+    "mner_f1": final["mner_f1"],
+    "dev_1500_equivalent_net_gain": final["dev_1500_equivalent_net_gain"],
+    "action_breakdown": p["final_budget_action_breakdown"],
+    "checks": p["checks"],
+    "dev_accessed": p["dev_accessed"],
+    "test_accessed": p["test_accessed"],
+})
+PY
+```
 
 ## 9. 产物目录速查
 

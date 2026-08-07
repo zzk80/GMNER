@@ -1,0 +1,110 @@
+{
+  "kind": "j0_a_candidate_lattice_oracle_result",
+  "format_version": 1,
+  "date": "2026-08-07",
+  "status": "PASSED_J0_B_REMAINS_LOCKED",
+  "scope": "strict_10_fold_final_chain_oof_train_only",
+  "source": {
+    "gold_free_rows_sha256": "d9ffcc53d71e64b5b6ceb3a043e579fce363779564710b9d2aebf65d9b934d4b",
+    "merge_manifest_sha256": "6480053ce530f4a649c67ece24d4b09681eaaf15e01443ea072f14ea17d9ca4f",
+    "train_source_sha256": "b067446640d71ffad116e67c359f095f99c9d5ca2d0f2a1bc103909ebc8505e9"
+  },
+  "gold_free_seal": {
+    "records": 7000,
+    "lattice_sha256": "b939f3a9ea50038f7efe0bc5d4ef5bd6d9facb66c7478c607102c159f3feab18",
+    "discrete_digest_sha256": "6868822050603e22d89c8e9e9f2bbe2acbdbe3d866d8404947f51047cfd30e75",
+    "oracle_supervision_sha256": "617b88c0d7f06960c9280df3cff077639aa05b3742f41b5bdb0657a15192455c",
+    "double_build_file_digest_exact": true,
+    "double_build_discrete_digest_exact": true,
+    "lattice_unchanged_after_supervision": true,
+    "gold_supervision_absent_before_seal": true
+  },
+  "candidate_namespace": {
+    "selected": "sealed_r36_span_candidates",
+    "r16_union_used": false,
+    "r16_r36_mismatch_records": 1183,
+    "r16_only_candidates": 1687,
+    "r36_only_candidates": 1975,
+    "amendment_before_gold_access": true
+  },
+  "population": {
+    "formal_keep_groups": 11951,
+    "none_add_groups": 7558,
+    "raw_alternatives": 337996,
+    "deduplicated_alternatives": 278241
+  },
+  "baseline": {
+    "correct": 9384,
+    "span_correct": 10259,
+    "predicted": 11951,
+    "gold": 11779,
+    "mner_f1": 0.790897597977244
+  },
+  "oracle_stages": {
+    "raw_semantic": {
+      "net_correct_gain": 1834,
+      "mner_f1": 0.9272607042486362
+    },
+    "deduplicated": {
+      "net_correct_gain": 1834,
+      "mner_f1": 0.9272607042486362
+    },
+    "top_k_1": {
+      "net_correct_gain": 578,
+      "mner_f1": 0.8305473341948393
+    },
+    "top_k_2": {
+      "net_correct_gain": 687,
+      "mner_f1": 0.8384813920572808
+    },
+    "top_k_4": {
+      "net_correct_gain": 1001,
+      "mner_f1": 0.8617899672212771
+    },
+    "top_k_8": {
+      "net_correct_gain": 1451,
+      "mner_f1": 0.8970484745622387
+    },
+    "record_constrained_top_k_4": {
+      "net_correct_gain": 988,
+      "mner_f1": 0.8607111738102153
+    },
+    "final_budget_constrained": {
+      "correct": 10357,
+      "predicted": 12307,
+      "additions": 356,
+      "net_correct_gain": 973,
+      "mner_f1": 0.8600016607157684,
+      "mner_f1_delta": 0.06910406273852443,
+      "dev_1500_equivalent_net_gain": 208.5
+    }
+  },
+  "final_action_breakdown": {
+    "replacement_selected": 1830,
+    "replacement_type_only": 410,
+    "replacement_boundary_only": 1341,
+    "replacement_boundary_and_type": 79,
+    "replacement_corrected": 617,
+    "replacement_damaged": 0,
+    "replacement_neutral": 1213,
+    "add_selected": 356,
+    "add_correct": 356,
+    "net_correct_contribution": 973
+  },
+  "continuation_gate": {
+    "minimum_oof_net_correct_gain": 308,
+    "minimum_dev_1500_equivalent_net_correct_gain": 66,
+    "every_fold_positive_net_gain": true,
+    "observed_oof_net_correct_gain": 973,
+    "observed_dev_1500_equivalent_net_gain": 208.5,
+    "passed": true
+  },
+  "authorization": {
+    "j0_b_latent_rematerialization": false,
+    "j1_training": false,
+    "j2_visual": false,
+    "j3_structured_decoder": false,
+    "dev_access": false,
+    "test_access": false
+  }
+}

@@ -4,14 +4,14 @@
 
 ```text
 性质：后续候选研究方案
-版本：1.1
+版本：1.2
 修订日期：2026-08-07
-当前状态：仅完成方法收敛，未授权实现或训练
+当前状态：J0-A PASSED；J0-B / J1 未授权
 正式主链：M3.3A 保持不变
 B1-T0：NO_GO / SEALED
 A1-T0：NO_GO / SEALED
 Observable post-hoc correction：TERMINATED
-近期唯一方法闸门：J0 -> J1
+近期唯一方法闸门：J0-B feasibility -> J1
 Dev / Test：LOCKED
 ```
 
@@ -237,10 +237,20 @@ record 冲突约束后 oracle
 无损兑现全部 Oracle，因此 J0 不能只证明候选空间略高于 `+33`。本路线建议：
 
 ```text
-最终预算与 record 约束后的净 Oracle：
+最终预算与 record 约束后的净 Oracle（每 1500 records 等效）：
 继续 J1 的建议下限     >= +66
 更有说服力的目标区间   +70 到 +100
 ```
+
+J0 使用 7000 条 Train OOF records，因此正式 Gate 按 record 数归一化：
+
+```text
+最低 OOF 净增 = ceil(66 * 7000 / 1500) = 308
+优选 OOF 区间 = 327 到 467
+```
+
+不能直接在 7000 条 OOF 总体上使用未缩放的 `+66`，否则只相当于约 14 个 Dev
+实体，低于正式目标所需的 33 个净正确实体。
 
 若 raw Oracle 很高，但去重、Top-K 和冲突约束后只剩约 `+33` 到 `+45`，应停止，
 不以“理论上仍超过目标”作为训练 J1 的理由。精确数值仍须在 J0 独立预注册中冻结；
@@ -579,6 +589,63 @@ KEEP/NONE 加入后的约束集合 Oracle 是多少？
 若最终预算下的受约束 Oracle 未达到预注册投入门槛，立即停止，不物化 latent，
 也不进入 J1。
 
+#### J0-A 正式结果
+
+J0-A 已于 2026-08-07 按独立预注册执行完成：
+
+```text
+数据范围                    10-fold final-chain OOF Train only
+records                     7000
+formal KEEP groups          11951
+NONE/ADD groups              7558
+raw alternatives           337996
+deduplicated alternatives  278241
+
+OOF baseline MNER F1       0.790898
+Top-1 Oracle net correct       +578
+Top-2 Oracle net correct       +687
+Top-4 Oracle net correct      +1001
+record-constrained Top-4       +988
+final-budget constrained       +973
+final Oracle MNER F1         0.860002
+1500-record equivalent gain   +208.5
+```
+
+最终预算固定为：
+
+```text
+每组 Top-4
+每 record 最多 32 个非控制候选
+span 不允许重叠
+每 record 最多 ADD 1 个实体
+KEEP / NONE 永不裁剪
+```
+
+最终 `+973` 精确分解为：
+
+```text
+replacement corrected   617
+replacement damaged       0
+correct ADD              356
+net                      973
+```
+
+十折均为正净增，gold-free lattice 在 supervision 前后 SHA256 完全不变，Dev/Test
+均未访问。因此 J0-A 的候选容量 Gate 通过。该结果只证明**受约束候选空间足够**，
+不证明 latent 可合法物化，也不证明 J1 reranker 可学习。
+
+执行前发现 R16 与 R36 的 perturbation span proposal 在 1183 条记录上不完全相同。
+该差异在读取 gold 前被记录并修订为：
+
+```text
+J0 唯一候选命名空间 = sealed R36 span candidates
+R16                    = 仅做描述性身份审计
+R16/R36 union          = 禁止
+```
+
+原因是 formal predictions 与最终下游状态均锚定 R36。完整机器结果见
+`j0_a_candidate_lattice_oracle_result.json`。
+
 ### J0-B：潜表示物化可行性
 
 仅在 J0-A 通过后验证：
@@ -759,4 +826,12 @@ J0 受约束联合候选 Oracle
 实现退化为 `CRF candidates -> MLP reranker`，则工程上可以作为基线，但不足以支撑
 本路线声称的方法贡献。
 
-当前文档只固定宏观路线，不构成 J0、潜表示重物化、训练、Dev 或 Test 的授权。
+当前授权边界为：
+
+```text
+J0-A gold-free lattice + post-seal Oracle  COMPLETE / PASSED
+J0-B latent rematerialization              NOT AUTHORIZED
+J1 training                                NOT AUTHORIZED
+J2/J3                                      LOCKED
+Dev/Test                                   LOCKED
+```
