@@ -4,11 +4,14 @@
 
 ```text
 性质：后续候选研究方案
+版本：1.1
+修订日期：2026-08-07
 当前状态：仅完成方法收敛，未授权实现或训练
 正式主链：M3.3A 保持不变
 B1-T0：NO_GO / SEALED
 A1-T0：NO_GO / SEALED
 Observable post-hoc correction：TERMINATED
+近期唯一方法闸门：J0 -> J1
 Dev / Test：LOCKED
 ```
 
@@ -54,6 +57,16 @@ final-chain 输出
 ```
 
 这使候选条件化联合解码成为合理的新方向，但不代表它已经获得方法成功证据。
+
+当前投入重点不是一次性实现完整多模态框架，而是验证两个前置命题：
+
+```text
+J0：受约束 typed-span lattice 是否有足够的完整净 Oracle 空间；
+J1：潜表示、候选条件化证据和反事实比较是否产生可迁移的净收益。
+```
+
+J1 是近期唯一的方法闸门。视觉、动态 region、record GNN 和完整 set decoder
+都只是条件分支，不能与 J1 同时开发并用联合结果反推其中某个机制有效。
 
 ---
 
@@ -219,6 +232,19 @@ record 冲突约束后 oracle
 ```
 
 不能只报告未受预算限制的理论候选上限。
+
+当前正式 MNER 从 `0.816714` 达到 `0.83` 约需净增加 33 个正确实体。模型不可能
+无损兑现全部 Oracle，因此 J0 不能只证明候选空间略高于 `+33`。本路线建议：
+
+```text
+最终预算与 record 约束后的净 Oracle：
+继续 J1 的建议下限     >= +66
+更有说服力的目标区间   +70 到 +100
+```
+
+若 raw Oracle 很高，但去重、Top-K 和冲突约束后只剩约 `+33` 到 `+45`，应停止，
+不以“理论上仍超过目标”作为训练 J1 的理由。精确数值仍须在 J0 独立预注册中冻结；
+这里给出的是投入决策基准，不构成 J0 执行授权。
 
 ---
 
@@ -512,6 +538,19 @@ full-fit Train/Dev deployment latent distribution
 
 因为一个共享 reranker 最终需要从十个 fold 模型的表示迁移到 full-fit 正式模型。若表示漂移严重，应先使用归一化或共享冻结投影解决，不能在 Dev 上事后调阈值。
 
+跨 fold 稳定化的优先顺序固定为：
+
+```text
+1. 对各类 latent 做同口径 LayerNorm
+2. 使用所有 fold 共享且冻结的 projection
+3. 优先使用 candidate - base、绝对差和逐元素乘积等相对表示
+4. 绝对 candidate latent 仅作为消融，不作为默认唯一输入
+```
+
+其中 `Z_candidate - Z_base` 直接描述同一 checkpoint、同一 record 内的反事实变化，
+通常比跨 checkpoint 的绝对向量更稳定。必须分别报告绝对表示和相对表示的跨 fold
+漂移，不能只报告合并后的总体均值。
+
 ---
 
 # 十二、分阶段实验路线
@@ -524,17 +563,34 @@ full-fit Train/Dev deployment latent distribution
 Dev/Test：锁定
 ```
 
-必须回答：
+J0 分成两个顺序固定的只读子阶段。
+
+### J0-A：受约束候选 Oracle
+
+先完成 gold-free lattice 封存和 post-seal Oracle，只回答：
 
 ```text
 typed-span 正候选覆盖率是多少？
 KEEP/NONE 加入后的约束集合 Oracle 是多少？
 不同 Top-K 预算损失多少 Oracle？
 联合边界+类型候选是否仍有达到目标的净空间？
-fold-specific latent states 能否合法、确定性物化？
 ```
 
-若受约束 Oracle 本身不足，立即停止，不进入 J1。
+若最终预算下的受约束 Oracle 未达到预注册投入门槛，立即停止，不物化 latent，
+也不进入 J1。
+
+### J0-B：潜表示物化可行性
+
+仅在 J0-A 通过后验证：
+
+```text
+fold-specific latent states 能否合法、确定性物化？
+candidate/base identity 能否与 sealed lattice 一一对应？
+绝对与相对 latent 的跨 fold 漂移是否可控？
+full-fit deployment latent 是否落在 OOF 可支持范围内？
+```
+
+J0-B 仍然不训练 reranker，也不访问 Dev/Test。
 
 ## J1：Frozen Text-Only Candidate Reranker
 
@@ -554,7 +610,27 @@ C3：+ base-candidate counterfactual comparison
 C4：+ FIX/DAMAGE risk supervision
 ```
 
-只有 C2/C3/C4 在锁定 OOF 上形成稳定净收益，才能证明新机制优于普通 latent MLP。
+J1 必须针对同一候选状态联合回答：
+
+```text
+候选是否比 KEEP/NONE 获得更多证据？
+执行该候选是否会损坏当前正确决策？
+```
+
+不能把一个独立 evidence 排序器和另一个 risk 分类器的总体指标相乘后声称动作安全。
+正式动作必须来自同一候选的 advantage 与 DAMAGE risk 联合分数。
+
+只有锁定 OOF 上出现稳定的：
+
+```text
+C1 static pooling
+< C2 conditioned evidence
+< C3 counterfactual comparison
+< C4 risk-aware scoring
+```
+
+并且 C3/C4 的 corrected 明显高于 damaged，才能证明新机制优于普通 latent MLP。
+若 C3/C4 仍无稳定净收益，候选纠错主线直接停止，不再用视觉或 GNN 补救。
 
 ## J2：Typed-Span-Conditioned Visual Evidence
 
@@ -567,6 +643,17 @@ text-only natural fallback
 ```
 
 先验证视觉是否降低 DAMAGE、提高候选精度，而不是只提高 AUROC。
+
+J2 的正式目标不是 visual coarse-type accuracy，而是：
+
+```text
+降低 text-only 候选的 DAMAGE
+提高正确候选相对 KEEP/NONE 的 margin
+视觉缺失时严格退化为冻结的 J1 text-only 行为
+```
+
+若视觉只提高 AUROC 或 region recall，却不改善动作 precision、net correction 和
+KEEP preservation，则 J2 判为无效，不进入动态 region 或 record-level 解码。
 
 ## J3：Dynamic Region 与 Record-Level Joint Decoder
 
@@ -666,5 +753,10 @@ J0 受约束联合候选 Oracle
 ```
 
 只有 J1 在严格 OOF 锁定评估中获得稳定 typed-span 净收益，完整多模态联合架构才值得继续投入。
+
+从论文方法角度，只有消融能够证明 conditioned evidence、counterfactual comparison
+和 risk-aware decoding 分别带来递增且可迁移的净收益，才能形成完整创新主张。若最终
+实现退化为 `CRF candidates -> MLP reranker`，则工程上可以作为基线，但不足以支撑
+本路线声称的方法贡献。
 
 当前文档只固定宏观路线，不构成 J0、潜表示重物化、训练、Dev 或 Test 的授权。
